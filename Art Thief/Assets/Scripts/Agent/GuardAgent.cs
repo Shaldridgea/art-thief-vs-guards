@@ -8,7 +8,7 @@ public class GuardAgent : Agent
     private BTGraph behaviourTreeGraph;
 
     [SerializeField]
-    private List<Transform> patrolPoints;
+    private PatrolPath patrolPath;
 
     private BehaviourTree agentTree;
 
@@ -22,8 +22,6 @@ public class GuardAgent : Agent
         base.Start();
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
-        // Set our first patrol point
-        targetPoint = patrolPoints[0];
     }
 
     private void Update()
@@ -39,5 +37,12 @@ public class GuardAgent : Agent
         {
             GameController.Instance.GuardsWon();
         }
+    }
+
+    public Vector3 GetNextPatrolPoint()
+    {
+        Vector3 point = patrolPath.GetPoint(patrolIndex);
+        ++patrolIndex;
+        return point;
     }
 }

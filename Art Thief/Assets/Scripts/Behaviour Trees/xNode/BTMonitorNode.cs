@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateNodeMenu("Monitor")]
 public class BTMonitorNode : BTDecoratorNode
 {
     [Output(connectionType = ConnectionType.Override)]

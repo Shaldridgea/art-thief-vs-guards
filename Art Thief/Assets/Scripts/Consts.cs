@@ -24,7 +24,9 @@ public static class Consts
         SetVariable,
         Wait,
         Condition,
-        HasArrived
+        HasArrived,
+        MoveToPoint,
+        SetPointFromPatrol
     }
 
     public enum RepeatCondition
