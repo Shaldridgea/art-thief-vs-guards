@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8123247363340226389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0e1c7dd9057e1a43a9e2c487cde2693, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -376, y: -72}
+  ports:
+    keys:
+    - parentNode
+    - childNodes
+    - childNodes 0
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -8123247363340226389}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+    - _fieldName: childNodes
+      _node: {fileID: -8123247363340226389}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 0
+    - _fieldName: childNodes 0
+      _node: {fileID: -8123247363340226389}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+  type: 0
+  childNodes: []
+  randomise: 0
+--- !u!114 &-1212488344848139476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Has Arrived
+  m_EditorClassIdentifier: Assembly-CSharp::BTHasArrivedNode
+  graph: {fileID: 11400000}
+  position: {x: -44.17166, y: 62.186607}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -1212488344848139476}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 10
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe0907a1598220946afc8f2af21c4f1a, type: 3}
+  m_Name: Guard BT
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: -8123247363340226389}
+  - {fileID: -1212488344848139476}
