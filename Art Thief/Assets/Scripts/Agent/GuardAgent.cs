@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class GuardAgent : Agent
 {
@@ -44,5 +45,27 @@ public class GuardAgent : Agent
         Vector3 point = patrolPath.GetPoint(patrolIndex);
         ++patrolIndex;
         return point;
+    }
+
+    public void TurnHeadToPoint(Vector3 targetPoint)
+    {
+        float lookAngle = Vector3.SignedAngle(AgentView.AgentHeadRoot.forward, (targetPoint - AgentView.AgentHeadRoot.position).normalized, Vector3.up);
+        TurnHead(lookAngle);
+    }
+
+    public void TurnHead(float turnAngle)
+    {
+        float angleResult = Vector3.SignedAngle(AgentView.AgentRoot.forward, AgentView.AgentHeadRoot.forward, Vector3.up) + turnAngle;
+        // Adjust our turning angle to be clamped so the head doesn't turn all the way around like an owl
+        if (Mathf.Abs(angleResult) >= 100f)
+            turnAngle -= Mathf.Sign(turnAngle) * (Mathf.Abs(angleResult) - 100f);
+
+        LeanTween.rotateAroundLocal(AgentView.AgentHeadRoot.gameObject, Vector3.up, turnAngle, 2f);
+    }
+
+    [Button("Test head turn", EButtonEnableMode.Playmode)]
+    private void TestHeadTurn()
+    {
+        TurnHeadToPoint(patrolPath.GetPoint(0));
     }
 }
