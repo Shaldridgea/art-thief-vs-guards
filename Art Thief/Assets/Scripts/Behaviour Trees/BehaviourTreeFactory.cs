@@ -27,6 +27,8 @@ public static class BehaviourTreeFactory
     {
         BehaviourNode thisNode = GetBehaviourInstance(nextNode, tree);
 
+        Debug.Assert(thisNode != null, "BehaviourTreeFactory node instance wasn't found");
+
         if (stack.Count > 0)
             stack.Peek().AddChild(thisNode);
 
@@ -83,6 +85,12 @@ public static class BehaviourTreeFactory
 
             case Consts.BehaviourType.HasArrived:
                 return new HasArrived(tree, null);
+
+            case Consts.BehaviourType.MoveToPoint:
+                return new MoveToPoint(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.SetPointFromPatrol:
+                return new SetPointFromPatrol(tree, dataNode.GetParameters());
         }
         return newNode;
     }

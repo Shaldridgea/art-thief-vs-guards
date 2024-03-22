@@ -58,6 +58,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        yield break;
         spyWonText.enabled = false;
         guardsWonText.enabled = false;
         // Turn agents off so they don't start working till we want them to

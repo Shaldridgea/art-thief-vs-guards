@@ -14,6 +14,9 @@ public class Condition : BehaviourNode
 
     public Condition(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
+        if (parameters == null)
+            return;
+
         if (parameters[0] == (int)Consts.BlackboardSource.GLOBAL)
             board = parentTree.GlobalBlackboard;
         else

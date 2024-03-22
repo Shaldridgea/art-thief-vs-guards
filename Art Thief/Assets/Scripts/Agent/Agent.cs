@@ -53,6 +53,8 @@ public class Agent : MonoBehaviour
     public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
     {
         navAgent.destination = newPosition;
+        return;
+        // TODO: Fix walking sounds
         // Stop the walking coroutine that creates the step sound if we aren't just
         // updating position only
         if (walkingCoroutine != null && !updatePositionOnly)

@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8414846901578664083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Wait
+  m_EditorClassIdentifier: Assembly-CSharp::BTWaitNode
+  graph: {fileID: 11400000}
+  position: {x: 40, y: 248}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -8414846901578664083}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 3
+        node: {fileID: -8123247363340226389}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 8
+  waitTime: 2
 --- !u!114 &-8123247363340226389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21,6 +53,7 @@ MonoBehaviour:
     - childNodes 0
     - childNodes 1
     - childNodes 2
+    - childNodes 3
     values:
     - _fieldName: parentNode
       _node: {fileID: -8123247363340226389}
@@ -80,6 +113,19 @@ MonoBehaviour:
       _connectionType: 1
       _typeConstraint: 0
       _dynamic: 1
+    - _fieldName: childNodes 3
+      _node: {fileID: -8123247363340226389}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: -8414846901578664083}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
   type: 0
   childNodes: []
   randomise: 0
@@ -96,7 +142,7 @@ MonoBehaviour:
   m_Name: Set Point From Patrol
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 24, y: -72}
+  position: {x: 72, y: -200}
   ports:
     keys:
     - parentNode
@@ -128,7 +174,7 @@ MonoBehaviour:
   m_Name: Has Arrived
   m_EditorClassIdentifier: Assembly-CSharp::BTHasArrivedNode
   graph: {fileID: 11400000}
-  position: {x: 312, y: 200}
+  position: {x: 360, y: 72}
   ports:
     keys:
     - parentNode
@@ -160,10 +206,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodes:
   - {fileID: -8123247363340226389}
-  - {fileID: -1212488344848139476}
   - {fileID: -3166145422362979433}
   - {fileID: 2650311037154689874}
   - {fileID: 8522009958515041153}
+  - {fileID: -1212488344848139476}
+  - {fileID: -8414846901578664083}
 --- !u!114 &2650311037154689874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +224,7 @@ MonoBehaviour:
   m_Name: Move To Point
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 40, y: 40}
+  position: {x: 88, y: -88}
   ports:
     keys:
     - parentNode
@@ -209,7 +256,7 @@ MonoBehaviour:
   m_Name: Repeat
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -8, y: 168}
+  position: {x: 40, y: 40}
   ports:
     keys:
     - parentNode
