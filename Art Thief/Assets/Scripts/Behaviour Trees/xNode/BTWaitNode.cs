@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using XNode;
 
-[CreateNodeMenu("Action/Set Point From Patrol")]
-public class BTSetPointFromPatrol : BTActionNode
+[CreateNodeMenu("Action/Wait")]
+public class BTWaitNode : BTActionNode
 {
     [SerializeField]
-    private string variableName;
-    
+    private float waitTime;
+
     protected override void Init()
     {
-        type = Consts.BehaviourType.SetPointFromPatrol;
+        type = Consts.BehaviourType.Wait;
         base.Init();
     }
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { variableName };
+        return new NodeParameter[] { new NodeParameter(waitTime) };
     }
 }

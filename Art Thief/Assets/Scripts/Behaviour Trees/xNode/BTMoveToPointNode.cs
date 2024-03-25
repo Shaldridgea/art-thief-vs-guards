@@ -4,7 +4,10 @@ using UnityEngine;
 using XNode;
 
 [CreateNodeMenu("Action/Move To Point")]
-public class BTMoveToPoint : BTActionNode {
+public class BTMoveToPointNode : BTActionNode {
+
+    [SerializeField]
+    private Consts.BlackboardSource source;
 
     [SerializeField]
     private string variableName;
@@ -17,6 +20,6 @@ public class BTMoveToPoint : BTActionNode {
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { variableName };
+        return new NodeParameter[] { (int)source, variableName };
     }
 }

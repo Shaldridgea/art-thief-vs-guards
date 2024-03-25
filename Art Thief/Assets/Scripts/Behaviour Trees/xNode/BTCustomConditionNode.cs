@@ -36,20 +36,3 @@ public class BTCustomConditionNode : BTConditionNode
         return parameters;
     }
 }
-
-
-[CreateNodeMenu("Condition/Has Arrived")]
-[NodeWidth(180)]
-public class BTHasArrivedNode : BTConditionNode
-{
-    protected override void Init()
-    {
-        type = Consts.BehaviourType.HasArrived;
-        base.Init();
-    }
-
-    public override NodeParameter[] GetParameters()
-    {
-        return null;
-    }
-}

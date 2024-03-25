@@ -26,7 +26,8 @@ public static class Consts
         Condition,
         HasArrived,
         MoveToPoint,
-        SetPointFromPatrol
+        SetPointFromPatrol,
+        Cooldown
     }
 
     public enum RepeatCondition
@@ -84,8 +85,8 @@ public static class Consts
     public enum AgentSource
     {
         Guard,
-        Spy
+        Thief
     }
 
-    public const string CHASE_KEY = "spyChase";
+    public const string CHASE_KEY = "thiefChase";
 }
