@@ -35,4 +35,6 @@ public class Blackboard
         else
             return default;
     }
+
+    public Dictionary<string, object> GetData() => variablesDict;
 }

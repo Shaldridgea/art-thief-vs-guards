@@ -9,6 +9,9 @@ public class GuardAgent : Agent
     private BTGraph behaviourTreeGraph;
 
     [SerializeField]
+    private float treeUpdateInterval;
+
+    [SerializeField]
     private PatrolPath patrolPath;
 
     private BehaviourTree agentTree;
@@ -16,6 +19,8 @@ public class GuardAgent : Agent
     private Transform targetPoint;
 
     private int patrolIndex;
+
+    private float treeUpdateTimer;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -28,7 +33,13 @@ public class GuardAgent : Agent
     private void Update()
     {
         // Update our behaviour tree
-        agentTree.Update();
+        if (treeUpdateTimer <= 0f)
+        {
+            treeUpdateTimer = treeUpdateInterval;
+            agentTree.Update();
+            return;
+        }
+        treeUpdateTimer -= Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -63,9 +74,39 @@ public class GuardAgent : Agent
         LeanTween.rotateAroundLocal(AgentView.AgentHeadRoot.gameObject, Vector3.up, turnAngle, 2f);
     }
 
+    public void TurnBodyToPoint(Vector3 targetPoint)
+    {
+        float lookAngle = Vector3.SignedAngle(AgentView.AgentRoot.forward, (targetPoint - AgentView.AgentRoot.position).normalized, Vector3.up);
+        TurnBody(lookAngle);
+    }
+
+    public void TurnBody(float turnAngle)
+    {
+        LeanTween.rotateAroundLocal(AgentView.AgentRoot.gameObject, Vector3.up, turnAngle, 2f);
+    }
+
+    private void OnGUI()
+    {
+        if (!name.Contains("1"))
+            return;
+
+        GUIStyle style = new GUIStyle("box");
+        style.fontSize = 20;
+        GUILayout.Box(name, style);
+        style.fontSize = 15;
+        foreach (var i in AgentBlackboard.GetData())
+            GUILayout.Box($"{i.Key}: {i.Value}", style);
+    }
+
     [Button("Test head turn", EButtonEnableMode.Playmode)]
     private void TestHeadTurn()
     {
         TurnHeadToPoint(patrolPath.GetPoint(0));
+    }
+
+    [Button("Test body turn", EButtonEnableMode.Playmode)]
+    private void TestBodyTurn()
+    {
+        TurnBodyToPoint(patrolPath.GetPoint(0));
     }
 }
