@@ -6,47 +6,43 @@ public class SetVariable : BehaviourNode
 {
     private Blackboard source;
 
-    private string[] variableNames;
+    private string variableName;
 
-    private NodeParameter[] values;
+    private NodeParameter value;
 
     public SetVariable(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
+        if (parameters == null)
+            return;
+
         if (parameters[0] == (int)Consts.BlackboardSource.GLOBAL)
             source = parentTree.GlobalBlackboard;
         else
             source = parentTree.Owner.AgentBlackboard;
-        if (parameters == null)
-            return;
 
-        variableNames = new string[parameters.Length / 2];
-        values = new NodeParameter[parameters.Length / 2];
-        for (int i = 0; i < parameters.Length; i += 2)
-        {
-            variableNames[i] = parameters[i+1];
-            values[i] = parameters[i+2];
-        }
+        variableName = parameters[1];
+        value = parameters[2];
     }
 
     public override Consts.NodeStatus Update()
     {
-        for (int i = 0; i < values.Length; ++i)
+        switch (value.type)
         {
-            switch (values[i].type)
-            {
-                case NodeParameter.ParamType.INT:
-                source.SetVariable<int>(variableNames[i], values[i]);
-                break;
-                case NodeParameter.ParamType.FLOAT:
-                source.SetVariable<float>(variableNames[i], values[i]);
-                break;
-                case NodeParameter.ParamType.BOOL:
-                source.SetVariable<bool>(variableNames[i], values[i]);
-                break;
-                case NodeParameter.ParamType.STRING:
-                source.SetVariable<string>(variableNames[i], values[i]);
-                break;
-            }
+            case NodeParameter.ParamType.Int:
+            source.SetVariable<int>(variableName, value);
+            break;
+            case NodeParameter.ParamType.Float:
+            source.SetVariable<float>(variableName, value);
+            break;
+            case NodeParameter.ParamType.Bool:
+            source.SetVariable<bool>(variableName, value);
+            break;
+            case NodeParameter.ParamType.String:
+            source.SetVariable<string>(variableName, value);
+            break;
+            case NodeParameter.ParamType.Vector3:
+            source.SetVariable<Vector3>(variableName, value);
+            break;
         }
         return Consts.NodeStatus.SUCCESS;
     }

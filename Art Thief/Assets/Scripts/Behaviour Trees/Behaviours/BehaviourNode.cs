@@ -43,4 +43,7 @@ public abstract class BehaviourNode
     }
 
     public virtual void AddChild(BehaviourNode addNode) { }
+
+    protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source) =>
+     source == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
 }

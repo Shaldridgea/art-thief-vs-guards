@@ -71,7 +71,7 @@ public class Condition : BehaviourNode
     #region Condition Delegates
     private ConditionCheckDelegate GetMatchingDelegate(NodeParameter.ParamType valueType, string conditionOperator)
     {
-        if (valueType == NodeParameter.ParamType.INT)
+        if (valueType == NodeParameter.ParamType.Int)
         {
             switch (conditionOperator)
             {
@@ -94,7 +94,7 @@ public class Condition : BehaviourNode
                 return NotEqualToInt;
             }
         }
-        else if(valueType == NodeParameter.ParamType.FLOAT)
+        else if(valueType == NodeParameter.ParamType.Float)
         {
             switch (conditionOperator)
             {
@@ -117,7 +117,7 @@ public class Condition : BehaviourNode
                 return NotEqualToFloat;
             }
         }
-        else if(valueType == NodeParameter.ParamType.BOOL)
+        else if(valueType == NodeParameter.ParamType.Bool)
         {
             switch (conditionOperator)
             {
@@ -128,7 +128,7 @@ public class Condition : BehaviourNode
                 return NotEqualToBool;
             }
         }
-        else if(valueType == NodeParameter.ParamType.STRING)
+        else if(valueType == NodeParameter.ParamType.String)
         {
             switch (conditionOperator)
             {
@@ -137,6 +137,17 @@ public class Condition : BehaviourNode
 
                 case "!=":
                 return NotEqualToString;
+            }
+        }
+        else if(valueType == NodeParameter.ParamType.Vector3)
+        {
+            switch (conditionOperator)
+            {
+                case "==":
+                return EqualToVector3;
+
+                case "!=":
+                return NotEqualToVector3;
             }
         }
         return null;
@@ -164,5 +175,8 @@ public class Condition : BehaviourNode
 
     private bool EqualToString(string a, NodeParameter b) => board.GetVariable<string>(a) == b;
     private bool NotEqualToString(string a, NodeParameter b) => board.GetVariable<string>(a) != b;
+
+    private bool EqualToVector3(string a, NodeParameter b) => board.GetVariable<Vector3>(a) == b;
+    private bool NotEqualToVector3(string a, NodeParameter b) => board.GetVariable<Vector3>(a) != b;
     #endregion
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 using XNode;
 
 [CreateNodeMenu("Set Variable")]
@@ -11,10 +12,11 @@ public class BTSetVariableNode : BTActionNode {
 	private Consts.BlackboardSource source;
 
     [SerializeField]
-    private string[] variableNames;
+    private string variableName;
 
+    [Header("Variable Value")]
     [SerializeField]
-    private NodeParameter[] variableValues;
+    private NodeParameter variableValue;
 
 	protected override void Init() {
 		type = Consts.BehaviourType.SetVariable;
@@ -23,17 +25,6 @@ public class BTSetVariableNode : BTActionNode {
 
     public override NodeParameter[] GetParameters()
     {
-        int varSize = variableNames.Length;
-        if (variableValues.Length < varSize)
-            varSize = variableValues.Length;
-        varSize *= 2;
-        NodeParameter[] nodeParams = new NodeParameter[varSize + 1];
-        nodeParams[0] = (int)source;
-        for(int i = 0; i < varSize; i += 2)
-        {
-            nodeParams[i + 1] = variableNames[i];
-            nodeParams[i + 2] = variableValues[i];
-        }
-        return nodeParams;
+        return new NodeParameter[] { (int)source, variableName, variableValue };
     }
 }
