@@ -12,7 +12,7 @@ public class Cooldown : Decorator
     public Cooldown(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
         cooldownTime = parameters[0];
-        cooldownStart = 1000000f;
+        cooldownStart = -1000000f;
     }
 
     public override Consts.NodeStatus Update()

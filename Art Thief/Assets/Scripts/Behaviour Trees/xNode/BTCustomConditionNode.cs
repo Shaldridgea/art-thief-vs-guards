@@ -30,7 +30,7 @@ public class BTCustomConditionNode : BTConditionNode
     {
         NodeParameter[] parameters = new NodeParameter[checkConditions.Length+1];
         parameters[0] = (int)source;
-        for (int i = 0; i < parameters.Length; ++i)
+        for (int i = 0; i < checkConditions.Length; ++i)
             parameters[i+1] = checkConditions[i];
 
         return parameters;
