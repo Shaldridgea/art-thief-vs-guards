@@ -46,4 +46,7 @@ public abstract class BehaviourNode
 
     protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source) =>
      source == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
+
+    protected Blackboard GetTargetBlackboard(NodeParameter source) =>
+    ((Consts.BlackboardSource)(int)source) == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
 }

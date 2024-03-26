@@ -18,6 +18,8 @@ public class Agent : MonoBehaviour
     [SerializeField]
     protected SensoryModule senses;
 
+    public SensoryModule Senses => senses;
+
     [SerializeField]
     private SoundTrigger walkingSound;
 

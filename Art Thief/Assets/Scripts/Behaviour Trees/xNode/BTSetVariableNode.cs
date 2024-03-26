@@ -4,7 +4,7 @@ using UnityEngine;
 using NaughtyAttributes;
 using XNode;
 
-[CreateNodeMenu("Set Variable")]
+[CreateNodeMenu("Variables/Set Variable", order = -10)]
 public class BTSetVariableNode : BTActionNode {
 
 	[SerializeField]
@@ -12,7 +12,19 @@ public class BTSetVariableNode : BTActionNode {
 	private Consts.BlackboardSource source;
 
     [SerializeField]
-    private string variableName;
+    [AllowNesting]
+    [ShowIf("IsAgent")]
+    private bool setOnOther;
+
+    private bool IsAgent => source == Consts.BlackboardSource.AGENT;
+
+    [SerializeField]
+    [AllowNesting]
+    [ShowIf(EConditionOperator.And, "IsAgent", "setOnOther")]
+    private string otherKey;
+
+    [SerializeField]
+    private string variableKey;
 
     [Header("Variable Value")]
     [SerializeField]
@@ -25,6 +37,6 @@ public class BTSetVariableNode : BTActionNode {
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { (int)source, variableName, variableValue };
+        return new NodeParameter[] { (int)source, variableKey, variableValue, setOnOther, otherKey };
     }
 }

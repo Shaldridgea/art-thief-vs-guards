@@ -94,6 +94,18 @@ public static class BehaviourTreeFactory
 
             case Consts.BehaviourType.Cooldown:
                 return new Cooldown(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.StoreVisibleInterests:
+                return new StoreVisibleInterests(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.SetRandomInterest:
+                return new SetRandomInterest(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.SetPointFromGameObject:
+                return new SetPointFromGameObject(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.StopMoving:
+                return new StopMoving(tree);
         }
         return newNode;
     }

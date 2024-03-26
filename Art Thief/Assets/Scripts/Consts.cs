@@ -27,7 +27,11 @@ public static class Consts
         HasArrived,
         MoveToPoint,
         SetPointFromPatrol,
-        Cooldown
+        Cooldown,
+        StoreVisibleInterests,
+        SetRandomInterest,
+        SetPointFromGameObject,
+        StopMoving
     }
 
     public enum RepeatCondition

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XNode;
 
-[CreateNodeMenu("Action/Set Point From Patrol")]
+[CreateNodeMenu("Variables/Set Point From Patrol")]
 public class BTSetPointFromPatrolNode : BTActionNode
 {
     [SerializeField]

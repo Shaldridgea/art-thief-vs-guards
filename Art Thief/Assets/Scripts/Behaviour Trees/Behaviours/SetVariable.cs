@@ -17,8 +17,22 @@ public class SetVariable : BehaviourNode
 
         if (parameters[0] == (int)Consts.BlackboardSource.GLOBAL)
             source = parentTree.GlobalBlackboard;
-        else
+        else if (parameters[0] == (int)Consts.BlackboardSource.AGENT)
+        {
             source = parentTree.Owner.AgentBlackboard;
+
+            // If we're setting on a different agent
+            if (parameters[3])
+            {
+                // Get the other agent with the corresponding key
+                GameObject target = source.GetVariable<GameObject>(parameters[4]);
+                if (target != null)
+                {
+                    if (target.TryGetComponent(out Agent targetAgent))
+                        source = targetAgent.AgentBlackboard;
+                }
+            }
+        }
 
         variableName = parameters[1];
         value = parameters[2];

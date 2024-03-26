@@ -34057,8 +34057,20 @@ PrefabInstance:
       value: Painting
       objectReference: {fileID: 0}
     - target: {fileID: 103664, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 103664, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
       propertyPath: m_TagString
       value: Art
+      objectReference: {fileID: 0}
+    - target: {fileID: 120568, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 190908, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 480340, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
       propertyPath: m_RootOrder
@@ -34127,19 +34139,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 103664, guid: 2f1666ad9b7fdd7459a360619d6ccffd, type: 3}
   m_PrefabInstance: {fileID: 730183856}
   m_PrefabAsset: {fileID: 0}
---- !u!135 &730183858
-SphereCollider:
+--- !u!65 &730183858
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730183857}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.65
-  m_Center: {x: 0, y: 0, z: 0.59}
+  m_Size: {x: 0.28, y: 0.40999997, z: 0.014927593}
+  m_Center: {x: 2.2952442e-19, y: 0, z: -0.00016998884}
 --- !u!1 &736204642
 GameObject:
   m_ObjectHideFlags: 0
@@ -87013,6 +87025,7 @@ GameObject:
   - component: {fileID: 2006471835}
   - component: {fileID: 2006471834}
   - component: {fileID: 2006471833}
+  - component: {fileID: 2006471838}
   m_Layer: 0
   m_Name: Guard (1)
   m_TagString: Untagged
@@ -87088,7 +87101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navAgent: {fileID: 2006471834}
   agentView: {fileID: 2006471835}
-  senses: {fileID: 0}
+  senses: {fileID: 2006471838}
   walkingSound: {fileID: 0}
   walkSoundInterval: 0
   behaviourTreeGraph: {fileID: 11400000, guid: 21e1c29de72d73b4a84b5bf4d3b07c21, type: 2}
@@ -87110,6 +87123,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 89.58, z: 0}
+--- !u!114 &2006471838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006471832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aaf7e33f2cb8ae45ad1df39d9ff4608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 0}
+  losCheckInterval: 0
+  awarenessIncrease: 0
 --- !u!43 &2016429054
 Mesh:
   m_ObjectHideFlags: 0
@@ -87795,6 +87823,7 @@ GameObject:
   - component: {fileID: 2026125887}
   - component: {fileID: 2026125884}
   - component: {fileID: 2026125886}
+  - component: {fileID: 2026125889}
   m_Layer: 0
   m_Name: Guard
   m_TagString: Untagged
@@ -87888,12 +87917,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navAgent: {fileID: 2026125884}
   agentView: {fileID: 2026125887}
-  senses: {fileID: 0}
+  senses: {fileID: 2026125889}
   walkingSound: {fileID: 0}
   walkSoundInterval: 0
   behaviourTreeGraph: {fileID: 11400000, guid: 21e1c29de72d73b4a84b5bf4d3b07c21, type: 2}
   treeUpdateInterval: 0
   patrolPath: {fileID: 2026125886}
+--- !u!114 &2026125889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2026125883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aaf7e33f2cb8ae45ad1df39d9ff4608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 0}
+  losCheckInterval: 0
+  awarenessIncrease: 0
 --- !u!43 &2044728102
 Mesh:
   m_ObjectHideFlags: 0

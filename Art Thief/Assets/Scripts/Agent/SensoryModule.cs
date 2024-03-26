@@ -34,4 +34,42 @@ public abstract class SensoryModule : MonoBehaviour
     protected void TriggerEnemyLost() => EnemyLost?.Invoke();
 
     protected void TriggerSoundHappened() => SoundHappened?.Invoke();
+
+    public const float INTEREST_RADIUS = 5f;
+
+    protected List<GameObject> FindNearbyInterests(string interestTag)
+    {
+        Collider[] nearbyInterests =
+        Physics.OverlapSphere(
+        transform.position,
+        INTEREST_RADIUS,
+        LayerMask.GetMask("Interest"),
+        QueryTriggerInteraction.Collide);
+
+        List<GameObject> desiredInterests = new List<GameObject>();
+        foreach(Collider c in nearbyInterests)
+        {
+            if (c.CompareTag(interestTag))
+                desiredInterests.Add(c.gameObject);
+        }
+        return desiredInterests;
+    }
+
+    public bool StoreNearbyInterests(string interestTag, Blackboard targetBoard, string listKey)
+    {
+        var interests = FindNearbyInterests(interestTag);
+        if(interests.Count > 0)
+        {
+            var existingList = targetBoard.GetVariable<List<GameObject>>(listKey);
+            if (existingList == null)
+                targetBoard.SetVariable(listKey, interests);
+            else
+            {
+                existingList.Clear();
+                existingList.AddRange(interests);
+            }
+            return true;
+        }
+        return false;
+    }
 }
