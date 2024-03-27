@@ -42,7 +42,7 @@ public abstract class BehaviourNode
             Status = Consts.NodeStatus.FAILURE;
     }
 
-    public virtual void AddChild(BehaviourNode addNode) { }
+    public virtual void AddChild(BehaviourNode addNode, string portName = "") { }
 
     protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source) =>
      source == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;

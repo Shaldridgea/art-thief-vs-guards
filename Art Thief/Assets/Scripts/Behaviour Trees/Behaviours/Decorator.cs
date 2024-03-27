@@ -11,7 +11,7 @@ public abstract class Decorator : BehaviourNode
 
     }
 
-    public override void AddChild(BehaviourNode addNode)
+    public override void AddChild(BehaviourNode addNode, string portName = "")
     {
         childNode = addNode;
     }

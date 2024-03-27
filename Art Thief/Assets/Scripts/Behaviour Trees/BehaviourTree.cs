@@ -41,8 +41,10 @@ public class BehaviourTree
         {
             BehaviourNode currentRunning = runningStack.Peek();
 
-            currentRunning.Tick();
-            if (currentRunning.Status == Consts.NodeStatus.RUNNING)
+            Debug.Assert(currentRunning.Status == Consts.NodeStatus.RUNNING, "Top of running stack does not have a status of RUNNING");
+
+            Consts.NodeStatus currentNewStatus = currentRunning.Tick();
+            if (currentNewStatus == Consts.NodeStatus.RUNNING)
                 return;
         }
 
@@ -62,9 +64,11 @@ public class BehaviourTree
         while(runningStack.Count > 0)
         {
             BehaviourNode current = runningStack.Peek();
-            current.OnExit();
+
             if (current == interruptSource)
                 break;
+
+            current.OnExit();
         }
     }
 }

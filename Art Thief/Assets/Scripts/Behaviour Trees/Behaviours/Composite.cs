@@ -25,7 +25,7 @@ public abstract class Composite : BehaviourNode
         nodeIndex = 0;
     }
 
-    public override void AddChild(BehaviourNode node)
+    public override void AddChild(BehaviourNode node, string portName = "")
     {
         ChildNodes.Add(node);
     }

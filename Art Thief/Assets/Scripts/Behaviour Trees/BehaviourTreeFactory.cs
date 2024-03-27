@@ -23,14 +23,14 @@ public static class BehaviourTreeFactory
         return currentTree;
     }
 
-    private static BehaviourNode ProcessNode(BTGraphNode nextNode, BehaviourTree tree, Stack<BehaviourNode> stack)
+    private static BehaviourNode ProcessNode(BTGraphNode nextNode, BehaviourTree tree, Stack<BehaviourNode> stack, NodePort outputSource = null)
     {
         BehaviourNode thisNode = GetBehaviourInstance(nextNode, tree);
 
         Debug.Assert(thisNode != null, $"BehaviourTreeFactory node instance wasn't found: {nextNode.BehaviourType}");
 
         if (stack.Count > 0)
-            stack.Peek().AddChild(thisNode);
+            stack.Peek().AddChild(thisNode, outputSource.fieldName);
 
         if (!nextNode.IsLeaf)
         {
@@ -40,7 +40,7 @@ public static class BehaviourTreeFactory
                 if (n.ConnectionCount == 0)
                     continue;
 
-                ProcessNode((BTGraphNode)n.Connection.node, tree, stack);
+                ProcessNode((BTGraphNode)n.Connection.node, tree, stack, n);
             }
             stack.Pop();
         }
