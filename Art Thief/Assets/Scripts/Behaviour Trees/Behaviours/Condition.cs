@@ -65,6 +65,26 @@ public class Condition : BehaviourNode
         if (bool.TryParse(newString, out bool newBool))
             return newBool;
 
+        // If our value is not any of the above then
+        // we check if it's actually a string or if it's
+        // a blackboard key as well
+        if (newString.StartsWith('"') && newString.EndsWith('"'))
+            return newString.Trim('"');
+
+        System.Type type = board.GetVariableType(newString);
+        if (type == null)
+            return newString;
+
+        if (type.Name.Contains("Int"))
+            return board.GetVariable<int>(newString);
+        else if (type.Name.Contains("Single") || type.Name.Contains("Float"))
+            return board.GetVariable<float>(newString);
+        else if (type.Name.Contains("Bool"))
+            return board.GetVariable<bool>(newString);
+        else if (type.Name.Contains("String"))
+            return board.GetVariable<string>(newString);
+
+        Debug.LogError($"Condition failed value parsing on key: {newString}");
         return newString;
     }
 

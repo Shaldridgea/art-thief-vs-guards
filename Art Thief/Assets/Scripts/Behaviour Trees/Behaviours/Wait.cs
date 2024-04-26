@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class Wait : BehaviourNode
 {
-    private float waitMax;
+    private float waitTime;
 
-    private float waitTimer;
+    private float waitStart;
 
     public Wait(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
-        waitMax = parameters[0];
+        waitTime = parameters[0];
     }
 
-    public override void Reset()
+    public override void OnEnter()
     {
-        base.Reset();
-        waitTimer = 0f;
+        base.OnEnter();
+        waitStart = Time.time;
     }
 
     public override Consts.NodeStatus Update()
     {
         Consts.NodeStatus status = Consts.NodeStatus.SUCCESS;
-        waitTimer += Time.deltaTime;
-        if (waitTimer < waitMax)
+        float elapsedTime = Time.time - waitStart;
+        if (elapsedTime < waitTime)
             status = Consts.NodeStatus.RUNNING;
 
         return status;
