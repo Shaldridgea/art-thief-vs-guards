@@ -12,8 +12,10 @@ public static class BehaviourTreeFactory
         Stack<BehaviourNode> nodeStack = new Stack<BehaviourNode>();
         BehaviourTree currentTree = new BehaviourTree(owner);
         var nodes = graph.nodes;
+        Dictionary<BTGraphNode, BehaviourNode> nodeMap = new Dictionary<BTGraphNode, BehaviourNode>();
+
         BTGraphNode node = (BTGraphNode)nodes.Find(n => n.GetInputPort("parentNode").ConnectionCount == 0);
-        currentTree.SetRoot(ProcessNode(node, currentTree, nodeStack));
+        currentTree.SetRoot(ProcessNode(node, currentTree, nodeStack, nodeMap));
 
         if(nodeStack.Count != 0)
             Debug.Log("Stack wasn't processed correctly");
@@ -23,16 +25,31 @@ public static class BehaviourTreeFactory
         return currentTree;
     }
 
-    private static BehaviourNode ProcessNode(BTGraphNode nextNode, BehaviourTree tree, Stack<BehaviourNode> stack, NodePort outputSource = null)
+    private static BehaviourNode ProcessNode(BTGraphNode nextNode, BehaviourTree tree, Stack<BehaviourNode> stack,
+    Dictionary<BTGraphNode, BehaviourNode> map, NodePort outputSource = null)
     {
-        BehaviourNode thisNode = GetBehaviourInstance(nextNode, tree);
+        // Check if we already have a BehaviourNode instance that
+        // maps to this graph node, otherwise make a new one
+        BehaviourNode thisNode;
+        bool alreadyCached = false;
+        if (map.TryGetValue(nextNode, out BehaviourNode cachedNode))
+        {
+            thisNode = cachedNode;
+            alreadyCached = true;
+        }
+        else
+        {
+            thisNode = CreateBehaviourInstance(nextNode, tree);
+            map.Add(nextNode, thisNode);
+            ++processedNodes;
+        }
 
         Debug.Assert(thisNode != null, $"BehaviourTreeFactory node instance wasn't found: {nextNode.BehaviourType}");
 
         if (stack.Count > 0)
             stack.Peek().AddChild(thisNode, outputSource.fieldName);
 
-        if (!nextNode.IsLeaf)
+        if (!nextNode.IsLeaf && !alreadyCached)
         {
             stack.Push(thisNode);
             foreach (NodePort n in nextNode.Outputs)
@@ -40,15 +57,14 @@ public static class BehaviourTreeFactory
                 if (n.ConnectionCount == 0)
                     continue;
 
-                ProcessNode((BTGraphNode)n.Connection.node, tree, stack, n);
+                ProcessNode((BTGraphNode)n.Connection.node, tree, stack, map, n);
             }
             stack.Pop();
         }
-        ++processedNodes;
         return thisNode;
     }
 
-    private static BehaviourNode GetBehaviourInstance(BTGraphNode dataNode, BehaviourTree tree)
+    private static BehaviourNode CreateBehaviourInstance(BTGraphNode dataNode, BehaviourTree tree)
     {
         BehaviourNode newNode = null;
         switch (dataNode.BehaviourType)
