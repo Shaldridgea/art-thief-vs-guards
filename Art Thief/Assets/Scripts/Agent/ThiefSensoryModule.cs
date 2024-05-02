@@ -7,8 +7,9 @@ public class SpySensoryModule : SensoryModule
     private ThiefAgent spy;
 
     // Start is called before the first frame update
-    void Start()
+    override protected void Start()
     {
+        base.Start();
         spy = (ThiefAgent)owner;
     }
 

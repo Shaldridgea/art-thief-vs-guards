@@ -5,9 +5,6 @@ using UnityEngine;
 public abstract class SensoryModule : MonoBehaviour
 {
     [SerializeField]
-    protected Agent owner;
-
-    [SerializeField]
     protected float losCheckInterval;
 
     [SerializeField]
@@ -23,9 +20,16 @@ public abstract class SensoryModule : MonoBehaviour
 
     public event SenseDelegate SoundHappened;
 
+    protected Agent owner;
+
     protected float awareness;
 
     protected float losTimer;
+
+    virtual protected void Start()
+    {
+        owner = GetComponent<Agent>();
+    }
 
     public abstract void SoundHeard(SoundTrigger sound);
 
@@ -35,7 +39,7 @@ public abstract class SensoryModule : MonoBehaviour
 
     protected void TriggerSoundHappened() => SoundHappened?.Invoke();
 
-    public const float INTEREST_RADIUS = 5f;
+    public const float INTEREST_RADIUS = 6f;
 
     protected List<GameObject> FindNearbyInterests(string interestTag)
     {
@@ -43,13 +47,13 @@ public abstract class SensoryModule : MonoBehaviour
         Physics.OverlapSphere(
         transform.position,
         INTEREST_RADIUS,
-        LayerMask.GetMask("Interest"),
+        LayerMask.GetMask("Interest", "Thief", "Guard"),
         QueryTriggerInteraction.Collide);
 
         List<GameObject> desiredInterests = new List<GameObject>();
         foreach(Collider c in nearbyInterests)
         {
-            if (c.CompareTag(interestTag))
+            if (c.CompareTag(interestTag) && c.gameObject != owner.gameObject)
                 desiredInterests.Add(c.gameObject);
         }
         return desiredInterests;
