@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using UnityEngine;
 
 public abstract class BehaviourNode
 {
@@ -43,6 +44,45 @@ public abstract class BehaviourNode
     }
 
     public virtual void AddChild(BehaviourNode addNode, string portName = "") { }
+
+    /// <summary>
+    /// Helper function to handle changing board targets in variable statements by using an accessor operator
+    /// </summary>
+    protected bool HandleStatementAccessor(string statement, Blackboard sourceBoard, out Blackboard newTargetBoard, out string modifiedStatement)
+    {
+        newTargetBoard = null;
+        modifiedStatement = null;
+
+        if (statement.Contains('.'))
+        {
+            string[] splitResult = statement.Split('.');
+            string left = splitResult[0];
+            string right = splitResult[1];
+
+            modifiedStatement = right;
+            if (left.ToLower() == "global")
+            {
+                newTargetBoard = ParentTree.GlobalBlackboard;
+                return true;
+            } // Check if our source board has the GameObject and associated Agent we expect it to have stored
+            else if (sourceBoard.GetData().ContainsKey(left))
+            {
+                if (sourceBoard.GetVariableType(left).Name.Contains("GameObject"))
+                {
+                    GameObject target = sourceBoard.GetVariable<GameObject>(left);
+                    if (target != null)
+                    {
+                        if (target.TryGetComponent(out Agent targetAgent))
+                        {
+                            newTargetBoard = targetAgent.AgentBlackboard;
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source) =>
      source == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;

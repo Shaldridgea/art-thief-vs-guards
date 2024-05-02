@@ -42,13 +42,13 @@ public abstract class Composite : BehaviourNode
     {
         Consts.NodeStatus status = Consts.NodeStatus.FAILURE;
 
-        // If we WERE running and our current child has finished running
+        // If we are running and our current child has finished running
         // then exit if we've met our condition, or keep updating with the next child
         if (Status == Consts.NodeStatus.RUNNING)
             if (ChildNodes[nodeIndex].Status != Consts.NodeStatus.RUNNING)
             {
                 status = ChildNodes[nodeIndex].Status;
-                if (ChildNodes[nodeIndex].Status == exitStatus)
+                if (status == exitStatus)
                     return status;
                 else
                     nodeIndex += 1;

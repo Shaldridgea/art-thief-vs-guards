@@ -4,58 +4,91 @@ using UnityEngine;
 
 public class SetVariable : BehaviourNode
 {
-    private Blackboard source;
+    private Blackboard board;
 
-    private string variableName;
+    private string keyStatement;
 
-    private NodeParameter value;
+    private NodeParameter valueStatement;
 
     public SetVariable(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
         if (parameters == null)
             return;
 
-        if (parameters[0] == (int)Consts.BlackboardSource.GLOBAL)
-            source = parentTree.GlobalBlackboard;
-        else if (parameters[0] == (int)Consts.BlackboardSource.AGENT)
-        {
-            source = parentTree.Owner.AgentBlackboard;
-
-            // If we're setting on a different agent
-            if (parameters[3])
-            {
-                // Get the other agent with the corresponding key
-                GameObject target = source.GetVariable<GameObject>(parameters[4]);
-                if (target != null)
-                {
-                    if (target.TryGetComponent(out Agent targetAgent))
-                        source = targetAgent.AgentBlackboard;
-                }
-            }
-        }
-
-        variableName = parameters[1];
-        value = parameters[2];
+        board = GetTargetBlackboard(parameters[0]);
+        keyStatement = parameters[1];
+        valueStatement = parameters[2];
     }
 
     public override Consts.NodeStatus Update()
     {
+        string variableName = keyStatement;
+        NodeParameter value = valueStatement;
+        Blackboard targetBoard = board;
+
+        // If we're setting on a different agent by accessor e.g. storedAgent.newVariable
+        if (HandleStatementAccessor(variableName, board, out Blackboard newBoard, out string newVariableName))
+        {
+            variableName = newVariableName;
+            targetBoard = newBoard;
+        }
+
+        if (value.type == NodeParameter.ParamType.String)
+        {
+            string valueString = value;
+            if (HandleStatementAccessor(valueString, board, out Blackboard tempBoard, out string newValueName))
+            {
+                object tempValue = tempBoard.GetVariable<object>(newValueName);
+                System.Type type = tempBoard.GetVariableType(newValueName);
+                if (type == typeof(int))
+                    value = (int)tempValue;
+                else if (type == typeof(float))
+                    value = (float)tempValue;
+                else if (type == typeof(bool))
+                    value = (bool)tempValue;
+                else if (type == typeof(string))
+                    value = (string)tempValue;
+                else if (type == typeof(Vector3))
+                    value = (Vector3)tempValue;
+                else
+                    value = newValueName;
+            }
+            else
+            {
+                if(board.GetData().ContainsKey(valueString))
+                {
+                    object tempValue = board.GetVariable<object>(valueString);
+                    System.Type type = board.GetVariableType(valueString);
+                    if (type == typeof(int))
+                        value = (int)tempValue;
+                    else if (type == typeof(float))
+                        value = (float)tempValue;
+                    else if (type == typeof(bool))
+                        value = (bool)tempValue;
+                    else if (type == typeof(string))
+                        value = (string)tempValue;
+                    else if (type == typeof(Vector3))
+                        value = (Vector3)tempValue;
+                }
+            }
+        }
+
         switch (value.type)
         {
             case NodeParameter.ParamType.Int:
-            source.SetVariable<int>(variableName, value);
+                targetBoard.SetVariable<int>(variableName, value);
             break;
             case NodeParameter.ParamType.Float:
-            source.SetVariable<float>(variableName, value);
+                targetBoard.SetVariable<float>(variableName, value);
             break;
             case NodeParameter.ParamType.Bool:
-            source.SetVariable<bool>(variableName, value);
+                targetBoard.SetVariable<bool>(variableName, value);
             break;
             case NodeParameter.ParamType.String:
-            source.SetVariable<string>(variableName, value);
+                targetBoard.SetVariable<string>(variableName, value);
             break;
             case NodeParameter.ParamType.Vector3:
-            source.SetVariable<Vector3>(variableName, value);
+                targetBoard.SetVariable<Vector3>(variableName, value);
             break;
         }
         return Consts.NodeStatus.SUCCESS;

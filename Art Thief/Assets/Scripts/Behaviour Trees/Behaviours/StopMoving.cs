@@ -12,7 +12,7 @@ public class StopMoving : BehaviourNode
 
     public override Consts.NodeStatus Update()
     {
-        ParentTree.Owner.NavAgent.isStopped = true;
+        ParentTree.Owner.NavAgent.ResetPath();
 
         return Consts.NodeStatus.SUCCESS;
     }

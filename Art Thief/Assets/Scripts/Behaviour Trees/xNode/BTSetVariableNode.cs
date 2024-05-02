@@ -12,18 +12,6 @@ public class BTSetVariableNode : BTActionNode {
 	private Consts.BlackboardSource source;
 
     [SerializeField]
-    [AllowNesting]
-    [ShowIf("IsAgent")]
-    private bool setOnOther;
-
-    private bool IsAgent => source == Consts.BlackboardSource.AGENT;
-
-    [SerializeField]
-    [AllowNesting]
-    [ShowIf(EConditionOperator.And, "IsAgent", "setOnOther")]
-    private string otherKey;
-
-    [SerializeField]
     private string variableKey;
 
     [Header("Variable Value")]
@@ -37,6 +25,6 @@ public class BTSetVariableNode : BTActionNode {
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { (int)source, variableKey, variableValue, setOnOther, otherKey };
+        return new NodeParameter[] { (int)source, variableKey, variableValue };
     }
 }

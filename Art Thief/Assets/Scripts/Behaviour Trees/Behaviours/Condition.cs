@@ -4,48 +4,54 @@ public class Condition : BehaviourNode
 {
     private Blackboard board;
 
-    private delegate bool ConditionCheckDelegate(string a, NodeParameter b);
+    private delegate bool ConditionCheckDelegate(NodeParameter a, NodeParameter b);
 
-    private string[] checkNames;
+    private string[] leftTokens;
 
-    private ConditionCheckDelegate[] checkConditions;
+    private string[] operatorTokens;
 
-    private NodeParameter[] checkValues;
+    private string[] rightTokens;
 
     public Condition(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
         if (parameters == null)
             return;
 
-        if (parameters[0] == (int)Consts.BlackboardSource.GLOBAL)
-            board = parentTree.GlobalBlackboard;
-        else
-            board = parentTree.Owner.AgentBlackboard;
+        board = GetTargetBlackboard(parameters[0]);
 
-        checkNames = new string[parameters.Length-1];
-        checkConditions = new ConditionCheckDelegate[parameters.Length-1];
-        checkValues = new NodeParameter[parameters.Length-1];
-        for(int i = 0; i < checkNames.Length; ++i)
+        leftTokens = new string[parameters.Length-1];
+        operatorTokens = new string[parameters.Length-1];
+        rightTokens = new string[parameters.Length-1];
+        for(int i = 0; i < parameters.Length-1; ++i)
         {
             string parsing = parameters[i+1];
-            string[] split = parsing.Split(' ');
+            string[] split = parsing.Split(' ', 3);
             if (split.Length != 3)
             {
                 Debug.Log("Condition parsing does not have correct split number: " + split.Length);
                 return;
             }
-            checkNames[i] = split[0];
-            checkValues[i] = ParseStringToValue(split[2]);
-            checkConditions[i] = GetMatchingDelegate(checkValues[i].type, split[1]);
+            leftTokens[i] = split[0];
+            operatorTokens[i] = split[1];
+            rightTokens[i] = split[2];
         }
     }
 
     public override Consts.NodeStatus Update()
     {
-        Consts.NodeStatus conditionStatus = Consts.NodeStatus.SUCCESS;
-        for (int i = 0; i < checkNames.Length; ++i)
+        NodeParameter[] leftValues = new NodeParameter[leftTokens.Length];
+        ConditionCheckDelegate[] operatorDelegates = new ConditionCheckDelegate[operatorTokens.Length];
+        NodeParameter[] rightValues = new NodeParameter[rightTokens.Length];
+        for(int i = 0; i < operatorTokens.Length; ++i)
         {
-            if (!checkConditions[i](checkNames[i], checkValues[i]))
+            leftValues[i] = ParseStringToValue(leftTokens[i]);
+            rightValues[i] = ParseStringToValue(rightTokens[i]);
+            operatorDelegates[i] = GetMatchingDelegate(rightValues[i].type, operatorTokens[i]);
+        }
+        Consts.NodeStatus conditionStatus = Consts.NodeStatus.SUCCESS;
+        for (int i = 0; i < leftTokens.Length; ++i)
+        {
+            if (!operatorDelegates[i](leftValues[i], rightValues[i]))
             {
                 conditionStatus = Consts.NodeStatus.FAILURE;
                 break;
@@ -56,6 +62,15 @@ public class Condition : BehaviourNode
 
     private NodeParameter ParseStringToValue(string newString)
     {
+        Blackboard workingBoard = board;
+        // First check if there is an accessor to a different board
+        if(HandleStatementAccessor(newString, board, out Blackboard checkBoard, out string newStringName))
+        {
+            workingBoard = checkBoard;
+            newString = newStringName;
+        }
+
+        // Parse normally for our primitives
         if(int.TryParse(newString, out int newInt))
             return newInt;
 
@@ -64,6 +79,21 @@ public class Condition : BehaviourNode
 
         if (bool.TryParse(newString, out bool newBool))
             return newBool;
+
+        if(newString.Contains("Vector3"))
+        {
+            int leftBracketIndex = newString.IndexOf('(') + 1;
+            int rightBracketIndex = newString.IndexOf(')');
+            string vectorValueString = newString.Substring(leftBracketIndex, rightBracketIndex - leftBracketIndex);
+            string[] vectorSplit = vectorValueString.Split(',');
+            float[] vectorComponents = new float[3];
+            for(int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
+            {
+                if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
+                    vectorComponents[i] = vecComponent;
+            }
+            return new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]);
+        }
 
         // If our value is not any of the above then
         // we check if it's actually a string or if it's
@@ -75,25 +105,27 @@ public class Condition : BehaviourNode
         if (type == null)
             return newString;
 
-        if (type.Name.Contains("Int"))
-            return board.GetVariable<int>(newString);
-        else if (type.Name.Contains("Single") || type.Name.Contains("Float"))
-            return board.GetVariable<float>(newString);
-        else if (type.Name.Contains("Bool"))
-            return board.GetVariable<bool>(newString);
-        else if (type.Name.Contains("String"))
-            return board.GetVariable<string>(newString);
+        if (type == typeof(int))
+            return workingBoard.GetVariable<int>(newString);
+        else if (type == typeof(float))
+            return workingBoard.GetVariable<float>(newString);
+        else if (type == typeof(bool))
+            return workingBoard.GetVariable<bool>(newString);
+        else if (type == typeof(string))
+            return workingBoard.GetVariable<string>(newString);
+        else if (type == typeof(Vector3))
+            return workingBoard.GetVariable<Vector3>(newString);
 
         Debug.LogError($"Condition failed value parsing on key: {newString}");
         return newString;
     }
 
     #region Condition Delegates
-    private ConditionCheckDelegate GetMatchingDelegate(NodeParameter.ParamType valueType, string conditionOperator)
+    private ConditionCheckDelegate GetMatchingDelegate(NodeParameter.ParamType valueType, string token)
     {
         if (valueType == NodeParameter.ParamType.Int)
         {
-            switch (conditionOperator)
+            switch (token)
             {
                 case ">":
                 return GreaterThanInt;
@@ -116,7 +148,7 @@ public class Condition : BehaviourNode
         }
         else if(valueType == NodeParameter.ParamType.Float)
         {
-            switch (conditionOperator)
+            switch (token)
             {
                 case ">":
                 return GreaterThanFloat;
@@ -139,7 +171,7 @@ public class Condition : BehaviourNode
         }
         else if(valueType == NodeParameter.ParamType.Bool)
         {
-            switch (conditionOperator)
+            switch (token)
             {
                 case "==":
                 return EqualToBool;
@@ -150,7 +182,7 @@ public class Condition : BehaviourNode
         }
         else if(valueType == NodeParameter.ParamType.String)
         {
-            switch (conditionOperator)
+            switch (token)
             {
                 case "==":
                 return EqualToString;
@@ -161,7 +193,7 @@ public class Condition : BehaviourNode
         }
         else if(valueType == NodeParameter.ParamType.Vector3)
         {
-            switch (conditionOperator)
+            switch (token)
             {
                 case "==":
                 return EqualToVector3;
@@ -173,30 +205,30 @@ public class Condition : BehaviourNode
         return null;
     }
 
-    private bool GreaterThanInt(string a, NodeParameter b) => board.GetVariable<int>(a) > b;
-    private bool GreaterThanOrEqualInt(string a, NodeParameter b) => board.GetVariable<int>(a) >= b;
-    private bool LessThanInt(string a, NodeParameter b) => board.GetVariable<int>(a) < b;
-    private bool LessThanOrEqualInt(string a, NodeParameter b) => board.GetVariable<int>(a) <= b;
-    private bool EqualToInt(string a, NodeParameter b) => board.GetVariable<int>(a) == b;
-    private bool NotEqualToInt(string a, NodeParameter b) => board.GetVariable<int>(a) != b;
+    private bool GreaterThanInt(NodeParameter a, NodeParameter b) => a > b;
+    private bool GreaterThanOrEqualInt(NodeParameter a, NodeParameter b) => a >= b;
+    private bool LessThanInt(NodeParameter a, NodeParameter b) => a < b;
+    private bool LessThanOrEqualInt(NodeParameter a, NodeParameter b) => a <= b;
+    private bool EqualToInt(NodeParameter a, NodeParameter b) => a == b;
+    private bool NotEqualToInt(NodeParameter a, NodeParameter b) => a != b;
 
 
-    private bool GreaterThanFloat(string a, NodeParameter b) => board.GetVariable<float>(a) > b;
-    private bool GreaterThanOrEqualFloat(string a, NodeParameter b) => board.GetVariable<float>(a) >= b;
-    private bool LessThanFloat(string a, NodeParameter b) => board.GetVariable<float>(a) < b;
-    private bool LessThanOrEqualFloat(string a, NodeParameter b) => board.GetVariable<float>(a) <= b;
-    private bool EqualToFloat(string a, NodeParameter b) => board.GetVariable<float>(a) == b;
-    private bool NotEqualToFloat(string a, NodeParameter b) => board.GetVariable<float>(a) != b;
+    private bool GreaterThanFloat(NodeParameter a, NodeParameter b) => a > (float)b;
+    private bool GreaterThanOrEqualFloat(NodeParameter a, NodeParameter b) => a >= (float)b;
+    private bool LessThanFloat(NodeParameter a, NodeParameter b) => a < (float)b;
+    private bool LessThanOrEqualFloat(NodeParameter a, NodeParameter b) => a <= (float)b;
+    private bool EqualToFloat(NodeParameter a, NodeParameter b) => a == (float)b;
+    private bool NotEqualToFloat(NodeParameter a, NodeParameter b) => a != (float)b;
 
 
-    private bool EqualToBool(string a, NodeParameter b) => board.GetVariable<bool>(a) == b;
-    private bool NotEqualToBool(string a, NodeParameter b) => board.GetVariable<bool>(a) != b;
+    private bool EqualToBool(NodeParameter a, NodeParameter b) => a == (bool)b;
+    private bool NotEqualToBool(NodeParameter a, NodeParameter b) => a != (bool)b;
 
 
-    private bool EqualToString(string a, NodeParameter b) => board.GetVariable<string>(a) == b;
-    private bool NotEqualToString(string a, NodeParameter b) => board.GetVariable<string>(a) != b;
+    private bool EqualToString(NodeParameter a, NodeParameter b) => a == (string)b;
+    private bool NotEqualToString(NodeParameter a, NodeParameter b) => a != (string)b;
 
-    private bool EqualToVector3(string a, NodeParameter b) => board.GetVariable<Vector3>(a) == b;
-    private bool NotEqualToVector3(string a, NodeParameter b) => board.GetVariable<Vector3>(a) != b;
+    private bool EqualToVector3(NodeParameter a, NodeParameter b) => a == (Vector3)b;
+    private bool NotEqualToVector3(NodeParameter a, NodeParameter b) => a != (Vector3)b;
     #endregion
 }
