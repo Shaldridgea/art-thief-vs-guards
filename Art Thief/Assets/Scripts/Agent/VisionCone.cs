@@ -4,27 +4,19 @@ using UnityEngine;
 
 public class VisionCone : MonoBehaviour
 {
-    [SerializeField]
-    private AgentView ownerView;
-
-    [SerializeField]
-    private LayerMask losMask;
-
-    public delegate void VisionDelegate(VisionCone callingCone, ThiefAgent spottedAgent);
+    public delegate void VisionDelegate(VisionCone callingCone, GameObject spottedVisual);
 
     public event VisionDelegate TriggerEnter;
 
     public event VisionDelegate TriggerExit;
 
-    private ThiefAgent targetAgent;
-
-    public bool HasLineOfSight(ThiefAgent targetThief = null)
+    private void OnTriggerEnter(Collider other)
     {
-        ThiefAgent lookAtThief = targetThief ?? targetAgent;
+        TriggerEnter?.Invoke(this, other.gameObject);
+    }
 
-        if (lookAtThief == null)
-            return false;
-
-        return !Physics.Linecast(ownerView.AgentHeadRoot.position, lookAtThief.AgentView.AgentHeadRoot.position, losMask);
+    private void OnTriggerExit(Collider other)
+    {
+        TriggerExit?.Invoke(this, other.gameObject);
     }
 }

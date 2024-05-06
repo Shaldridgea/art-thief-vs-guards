@@ -13,7 +13,7 @@ public class SpySensoryModule : SensoryModule
         spy = (ThiefAgent)owner;
     }
 
-    public override void SoundHeard(SoundTrigger sound)
+    public override void NotifySound(SenseInterest sound)
     {
         throw new System.NotImplementedException();
     }

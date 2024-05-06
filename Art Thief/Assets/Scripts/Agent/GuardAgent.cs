@@ -25,6 +25,8 @@ public class GuardAgent : Agent
 
     private float treeUpdateTimer;
 
+    private SuspiciousInterest currentSuspicion;
+
     static GuardAgent debuggingAgent;
 
     // Start is called before the first frame update
@@ -83,12 +85,41 @@ public class GuardAgent : Agent
         treeUpdateTimer -= Time.deltaTime;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public override void HandleSoundHeard(SenseInterest sound)
     {
-        // If we entered the catching trigger of the spy
-        if (other.CompareTag("Caught"))
+        base.HandleSoundHeard(sound);
+        // Don't treat unimportant friendly sounds as suspicious
+        if (sound.OwnerTeam == Consts.Team.GUARD && !sound.IsSuspicious)
+            return;
+
+        if (!sound.TryGetComponent(out SuspiciousInterest suspect))
+            return;
+
+        if (currentSuspicion == null || (currentSuspicion.Priority <= suspect.Priority && currentSuspicion != suspect))
         {
-            GameController.Instance.GuardsWon();
+            currentSuspicion = suspect;
+            AgentBlackboard.SetVariable("suspicion", "sound");
+            AgentBlackboard.SetVariable("suspicionFound", true);
+            AgentBlackboard.SetVariable("susInterest", sound.gameObject);
+        }
+    }
+
+    public override void HandleVisualSeen(SenseInterest visual)
+    {
+        base.HandleVisualSeen(visual);
+        // Check if other guards appear suspicious or not i.e. unconscious on the ground
+        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+            return;
+
+        if (!visual.TryGetComponent(out SuspiciousInterest suspect))
+            return;
+
+        if (currentSuspicion == null || (currentSuspicion.Priority <= suspect.Priority && currentSuspicion != suspect))
+        {
+            currentSuspicion = suspect;
+            AgentBlackboard.SetVariable("suspicion", "visual");
+            AgentBlackboard.SetVariable("suspicionFound", true);
+            AgentBlackboard.SetVariable("susInterest", visual.gameObject);
         }
     }
 

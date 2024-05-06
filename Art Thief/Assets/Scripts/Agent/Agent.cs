@@ -21,7 +21,7 @@ public class Agent : MonoBehaviour
     public SensoryModule Senses => senses;
 
     [SerializeField]
-    private SoundTrigger walkingSound;
+    private SoundInterest walkingSound;
 
     [SerializeField]
     private float walkSoundInterval;
@@ -35,16 +35,18 @@ public class Agent : MonoBehaviour
     {
         // Make a new blackboard for this agent
         AgentBlackboard = new Blackboard();
+        senses.SoundHeard += HandleSoundHeard;
+        senses.VisualSeen += HandleVisualSeen;
     }
 
-    public void NotifySound(SoundTrigger sound)
+    public virtual void HandleSoundHeard(SenseInterest sound)
     {
-        // Ignore our own walking sounds
-        if (sound == walkingSound)
-            return;
+        
+    }
 
-        // Trigger sensory module to handle hearing a sound
-        senses.SoundHeard(sound);
+    public virtual void HandleVisualSeen(SenseInterest visual)
+    {
+
     }
 
     /// <summary>

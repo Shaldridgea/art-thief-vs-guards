@@ -5,20 +5,25 @@ using UnityEngine;
 public abstract class SensoryModule : MonoBehaviour
 {
     [SerializeField]
+    protected LayerMask losMask;
+
+    [SerializeField]
     protected float losCheckInterval;
 
     [SerializeField]
-    protected float awarenessIncrease;
+    protected float awarenessChange;
 
-    public float AwarenessIncrease => awarenessIncrease;
+    public float AwarenessIncrease => awarenessChange;
 
-    public delegate void SenseDelegate();
+    public delegate void SenseDelegate(SenseInterest interest);
 
     public event SenseDelegate EnemyFound;
 
     public event SenseDelegate EnemyLost;
 
-    public event SenseDelegate SoundHappened;
+    public event SenseDelegate VisualSeen;
+
+    public event SenseDelegate SoundHeard;
 
     protected Agent owner;
 
@@ -26,18 +31,20 @@ public abstract class SensoryModule : MonoBehaviour
 
     protected float losTimer;
 
-    virtual protected void Start()
+    protected virtual void Start()
     {
         owner = GetComponent<Agent>();
     }
 
-    public abstract void SoundHeard(SoundTrigger sound);
+    public virtual void NotifySound(SenseInterest sound)
+    {
+        SoundHeard?.Invoke(sound);
+    }
 
-    protected void TriggerEnemyFound() => EnemyFound?.Invoke();
-
-    protected void TriggerEnemyLost() => EnemyLost?.Invoke();
-
-    protected void TriggerSoundHappened() => SoundHappened?.Invoke();
+    public virtual void NotifyVisual(SenseInterest visual)
+    {
+        VisualSeen?.Invoke(visual);
+    }
 
     public const float INTEREST_RADIUS = 6f;
 

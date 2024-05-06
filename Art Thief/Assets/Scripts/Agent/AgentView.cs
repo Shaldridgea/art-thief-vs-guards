@@ -10,6 +10,11 @@ public class AgentView : MonoBehaviour
     public Transform AgentRoot => agentRoot;
 
     [SerializeField]
+    private Transform agentEyeRoot;
+
+    public Transform AgentEyeRoot => agentEyeRoot;
+
+    [SerializeField]
     private Transform agentHeadRoot;
 
     public Transform AgentHeadRoot => agentHeadRoot;

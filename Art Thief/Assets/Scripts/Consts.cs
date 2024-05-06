@@ -46,6 +46,12 @@ public static class Consts
         GLOBAL
     }
 
+    public enum Team
+    {
+        GUARD,
+        THIEF
+    }
+
     public enum UtilityActionType
     {
         Path,
