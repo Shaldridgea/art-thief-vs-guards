@@ -9,10 +9,13 @@ public class Cooldown : Decorator
 
     private float cooldownStart;
 
+    private bool startOnCooldown;
+
     public Cooldown(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
         cooldownTime = parameters[0];
-        cooldownStart = -1000000f;
+        startOnCooldown = parameters[1];
+        cooldownStart = startOnCooldown ? Time.time : -1000000f;
     }
 
     public override Consts.NodeStatus Update()

@@ -8,6 +8,9 @@ using XNode;
 [NodeWidth(180)]
 public class BTHasArrivedNode : BTConditionNode
 {
+    [SerializeField]
+    private float stoppingDistance;
+    
     protected override void Init()
     {
         type = Consts.BehaviourType.HasArrived;
@@ -16,6 +19,6 @@ public class BTHasArrivedNode : BTConditionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return null;
+        return new NodeParameter[] { stoppingDistance };
     }
 }

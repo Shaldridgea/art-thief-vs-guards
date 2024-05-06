@@ -100,7 +100,7 @@ public static class BehaviourTreeFactory
                 return new Condition(tree, dataNode.GetParameters());
 
             case Consts.BehaviourType.HasArrived:
-                return new HasArrived(tree, null);
+                return new HasArrived(tree, dataNode.GetParameters());
 
             case Consts.BehaviourType.MoveToPoint:
                 return new MoveToPoint(tree, dataNode.GetParameters());
