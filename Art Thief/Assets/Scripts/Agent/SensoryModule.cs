@@ -21,7 +21,9 @@ public abstract class SensoryModule : MonoBehaviour
 
     public event SenseDelegate EnemyLost;
 
-    public event SenseDelegate VisualSeen;
+    public event SenseDelegate VisualFound;
+
+    public event SenseDelegate VisualLost;
 
     public event SenseDelegate SoundHeard;
 
@@ -41,9 +43,14 @@ public abstract class SensoryModule : MonoBehaviour
         SoundHeard?.Invoke(sound);
     }
 
-    public virtual void NotifyVisual(SenseInterest visual)
+    public virtual void NotifyVisualFound(SenseInterest visual)
     {
-        VisualSeen?.Invoke(visual);
+        VisualFound?.Invoke(visual);
+    }
+
+    public virtual void NotifyVisualLost(SenseInterest visual)
+    {
+        VisualLost?.Invoke(visual);
     }
 
     public const float INTEREST_RADIUS = 6f;

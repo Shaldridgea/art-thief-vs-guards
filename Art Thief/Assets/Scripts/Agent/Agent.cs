@@ -36,7 +36,8 @@ public class Agent : MonoBehaviour
         // Make a new blackboard for this agent
         AgentBlackboard = new Blackboard();
         senses.SoundHeard += HandleSoundHeard;
-        senses.VisualSeen += HandleVisualSeen;
+        senses.VisualFound += HandleVisualFound;
+        senses.VisualLost += HandleVisualLost;
     }
 
     public virtual void HandleSoundHeard(SenseInterest sound)
@@ -44,7 +45,12 @@ public class Agent : MonoBehaviour
         
     }
 
-    public virtual void HandleVisualSeen(SenseInterest visual)
+    public virtual void HandleVisualFound(SenseInterest visual)
+    {
+
+    }
+
+    public virtual void HandleVisualLost(SenseInterest visual)
     {
 
     }

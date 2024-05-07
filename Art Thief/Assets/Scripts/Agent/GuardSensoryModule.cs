@@ -8,11 +8,13 @@ public class GuardSensoryModule : SensoryModule
     [SerializeField]
     private VisionCone[] visionCones;
 
-    private List<SenseInterest> sensedObjects = new List<SenseInterest>();
+    private List<SenseInterest> inConeObjects = new List<SenseInterest>();
+
+    private Dictionary<SenseInterest, bool> visibilityMap = new Dictionary<SenseInterest, bool>();
+
+    private Dictionary<SenseInterest, int> entryCountMap = new Dictionary<SenseInterest, int>();
 
     private float losCheckTimer;
-
-    private bool isAnythingVisible;
 
     protected override void Start()
     {
@@ -26,41 +28,52 @@ public class GuardSensoryModule : SensoryModule
 
     private void HandleVisionEnter(VisionCone origin, GameObject other)
     {
-        if(other.TryGetComponent(out SenseInterest visualInterest))
-            if(!sensedObjects.Contains(visualInterest))
-                sensedObjects.Add(visualInterest);
+        if (other.TryGetComponent(out SenseInterest visualInterest))
+            if (!inConeObjects.Contains(visualInterest))
+            {
+                inConeObjects.Add(visualInterest);
+                visibilityMap[visualInterest] = false;
+                entryCountMap[visualInterest] = 1;
+            }
+            else
+                entryCountMap[visualInterest]++;
     }
 
     private void HandleVisionExit(VisionCone origin, GameObject other)
     {
         if (other.TryGetComponent(out SenseInterest visualInterest))
-            if (sensedObjects.Contains(visualInterest))
-                sensedObjects.Remove(visualInterest);
+            if (inConeObjects.Contains(visualInterest))
+            {
+                if (--entryCountMap[visualInterest] == 0)
+                {
+                    inConeObjects.Remove(visualInterest);
+                    visibilityMap.Remove(visualInterest);
+                    entryCountMap.Remove(visualInterest);
+                    NotifyVisualLost(visualInterest);
+                }
+            }
     }
 
     private void FixedUpdate()
     {
         if(losCheckTimer <= 0f)
         {
-            isAnythingVisible = false;
-            for(int i = 0; i < sensedObjects.Count; ++i)
+            for(int i = 0; i < inConeObjects.Count; ++i)
             {
-                if (Physics.Linecast(owner.AgentView.AgentEyeRoot.position, sensedObjects[i].transform.position, losMask.value))
-                    continue;
+                SenseInterest target = inConeObjects[i];
+                bool isSeen = Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position, losMask.value);
 
-                isAnythingVisible = true;
-                if (awareness >= 1f)
-                    NotifyVisual(sensedObjects[i]);
+                if (!visibilityMap[target] && isSeen)
+                    NotifyVisualFound(inConeObjects[i]);
+                else if (visibilityMap[target] && !isSeen)
+                    NotifyVisualLost(target);
+
+                visibilityMap[target] = isSeen;
             }
 
             losCheckTimer = losCheckInterval;
         }
         else
             losCheckTimer -= Time.fixedDeltaTime;
-
-        if (isAnythingVisible)
-            awareness = Mathf.Min(awareness + awarenessChange * Time.fixedDeltaTime, 5f);
-        else
-            awareness = Mathf.Max(awareness - awarenessChange * Time.fixedDeltaTime, 0f);
     }
 }
