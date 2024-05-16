@@ -25,7 +25,7 @@ public class GuardAgent : Agent
 
     private float treeUpdateTimer;
 
-    private SuspiciousInterest currentSuspicion;
+    private SuspicionModule suspicion;
 
     static GuardAgent debuggingAgent;
 
@@ -33,6 +33,9 @@ public class GuardAgent : Agent
     protected override void Start()
     {
         base.Start();
+        if (TryGetComponent(out SuspicionModule susModule))
+            suspicion = susModule;
+
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
 
@@ -95,18 +98,12 @@ public class GuardAgent : Agent
         if (!sound.TryGetComponent(out SuspiciousInterest suspect))
             return;
 
-        if (currentSuspicion == null || (currentSuspicion.Priority <= suspect.Priority && currentSuspicion != suspect))
-        {
-            currentSuspicion = suspect;
-            AgentBlackboard.SetVariable("suspicion", "sound");
-            AgentBlackboard.SetVariable("suspicionFound", true);
-            AgentBlackboard.SetVariable("susInterest", sound.gameObject);
-        }
+        suspicion.OnSuspicionSensed(suspect, Consts.SuspicionType.Sound);
     }
 
-    public override void HandleVisualSeen(SenseInterest visual)
+    public override void HandleVisualFound(SenseInterest visual)
     {
-        base.HandleVisualSeen(visual);
+        base.HandleVisualFound(visual);
         // Check if other guards appear suspicious or not i.e. unconscious on the ground
         if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
             return;
@@ -114,13 +111,20 @@ public class GuardAgent : Agent
         if (!visual.TryGetComponent(out SuspiciousInterest suspect))
             return;
 
-        if (currentSuspicion == null || (currentSuspicion.Priority <= suspect.Priority && currentSuspicion != suspect))
-        {
-            currentSuspicion = suspect;
-            AgentBlackboard.SetVariable("suspicion", "visual");
-            AgentBlackboard.SetVariable("suspicionFound", true);
-            AgentBlackboard.SetVariable("susInterest", visual.gameObject);
-        }
+        suspicion.OnSuspicionSensed(suspect, Consts.SuspicionType.Visual);
+    }
+
+    public override void HandleVisualLost(SenseInterest visual)
+    {
+        base.HandleVisualLost(visual);
+        // Check if other guards appear suspicious or not i.e. unconscious on the ground
+        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+            return;
+
+        if (!visual.TryGetComponent(out SuspiciousInterest suspect))
+            return;
+
+        suspicion.OnVisualSuspectLost(suspect);
     }
 
     public Vector3 GetNextPatrolPoint()
@@ -182,8 +186,10 @@ public class GuardAgent : Agent
             Vector3[] corners = navAgent.path.corners;
             for (int i = 0; i < corners.Length-1; ++i)
             {
+                Vector3 start = corners[i];
+                Vector3 end = corners[i + 1];
                 Gizmos.color = Color.red;
-                Gizmos.DrawLine(corners[i], corners[i + 1]);
+                Gizmos.DrawLine(start, end);
             }
         }
 

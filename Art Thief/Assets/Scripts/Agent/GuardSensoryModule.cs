@@ -28,7 +28,7 @@ public class GuardSensoryModule : SensoryModule
 
     private void HandleVisionEnter(VisionCone origin, GameObject other)
     {
-        if (other.TryGetComponent(out SenseInterest visualInterest))
+        if (other.TryGetComponent(out VisualInterest visualInterest))
             if (!inConeObjects.Contains(visualInterest))
             {
                 inConeObjects.Add(visualInterest);
@@ -41,15 +41,17 @@ public class GuardSensoryModule : SensoryModule
 
     private void HandleVisionExit(VisionCone origin, GameObject other)
     {
-        if (other.TryGetComponent(out SenseInterest visualInterest))
+        if (other.TryGetComponent(out VisualInterest visualInterest))
             if (inConeObjects.Contains(visualInterest))
             {
                 if (--entryCountMap[visualInterest] == 0)
                 {
+                    if(visibilityMap[visualInterest])
+                        NotifyVisualLost(visualInterest);
+
                     inConeObjects.Remove(visualInterest);
                     visibilityMap.Remove(visualInterest);
                     entryCountMap.Remove(visualInterest);
-                    NotifyVisualLost(visualInterest);
                 }
             }
     }
@@ -58,13 +60,13 @@ public class GuardSensoryModule : SensoryModule
     {
         if(losCheckTimer <= 0f)
         {
-            for(int i = 0; i < inConeObjects.Count; ++i)
+            for (int i = 0; i < inConeObjects.Count; ++i)
             {
                 SenseInterest target = inConeObjects[i];
-                bool isSeen = Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position, losMask.value);
+                bool isSeen = !Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position, losMask.value);
 
                 if (!visibilityMap[target] && isSeen)
-                    NotifyVisualFound(inConeObjects[i]);
+                    NotifyVisualFound(target);
                 else if (visibilityMap[target] && !isSeen)
                     NotifyVisualLost(target);
 

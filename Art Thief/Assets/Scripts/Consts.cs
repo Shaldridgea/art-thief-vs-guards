@@ -52,6 +52,12 @@ public static class Consts
         THIEF
     }
 
+    public enum SuspicionType
+    {
+        Visual,
+        Sound
+    }
+
     public enum UtilityActionType
     {
         Path,
