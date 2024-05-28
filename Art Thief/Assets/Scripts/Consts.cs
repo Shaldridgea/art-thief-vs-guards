@@ -60,6 +60,12 @@ public static class Consts
         Sound
     }
 
+    public enum PatrolPathType
+    {
+        Regular,
+        Perimeter
+    }
+
     public enum UtilityActionType
     {
         Path,

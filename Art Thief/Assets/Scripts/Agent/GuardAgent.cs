@@ -12,7 +12,10 @@ public class GuardAgent : Agent
     private float treeUpdateInterval;
 
     [SerializeField]
-    private PatrolPath patrolPath;
+    private PatrolPath regularPatrol;
+
+    [SerializeField]
+    private PatrolPath perimeterPatrol;
 
     [SerializeField]
     private List<string> blackboardDefaults;
@@ -127,39 +130,40 @@ public class GuardAgent : Agent
         suspicion.OnVisualSuspectLost(suspect);
     }
 
-    public Vector3 GetNextPatrolPoint()
+    public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)
     {
-        Vector3 point = patrolPath.GetPoint(patrolIndex);
+        PatrolPath path = pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
+        Vector3 point = path.GetPoint(patrolIndex);
         ++patrolIndex;
         return point;
     }
 
-    public void TurnHeadToPoint(Vector3 targetPoint)
+    public void TurnHeadToPoint(Vector3 targetPoint, float time)
     {
-        float lookAngle = Vector3.SignedAngle(AgentView.AgentHeadRoot.forward, (targetPoint - AgentView.AgentHeadRoot.position).normalized, Vector3.up);
-        TurnHead(lookAngle);
+        float lookAngle = -Vector3.SignedAngle(AgentView.AgentRoot.forward, (targetPoint - AgentView.AgentHeadRoot.position).normalized, Vector3.up);
+        TurnHead(lookAngle, time);
     }
 
-    public void TurnHead(float turnAngle)
+    public void TurnHead(float turnAngle, float time)
     {
-        float angleResult = Vector3.SignedAngle(AgentView.AgentRoot.forward, AgentView.AgentHeadRoot.forward, Vector3.up) + turnAngle;
         // Adjust our turning angle to be clamped so the head doesn't turn all the way around like an owl
-        if (Mathf.Abs(angleResult) >= 100f)
-            turnAngle -= Mathf.Sign(turnAngle) * (Mathf.Abs(angleResult) - 100f);
+        turnAngle = Mathf.Clamp(turnAngle, -100f, 100f);
 
-        LeanTween.rotateAroundLocal(AgentView.AgentHeadRoot.gameObject, Vector3.up, turnAngle, 2f);
+        LeanTween.rotateLocal(AgentView.AgentHeadRoot.gameObject, new Vector3(0f, 0f, turnAngle), time);
     }
 
-    public void TurnBodyToPoint(Vector3 targetPoint)
+    public void TurnBodyToPoint(Vector3 targetPoint, float time)
     {
         float lookAngle = Vector3.SignedAngle(AgentView.AgentRoot.forward, (targetPoint - AgentView.AgentRoot.position).normalized, Vector3.up);
-        TurnBody(lookAngle);
+        TurnBody(lookAngle, time);
     }
 
-    public void TurnBody(float turnAngle)
+    public void TurnBody(float turnAngle, float time)
     {
-        LeanTween.rotateAroundLocal(AgentView.AgentRoot.gameObject, Vector3.up, turnAngle, 2f);
+        LeanTween.rotateAroundLocal(AgentView.AgentRoot.gameObject, Vector3.up, turnAngle, time);
     }
+
+    public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
     private void OnMouseDown()
     {
@@ -202,12 +206,12 @@ public class GuardAgent : Agent
     [Button("Test head turn", EButtonEnableMode.Playmode)]
     private void TestHeadTurn()
     {
-        TurnHeadToPoint(patrolPath.GetPoint(0));
+        TurnHeadToPoint(regularPatrol.GetPoint(0), 2f);
     }
 
     [Button("Test body turn", EButtonEnableMode.Playmode)]
     private void TestBodyTurn()
     {
-        TurnBodyToPoint(patrolPath.GetPoint(0));
+        TurnBodyToPoint(regularPatrol.GetPoint(0), 2f);
     }
 }

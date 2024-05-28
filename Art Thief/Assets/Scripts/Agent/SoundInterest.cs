@@ -10,6 +10,9 @@ public class SoundInterest : SenseInterest
     [SerializeField]
     private SphereCollider trigger;
 
+    [SerializeField]
+    private bool testing;
+
     public bool IsOngoing => trigger.enabled;
 
     private int sourceIndex;
@@ -18,7 +21,8 @@ public class SoundInterest : SenseInterest
     void Start()
     {
         // Set our trigger to off by default
-        trigger.enabled = false;
+        if(!testing)
+            trigger.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other)

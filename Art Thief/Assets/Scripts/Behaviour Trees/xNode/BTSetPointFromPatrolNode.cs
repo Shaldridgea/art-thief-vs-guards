@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using XNode;
 
-[CreateNodeMenu("Variables/Set Point From Patrol")]
+[CreateNodeMenu("Variables/Set Next Point From Patrol")]
 public class BTSetPointFromPatrolNode : BTActionNode
 {
+    [SerializeField]
+    private Consts.PatrolPathType pathType;
+
     [SerializeField]
     private string variableName;
     
@@ -17,6 +20,6 @@ public class BTSetPointFromPatrolNode : BTActionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { variableName };
+        return new NodeParameter[] { variableName, (int)pathType };
     }
 }

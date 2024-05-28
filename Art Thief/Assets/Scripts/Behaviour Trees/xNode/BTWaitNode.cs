@@ -17,6 +17,6 @@ public class BTWaitNode : BTActionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { new NodeParameter(waitTime) };
+        return new NodeParameter[] { waitTime };
     }
 }

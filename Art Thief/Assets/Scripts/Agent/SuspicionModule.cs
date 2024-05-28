@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class SuspicionModule : MonoBehaviour
 {
+    [SerializeField]
+    [Tooltip("How long in seconds for a suspicious thing to be spotted")]
+    private float spottedTimerMax;
+
+    private float spottedTimer;
+
     private Dictionary<SuspiciousInterest, (bool Visible, float Awareness)> visualSuspectMap = new Dictionary<SuspiciousInterest, (bool Visible, float Awareness)>();
 
     private List<SuspiciousInterest> visualSuspectList = new List<SuspiciousInterest>();
@@ -20,6 +26,7 @@ public class SuspicionModule : MonoBehaviour
     void Start()
     {
         suspicionPriority = -1;
+        spottedTimer = -1f;
         if (TryGetComponent(out Agent myAgent))
             owner = myAgent;
     }
@@ -41,11 +48,20 @@ public class SuspicionModule : MonoBehaviour
             {
                 SetSuspicion(key);
                 newSuspicionSet = true;
+                spottedTimer = spottedTimerMax;
                 break;
             }
         }
         if (newSuspicionSet)
             CullSuspects();
+
+        if (spottedTimer == 0f)
+        {
+            owner.AgentBlackboard.SetVariable("suspicionConfirmed", true);
+            spottedTimer = -1f;
+        }
+        else if(spottedTimer > 0f)
+            spottedTimer = Mathf.Max(spottedTimer - Time.deltaTime, 0f);
     }
 
     private void SetSuspicion(SuspiciousInterest newInterest)
@@ -55,6 +71,7 @@ public class SuspicionModule : MonoBehaviour
         owner.AgentBlackboard.SetVariable("suspicious", true);
         owner.AgentBlackboard.SetVariable("suspicionFound", true);
         owner.AgentBlackboard.SetVariable("suspicion", currentSuspicion.gameObject);
+        owner.AgentBlackboard.SetVariable("thiefFound", currentSuspicion.CompareTag("Thief"));
         ignoreList.Add(newInterest);
     }
 
