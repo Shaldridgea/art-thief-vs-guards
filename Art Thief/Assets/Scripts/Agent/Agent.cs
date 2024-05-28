@@ -28,6 +28,9 @@ public class Agent : MonoBehaviour
 
     private Coroutine walkingCoroutine;
 
+    [SerializeField]
+    private List<string> blackboardDefaults;
+
     public Blackboard AgentBlackboard { get; private set; }
 
     // Start is called before the first frame update
@@ -38,6 +41,42 @@ public class Agent : MonoBehaviour
         senses.SoundHeard += HandleSoundHeard;
         senses.VisualFound += HandleVisualFound;
         senses.VisualLost += HandleVisualLost;
+
+        // Set our default blackboard values by parsing the strings for their keys and values
+        foreach (string s in blackboardDefaults)
+        {
+            string[] splitResult = s.Split(',', 2);
+            string left = splitResult[0].Trim();
+            string right = splitResult[1].Trim();
+
+            // Parse normally for our primitives
+            if (int.TryParse(right, out int newInt))
+                AgentBlackboard.SetVariable(left, newInt);
+            else
+            if (float.TryParse(right, out float newFloat))
+                AgentBlackboard.SetVariable(left, newFloat);
+            else
+            if (bool.TryParse(right, out bool newBool))
+                AgentBlackboard.SetVariable(left, newBool);
+            else
+            if (right.Contains("Vector3"))
+            {
+                int leftBracketIndex = right.IndexOf('(') + 1;
+                int rightBracketIndex = right.IndexOf(')');
+                string vectorValueString = right[leftBracketIndex..rightBracketIndex];
+                string[] vectorSplit = vectorValueString.Split(',');
+                float[] vectorComponents = new float[3];
+                for (int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
+                {
+                    if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
+                        vectorComponents[i] = vecComponent;
+                }
+                AgentBlackboard.SetVariable(left,
+                new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]));
+            }
+            else
+                AgentBlackboard.SetVariable(left, right);
+        }
     }
 
     public virtual void HandleSoundHeard(SenseInterest sound)
@@ -62,7 +101,7 @@ public class Agent : MonoBehaviour
     /// <param name="updatePositionOnly"></param>
     public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
     {
-        navAgent.destination = newPosition;
+        navAgent.SetDestination(newPosition);
         return;
         // TODO: Fix walking sounds
         // Stop the walking coroutine that creates the step sound if we aren't just

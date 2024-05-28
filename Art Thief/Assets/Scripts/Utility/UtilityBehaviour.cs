@@ -8,25 +8,16 @@ public class UtilityBehaviour : MonoBehaviour
     private ThiefAgent agent;
 
     [SerializeField]
-    private List<MotiveData> motiveData;
-
-    [SerializeField]
     private List<ActionData> actionData;
 
     [SerializeField]
-    private float evaluationInterval;
+    private float updateInterval;
 
-    private float evalTimer;
-
-    private List<MotiveValue> motiveList = new List<MotiveValue>();
-
-    private Dictionary<string, MotiveValue> motiveDict = new Dictionary<string, MotiveValue>();
+    private float updateTimer;
 
     private List<UtilityAction> actionList = new List<UtilityAction>();
 
     private List<UtilityAction> sortedActions;
-
-    private float discontentment;
 
     private UtilityAction currentAction;
 
@@ -35,21 +26,9 @@ public class UtilityBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Create all our motives
-        for(int i = 0; i < motiveData.Count; ++i)
-        {
-            motiveList.Add(new MotiveValue(agent, motiveData[i]));
-            motiveDict.Add(motiveData[i].Motive, motiveList[i]);
-        }
-
         // Create our actions and give the actions their relvant motives
         for (int i = 0; i < actionData.Count; ++i)
-        {
-            MotiveValue[] thisMotives = new MotiveValue[actionData[i].Motives.Length];
-            for (int j = 0; j < thisMotives.Length; ++j)
-                thisMotives[j] = motiveDict[actionData[i].Motives[j].MotiveName];
-            actionList.Add(Consts.GetUtilityAction(actionData[i].Action, thisMotives));
-        }
+            actionList.Add(Consts.GetUtilityAction(actionData[i]));
         sortedActions = new List<UtilityAction>(actionList);
     }
 
@@ -61,11 +40,11 @@ public class UtilityBehaviour : MonoBehaviour
             toggleGUI = !toggleGUI;
 
         // Run our evaluation timer
-        evalTimer -= Time.deltaTime;
-        if (evalTimer > 0f)
+        updateTimer -= Time.deltaTime;
+        if (updateTimer > 0f)
             return;
         else
-            evalTimer = evaluationInterval;
+            updateTimer = updateInterval;
 
         // Calculate our new action to take
         EvaluateUtility();
@@ -80,10 +59,10 @@ public class UtilityBehaviour : MonoBehaviour
     {
         // Evaluate the utility of all our current actions and choose the one that has the highest score
         UtilityAction favouredAction = null;
-        float currentUtility = 0f;
+        float currentUtility = float.MinValue;
         for (int i = 0; i < actionList.Count; ++i)
         {
-            float comparisonUtility = actionList[i].EvaluateUtility();
+            float comparisonUtility = actionList[i].CalculateScore(agent.AgentBlackboard);
             if(comparisonUtility > currentUtility)
             {
                 currentUtility = comparisonUtility;

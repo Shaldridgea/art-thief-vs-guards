@@ -12,7 +12,9 @@ public class MotiveData : ScriptableObject
     public string Motive => motiveName;
 
     [SerializeField]
-    private string blackboardValue;
+    private string blackboardKey;
 
-    public string BlackboardKey => blackboardValue;
+    public string BlackboardKey => blackboardKey;
+
+    public float GetInsistence(Blackboard board) => board.GetVariable<float>(blackboardKey);
 }

@@ -17,9 +17,6 @@ public class GuardAgent : Agent
     [SerializeField]
     private PatrolPath perimeterPatrol;
 
-    [SerializeField]
-    private List<string> blackboardDefaults;
-
     private BehaviourTree agentTree;
 
     private Transform targetPoint;
@@ -41,54 +38,18 @@ public class GuardAgent : Agent
 
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
-
-        // Set our default blackboard values by parsing the strings for their keys and values
-        foreach(string s in blackboardDefaults)
-        {
-            string[] splitResult = s.Split(',');
-            string left = splitResult[0].Trim();
-            string right = splitResult[1].Trim();
-
-            // Parse normally for our primitives
-            if (int.TryParse(right, out int newInt))
-                AgentBlackboard.SetVariable(left, newInt);
-            else
-            if (float.TryParse(right, out float newFloat))
-                AgentBlackboard.SetVariable(left, newFloat);
-            else
-            if (bool.TryParse(right, out bool newBool))
-                AgentBlackboard.SetVariable(left, newBool);
-            else
-            if (right.Contains("Vector3"))
-            {
-                int leftBracketIndex = right.IndexOf('(') + 1;
-                int rightBracketIndex = right.IndexOf(')');
-                string vectorValueString = right[leftBracketIndex..rightBracketIndex];
-                string[] vectorSplit = vectorValueString.Split(',');
-                float[] vectorComponents = new float[3];
-                for (int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
-                {
-                    if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
-                        vectorComponents[i] = vecComponent;
-                }
-                AgentBlackboard.SetVariable(left,
-                new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]));
-            }
-            else
-                AgentBlackboard.SetVariable(left, right);
-        }
     }
 
     private void Update()
     {
         // Update our behaviour tree
+        treeUpdateTimer -= Time.deltaTime;
         if (treeUpdateTimer <= 0f)
         {
             treeUpdateTimer = treeUpdateInterval;
             agentTree.Update();
             return;
         }
-        treeUpdateTimer -= Time.deltaTime;
     }
 
     public override void HandleSoundHeard(SenseInterest sound)

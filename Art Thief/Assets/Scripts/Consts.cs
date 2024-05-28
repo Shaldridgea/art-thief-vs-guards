@@ -68,16 +68,24 @@ public static class Consts
 
     public enum UtilityActionType
     {
-        Path,
+        FindArt,
+        FindExit,
         Steal,
         Hide,
-        Run,
+        Evade,
         Attack
     }
 
-    public static UtilityAction GetUtilityAction(UtilityActionType actionType, MotiveValue[] motiveValues)
+    public static UtilityAction GetUtilityAction(ActionData actionData)
     {
-        // TODO: Return the correct actions when they're made
+        switch (actionData.Action)
+        {
+            case UtilityActionType.FindArt:
+                return new FindArtAction(actionData);
+
+            case UtilityActionType.FindExit:
+                return new FindExitAction(actionData);
+        }
         return null;
     }
 

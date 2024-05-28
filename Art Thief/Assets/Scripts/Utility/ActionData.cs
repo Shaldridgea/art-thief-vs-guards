@@ -12,7 +12,23 @@ public class ActionData : ScriptableObject
     public Consts.UtilityActionType Action => actionType;
 
     [SerializeField]
-    private UtilityAction.MotiveUtility[] actionMotives;
+    private UtilityAction.ScoreCurve[] motiveCurves;
 
-    public UtilityAction.MotiveUtility[] Motives => actionMotives;
+    public UtilityAction.ScoreCurve[] Motives => motiveCurves;
+
+    private void OnValidate()
+    {
+        if (motiveCurves == null)
+            return;
+
+        if (motiveCurves.Length == 0)
+            return;
+
+        for (int i = 0; i < motiveCurves.Length; ++i)
+            if (motiveCurves[i].Curve != null)
+            {
+                motiveCurves[i].Curve.preWrapMode = WrapMode.ClampForever;
+                motiveCurves[i].Curve.postWrapMode = WrapMode.ClampForever;
+            }
+    }
 }
