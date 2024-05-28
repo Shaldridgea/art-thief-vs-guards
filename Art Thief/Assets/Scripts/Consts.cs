@@ -31,7 +31,9 @@ public static class Consts
         StoreVisibleInterests,
         SetRandomInterest,
         SetPointFromGameObject,
-        StopMoving
+        StopMoving,
+        TurnHead,
+        IsTurningHead
     }
 
     public enum RepeatCondition

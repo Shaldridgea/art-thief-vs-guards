@@ -122,6 +122,12 @@ public static class BehaviourTreeFactory
 
             case Consts.BehaviourType.StopMoving:
                 return new StopMoving(tree);
+
+            case Consts.BehaviourType.TurnHead:
+                return new TurnHead(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.IsTurningHead:
+                return new IsTurningHead(tree);
         }
         return newNode;
     }
