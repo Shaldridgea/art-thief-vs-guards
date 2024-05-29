@@ -73,7 +73,9 @@ public abstract class UtilityAction
         return Score;
     }
 
+    public abstract void EnterAction(ThiefAgent thief);
+
     public abstract void PerformAction(ThiefAgent thief);
 
-    public abstract void StopAction(ThiefAgent thief);
+    public abstract void ExitAction(ThiefAgent thief);
 }

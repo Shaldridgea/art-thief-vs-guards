@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95e0819759c2e2e4a9cac8b0156f2786, type: 3}
-  m_Name: Find Art
+  m_Name: Steal Art
   m_EditorClassIdentifier: 
-  actionType: 0
+  actionType: 2
   motiveCurves:
   - motiveSource: {fileID: 11400000, guid: 3c39bd4ca6a353447bd39bd5c1a23e43, type: 2}
     curve:
@@ -20,9 +20,9 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
-        inSlope: -1
-        outSlope: -1
+        value: 0.9
+        inSlope: -0.9
+        outSlope: -0.9
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
@@ -30,8 +30,33 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: -1
-        outSlope: -1
+        inSlope: -0.9
+        outSlope: -0.9
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  - motiveSource: {fileID: 11400000, guid: be71b035b6f08ae4088fd8edb540b665, type: 2}
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334

@@ -15,22 +15,9 @@ public class Blackboard
 
     public void SetVariable<T>(string variableName, T newValue)
     {
-        // If it's been more than a frame since we last set a value
-        if (setFrameCount < Time.frameCount)
-            lockedVariables.Clear(); // Clear the locked variables hash set
-
-        // If a variable is not locked
-        if (!lockedVariables.Contains(variableName))
-        {
-            variablesDict[variableName] = newValue;
-            Type type = newValue.GetType();
-            typeDict[variableName] = type;
-            // Lock this variable after setting so it can't be set more than once per frame
-            lockedVariables.Add(variableName);
-        }
-
-        // Set the frame this variable was set on
-        setFrameCount = Time.frameCount;
+        variablesDict[variableName] = newValue;
+        Type type = newValue.GetType();
+        typeDict[variableName] = type;
     }
 
     public T GetVariable<T>(string variableName)

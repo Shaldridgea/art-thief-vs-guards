@@ -74,11 +74,22 @@ public class UtilityBehaviour : MonoBehaviour
         sortedActions.Sort((x, y) => y.Score.CompareTo(x.Score));
 
         // If the action we want to perform is different from the one we were doing before
-        if (currentAction != favouredAction)
+        if (favouredAction != currentAction)
         {
             // Stop our current action and set our new one to do
-            currentAction?.StopAction(agent);
+            currentAction?.ExitAction(agent);
             currentAction = favouredAction;
+            currentAction.EnterAction(agent);
         }
+    }
+
+    private void OnGUI()
+    {
+        GUIStyle style = new GUIStyle("box");
+        style.fontSize = 20;
+        GUILayout.Box(name, style);
+        style.fontSize = 15;
+        for (int i = 0; i < actionList.Count; ++i)
+            GUILayout.Box($"{actionData[i].Action}: {actionList[i].Score}", style);
     }
 }

@@ -85,6 +85,9 @@ public static class Consts
 
             case UtilityActionType.FindExit:
                 return new FindExitAction(actionData);
+
+            case UtilityActionType.Steal:
+                return new StealArtAction(actionData);
         }
         return null;
     }

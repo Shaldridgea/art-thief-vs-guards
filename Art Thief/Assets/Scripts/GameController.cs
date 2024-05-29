@@ -43,7 +43,7 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private Transform buttonLayout;
 
-    public Transform ArtGoal { get; private set; }
+    public Transform ArtGoal { get; set; }
 
     [SerializeField]
     private List<GuardAgent> guards;
