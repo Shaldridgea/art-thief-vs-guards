@@ -124,6 +124,8 @@ public class Agent : MonoBehaviour
     public void MoveAgent(NavMeshPath newPath, bool updatePositionOnly = false)
     {
         navAgent.SetPath(newPath);
+        return;
+
         if (walkingCoroutine != null && !updatePositionOnly)
         {
             StopCoroutine(walkingCoroutine);
@@ -145,4 +147,31 @@ public class Agent : MonoBehaviour
 
         yield break;
     }
+
+    public void TurnHeadToPoint(Vector3 targetPoint, float time)
+    {
+        float lookAngle = Vector3.SignedAngle((targetPoint - AgentView.AgentHeadRoot.position).normalized, AgentView.AgentRoot.forward, Vector3.up);
+        TurnHead(lookAngle, time);
+    }
+
+    public void TurnHead(float turnAngle, float time)
+    {
+        // Adjust our turning angle to be clamped so the head doesn't turn all the way around like an owl
+        turnAngle = Mathf.Clamp(turnAngle, -100f, 100f);
+
+        LeanTween.rotateLocal(AgentView.AgentHeadRoot.gameObject, new Vector3(0f, 0f, turnAngle), time);
+    }
+
+    public void TurnBodyToPoint(Vector3 targetPoint, float time)
+    {
+        float lookAngle = Vector3.SignedAngle(AgentView.AgentRoot.forward, (targetPoint - AgentView.AgentRoot.position).normalized, Vector3.up);
+        TurnBody(lookAngle, time);
+    }
+
+    public void TurnBody(float turnAngle, float time)
+    {
+        LeanTween.rotateAroundLocal(AgentView.AgentRoot.gameObject, Vector3.up, turnAngle, time);
+    }
+
+    public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 }

@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class #SCRIPTNAME#: UtilityAction
+{
+    public #SCRIPTNAME#(ActionData newData) : base(newData) { }
+
+    public override void EnterAction(ThiefAgent thief)
+    {
+        return;
+    }
+
+    public override void PerformAction(ThiefAgent thief)
+    {
+        return;
+    }
+
+    public override void ExitAction(ThiefAgent thief)
+    {
+        return;
+    }
+}

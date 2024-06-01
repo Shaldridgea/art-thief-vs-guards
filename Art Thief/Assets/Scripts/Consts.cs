@@ -66,6 +66,13 @@ public static class Consts
         Perimeter
     }
 
+    public enum HidingAreaType
+    {
+        Safe,
+        Dynamic,
+        Conditional
+    }
+
     public enum UtilityActionType
     {
         FindArt,
@@ -88,6 +95,9 @@ public static class Consts
 
             case UtilityActionType.Steal:
                 return new StealArtAction(actionData);
+
+            case UtilityActionType.Hide:
+                return new HideAction(actionData);
         }
         return null;
     }

@@ -6,6 +6,11 @@ public class ThiefSensoryModule : SensoryModule
 {
     private ThiefAgent thief;
 
+    [SerializeField]
+    private List<GuardAgent> awareGuards;
+
+    public List<GuardAgent> AwareGuards => awareGuards;
+
     // Start is called before the first frame update
     override protected void Start()
     {

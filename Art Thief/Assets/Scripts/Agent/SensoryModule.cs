@@ -7,6 +7,8 @@ public abstract class SensoryModule : MonoBehaviour
     [SerializeField]
     protected LayerMask losMask;
 
+    public LayerMask LosMask => losMask;
+
     [SerializeField]
     protected float losCheckInterval;
 
