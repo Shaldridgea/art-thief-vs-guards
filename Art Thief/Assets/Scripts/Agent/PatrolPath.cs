@@ -36,7 +36,7 @@ public class PatrolPath : MonoBehaviour
         if(compareDistance <= 5f)
         {
             ++compareIndex;
-            if (compareIndex > pointsList.Count)
+            if (compareIndex >= pointsList.Count)
                 compareIndex = 0;
         }
         return pointsList[compareIndex];

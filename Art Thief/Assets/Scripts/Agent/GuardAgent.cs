@@ -94,8 +94,7 @@ public class GuardAgent : Agent
     public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)
     {
         PatrolPath path = pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
-        Vector3 point = path.GetPoint(patrolIndex);
-        ++patrolIndex;
+        Vector3 point = path.GetNextPointFromPosition(transform.position);
         return point;
     }
 
@@ -117,26 +116,6 @@ public class GuardAgent : Agent
             GUILayout.Box($"{i.Key}: {i.Value}", style);
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        if(navAgent.hasPath && !navAgent.isPathStale)
-        {
-            Vector3[] corners = navAgent.path.corners;
-            for (int i = 0; i < corners.Length-1; ++i)
-            {
-                Vector3 start = corners[i];
-                Vector3 end = corners[i + 1];
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(start, end);
-            }
-        }
-
-        Color gizColor = Color.yellow;
-        gizColor.a = 0.25f;
-        Gizmos.color = gizColor;
-        Gizmos.DrawSphere(transform.position, SensoryModule.INTEREST_RADIUS);
-    }
-
     [Button("Test head turn", EButtonEnableMode.Playmode)]
     private void TestHeadTurn()
     {
@@ -147,5 +126,14 @@ public class GuardAgent : Agent
     private void TestBodyTurn()
     {
         TurnBodyToPoint(regularPatrol.GetPoint(0), 2f);
+    }
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+        Color gizColor = Color.yellow;
+        gizColor.a = 0.25f;
+        Gizmos.color = gizColor;
+        Gizmos.DrawSphere(transform.position, SensoryModule.INTEREST_RADIUS);
     }
 }

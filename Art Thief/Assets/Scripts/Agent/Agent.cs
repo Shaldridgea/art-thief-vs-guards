@@ -102,7 +102,10 @@ public class Agent : MonoBehaviour
     public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
     {
         navAgent.SetDestination(newPosition);
-        return;
+
+        if (walkingSound == null)
+            return;
+
         // TODO: Fix walking sounds
         // Stop the walking coroutine that creates the step sound if we aren't just
         // updating position only
@@ -124,7 +127,9 @@ public class Agent : MonoBehaviour
     public void MoveAgent(NavMeshPath newPath, bool updatePositionOnly = false)
     {
         navAgent.SetPath(newPath);
-        return;
+
+        if(walkingSound == null)
+            return;
 
         if (walkingCoroutine != null && !updatePositionOnly)
         {
@@ -174,4 +179,19 @@ public class Agent : MonoBehaviour
     }
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
+
+    protected virtual void OnDrawGizmosSelected()
+    {
+        if (navAgent.hasPath && !navAgent.isPathStale)
+        {
+            Vector3[] corners = navAgent.path.corners;
+            for (int i = 0; i < corners.Length - 1; ++i)
+            {
+                Vector3 start = corners[i];
+                Vector3 end = corners[i + 1];
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(start, end);
+            }
+        }
+    }
 }
