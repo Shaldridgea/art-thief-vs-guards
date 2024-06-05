@@ -10,6 +10,11 @@ public class SenseInterest : MonoBehaviour
     public bool IsSuspicious => isSuspicious;
 
     [SerializeField]
+    private GameObject owner;
+
+    public GameObject Owner => owner;
+
+    [SerializeField]
     private Consts.Team ownerTeam;
 
     public Consts.Team OwnerTeam => ownerTeam;

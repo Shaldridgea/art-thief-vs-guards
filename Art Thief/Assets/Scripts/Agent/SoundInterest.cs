@@ -28,7 +28,7 @@ public class SoundInterest : SenseInterest
     private void OnTriggerEnter(Collider other)
     {
         bool isAgent = other.CompareTag("Thief") || other.CompareTag("Guard");
-        // If this sound trigger hits a spy or guard, notify it
+        // If this sound trigger hits a thief or guard, notify it
         if(isAgent)
             if(other.TryGetComponent(out SensoryModule senses))
                 senses.NotifySound(this);

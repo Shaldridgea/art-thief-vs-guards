@@ -8,6 +8,8 @@ public class HidingArea : MonoBehaviour
     [SerializeField]
     private Consts.HidingAreaType areaType;
 
+    public Consts.HidingAreaType AreaType => areaType;
+
     [SerializeField]
     private BoxCollider boxArea;
 
@@ -19,10 +21,25 @@ public class HidingArea : MonoBehaviour
         IsSafe = areaType == Consts.HidingAreaType.Safe;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CheckForSafety(List<GuardAgent> threats)
     {
-        
+        if(areaType == Consts.HidingAreaType.Safe)
+            return;
+
+        for(int i = 0; i < threats.Count; ++i)
+        {
+            GuardAgent guard = threats[i];
+            float angleToArea = Vector3.Angle(guard.transform.forward, (transform.position - guard.transform.position).normalized);
+            if (angleToArea <= 50f)
+            {
+                if (!Physics.Linecast(guard.transform.position, transform.position, guard.Senses.LosMask, QueryTriggerInteraction.Ignore))
+                {
+                    IsSafe = false;
+                    return;
+                }
+            }
+        }
+        IsSafe = true;
     }
 
     private void OnDrawGizmos()
