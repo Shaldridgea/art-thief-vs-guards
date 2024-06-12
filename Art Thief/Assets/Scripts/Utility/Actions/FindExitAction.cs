@@ -20,4 +20,9 @@ public class FindExitAction : UtilityAction
     {
         thief.NavAgent.ResetPath();
     }
+
+    public override void OnSceneGUI()
+    {
+        return;
+    }
 }

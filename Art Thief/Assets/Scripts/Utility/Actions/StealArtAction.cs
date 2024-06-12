@@ -30,4 +30,9 @@ public class StealArtAction : UtilityAction
     {
         return;
     }
+
+    public override void OnSceneGUI()
+    {
+        return;
+    }
 }

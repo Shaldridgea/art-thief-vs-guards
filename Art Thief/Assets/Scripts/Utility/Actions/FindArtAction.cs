@@ -25,4 +25,9 @@ public class FindArtAction : UtilityAction
     {
         thief.NavAgent.ResetPath();
     }
+
+    public override void OnSceneGUI()
+    {
+        return;
+    }
 }

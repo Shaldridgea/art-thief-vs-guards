@@ -35,6 +35,8 @@ public abstract class UtilityAction
         public float GetValue(Blackboard board) => curve.Evaluate(motiveSource.GetInsistence(board));
     }
 
+    public delegate void DebugDrawCallback();
+
     protected Consts.UtilityActionType type;
 
     public string Name => type.ToString();
@@ -78,4 +80,6 @@ public abstract class UtilityAction
     public abstract void PerformAction(ThiefAgent thief);
 
     public abstract void ExitAction(ThiefAgent thief);
+
+    public abstract void OnSceneGUI();
 }

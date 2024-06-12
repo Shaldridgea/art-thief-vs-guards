@@ -149,4 +149,9 @@ public class HideAction : UtilityAction
         }
         return corners[^1];
     }
+
+    public override void OnSceneGUI()
+    {
+        return;
+    }
 }

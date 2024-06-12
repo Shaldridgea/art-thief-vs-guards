@@ -12,16 +12,6 @@ public class ThiefAgent : Agent
         base.Start();
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.CompareTag("Exit"))
-        {
-            // Declare the spy the winner if they get to the exit
-            // This ignores whether the spy has stolen the art or not since the guard's win condition is catching the spy
-            GameController.Instance.SpyWon();
-        }
-    }
-
     public override void HandleSoundHeard(SenseInterest sound)
     {
         // Ignore our own sounds

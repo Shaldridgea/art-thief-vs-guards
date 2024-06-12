@@ -33,6 +33,10 @@ public class Agent : MonoBehaviour
 
     public Blackboard AgentBlackboard { get; private set; }
 
+    private List<Room> roomList = new();
+
+    public Room CurrentRoom => roomList.Count == 0 ? null : roomList[^1];
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -193,5 +197,19 @@ public class Agent : MonoBehaviour
                 Gizmos.DrawLine(start, end);
             }
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Room"))
+            if(other.TryGetComponent(out Room room))
+                roomList.Add(room);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Room"))
+            if (other.TryGetComponent(out Room room))
+                roomList.Remove(room);
     }
 }

@@ -98,6 +98,9 @@ public static class Consts
 
             case UtilityActionType.Hide:
                 return new HideAction(actionData);
+
+            case UtilityActionType.Evade:
+                return new EvadeAction(actionData);
         }
         return null;
     }

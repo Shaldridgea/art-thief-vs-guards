@@ -92,4 +92,11 @@ public class UtilityBehaviour : MonoBehaviour
         for (int i = 0; i < actionList.Count; ++i)
             GUILayout.Box($"{actionData[i].Action}: {actionList[i].Score}", style);
     }
+
+    public UtilityAction.DebugDrawCallback GetDebugDrawCallback(){
+        if (currentAction != null)
+            return currentAction.OnSceneGUI;
+
+        return null;
+    }
 }
