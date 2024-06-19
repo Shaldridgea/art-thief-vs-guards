@@ -64,7 +64,7 @@ public class EvadeAction : UtilityAction
         // and make a list of doorways that go to rooms we haven't been in recently
         foreach (var d in room.Doorways)
         {
-            d.CalculateRisk(thief, (thief.Senses as ThiefSensoryModule).AwareGuards);
+            d.CalculateRisk(thief, thief.ThiefSenses.AwareGuards);
             leastRisk.Add(d);
             if (!GoesToRecentRoom(d))
                 validCandidates.Add(d);

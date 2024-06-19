@@ -19,7 +19,7 @@ public class HideAction : UtilityAction
     {
         turnedAround = false;
         Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, 15f, LayerMask.GetMask("Hide"), QueryTriggerInteraction.Collide);
-        ThiefSensoryModule thiefSenses = thief.Senses as ThiefSensoryModule;
+        ThiefSensoryModule senses = thief.ThiefSenses;
 
         List<(HidingArea area, float distance)> areaList = new List<(HidingArea area, float distance)>();
 
@@ -48,11 +48,11 @@ public class HideAction : UtilityAction
         // Check if any of these areas are safe to go to, preferring closest first
         foreach(var (area, distance) in areaList)
         {
-            area.CheckForSafety(thiefSenses.AwareGuards);
+            area.CheckForSafety(senses.AwareGuards);
             if (area.IsSafe)
             {
                 var newPath = Consts.GetNewPath(thief.transform.position, area.transform.position);
-                if (IsPathSafe(thief, newPath, thiefSenses.AwareGuards))
+                if (IsPathSafe(thief, newPath, senses.AwareGuards))
                 {
                     targetArea = area;
                     targetPosition = targetArea.transform.position;
@@ -65,21 +65,26 @@ public class HideAction : UtilityAction
 
     public override void PerformAction(ThiefAgent thief)
     {
-        if(targetArea != null && !thief.NavAgent.hasPath)
+        if (targetArea != null && !thief.NavAgent.hasPath)
+        {
             thief.MoveAgent(targetPath);
+            thief.AgentBlackboard.SetVariable("hiding", 1f);
+        }
 
         if (thief.NavAgent.hasPath && !turnedAround)
             if (thief.NavAgent.remainingDistance <= 1f)
             {
                 thief.TurnBody(180f, 1.5f);
-
+                thief.AgentBlackboard.SetVariable("hiding", 0f);
                 turnedAround = true;
             }
     }
 
     public override void ExitAction(ThiefAgent thief)
     {
-        return;
+        targetArea = null;
+        thief.AgentBlackboard.SetVariable("hiding", 0f);
+        thief.NavAgent.ResetPath();
     }
 
     private bool IsPathSafe(ThiefAgent thief, NavMeshPath path, List<GuardAgent> guardThreats)

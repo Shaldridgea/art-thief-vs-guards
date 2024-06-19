@@ -21,21 +21,55 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 0
         value: 0
+        inSlope: 3.1790736
+        outSlope: 3.1790736
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.03084223
+      - serializedVersion: 3
+        time: 1
+        value: 0.9078369
+        inSlope: 0.10728418
+        outSlope: -2.8794737
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.11981022
+        outWeight: 0.03440094
+      - serializedVersion: 3
+        time: 2
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  - motiveSource: {fileID: 11400000, guid: 1103c608f3b04814ca86ce3a2ed559df, type: 2}
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0.25
+        outSlope: 0.25
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 2
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
+        value: 0.25
+        inSlope: 0.25
+        outSlope: 0.25
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0.03440094
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 0

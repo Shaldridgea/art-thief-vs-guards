@@ -16,9 +16,6 @@ public class FindArtAction : UtilityAction
     {
         if(!thief.NavAgent.hasPath)
             thief.MoveAgent(thief.AgentBlackboard.GetVariable<Vector3>("artPosition"));
-
-        if (thief.NavAgent.hasPath)
-            thief.AgentBlackboard.SetVariable("nearToArt", thief.NavAgent.remainingDistance <= 1f ? 1f : 0f);
     }
 
     public override void ExitAction(ThiefAgent thief)

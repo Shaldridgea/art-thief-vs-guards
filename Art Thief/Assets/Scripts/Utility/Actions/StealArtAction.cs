@@ -20,10 +20,7 @@ public class StealArtAction : UtilityAction
         thief.AgentBlackboard.SetVariable("stealProgress", stealProgress);
 
         if (stealProgress >= 1f)
-        {
-            GameController.Instance.ArtGoal.SetParent(thief.transform, true);
-            thief.AgentBlackboard.SetVariable("artStolen", 1f);
-        }
+            thief.TakeArt();
     }
 
     public override void ExitAction(ThiefAgent thief)

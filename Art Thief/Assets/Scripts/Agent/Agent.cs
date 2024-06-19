@@ -106,6 +106,7 @@ public class Agent : MonoBehaviour
     public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
     {
         navAgent.SetDestination(newPosition);
+        LeanTween.cancel(AgentView.AgentRoot.gameObject);
 
         if (walkingSound == null)
             return;
@@ -131,8 +132,9 @@ public class Agent : MonoBehaviour
     public void MoveAgent(NavMeshPath newPath, bool updatePositionOnly = false)
     {
         navAgent.SetPath(newPath);
+        LeanTween.cancel(AgentView.AgentRoot.gameObject);
 
-        if(walkingSound == null)
+        if (walkingSound == null)
             return;
 
         if (walkingCoroutine != null && !updatePositionOnly)
