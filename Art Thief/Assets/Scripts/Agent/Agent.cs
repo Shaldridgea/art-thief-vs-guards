@@ -186,6 +186,13 @@ public class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
+    public void PlayFightingAnimation(bool beingAttacked)
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? 15f : -15f, 0.5f);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 1f).setFrom(beingAttacked ? 15f : -15f).setDelay(0.5f).setLoopPingPong(2);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setFrom(beingAttacked ? 15f : -15f).setDelay(4.5f);
+    }
+
     protected virtual void OnDrawGizmosSelected()
     {
         if (navAgent.hasPath && !navAgent.isPathStale)

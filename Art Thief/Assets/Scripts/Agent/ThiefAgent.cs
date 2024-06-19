@@ -30,11 +30,17 @@ public class ThiefAgent : Agent
         AgentBlackboard.SetVariable("nearToArt", Vector3.Distance(transform.position.ZeroY(), artGoal.position.ZeroY()) <= 1f ? 1f : 0f);
 
         float danger = 0f;
+        float aggression = 0f;
         var guards = ThiefSenses.AwareGuards;
         foreach(var g in guards)
         {
             bool hasLos = g.GuardSenses.IsInLOS(transform.position);
-            danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, Vector3.Distance(transform.position, g.transform.position));
+            float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
+            danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
+            if (distanceToGuard < 1f)
+                aggression += 0.5f;
+            if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= 15f)
+                aggression += 0.5f;
             if (hasLos)
                 danger += 0.5f;
         }
@@ -43,6 +49,7 @@ public class ThiefAgent : Agent
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
         storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
         AgentBlackboard.SetVariable("danger", storedDanger);
+        AgentBlackboard.SetVariable("aggro", aggression);
     }
 
     public void TakeArt()

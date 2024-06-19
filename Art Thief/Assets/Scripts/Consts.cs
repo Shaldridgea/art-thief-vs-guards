@@ -101,6 +101,9 @@ public static class Consts
 
             case UtilityActionType.Evade:
                 return new EvadeAction(actionData);
+
+            case UtilityActionType.Attack:
+                return new AttackAction(actionData);
         }
         return null;
     }
