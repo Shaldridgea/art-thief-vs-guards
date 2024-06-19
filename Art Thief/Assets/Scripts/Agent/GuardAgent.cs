@@ -17,6 +17,8 @@ public class GuardAgent : Agent
     [SerializeField]
     private PatrolPath perimeterPatrol;
 
+    public GuardSensoryModule GuardSenses => (GuardSensoryModule)senses;
+
     private BehaviourTree agentTree;
 
     private Transform targetPoint;

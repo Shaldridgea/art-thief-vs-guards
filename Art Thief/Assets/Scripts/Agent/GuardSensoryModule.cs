@@ -26,6 +26,21 @@ public class GuardSensoryModule : SensoryModule
         }
     }
 
+    public bool IsInLOS(Vector3 checkPosition, Vector3 guardForward = default)
+    {
+        if (guardForward == default)
+            guardForward = transform.forward;
+
+        float lookAngle = Vector3.Angle(guardForward,
+            (checkPosition.ZeroY() - transform.position.ZeroY()).normalized);
+
+        if (lookAngle <= VIEW_ANGLE)
+            if (!Physics.Linecast(checkPosition, owner.AgentView.AgentEyeRoot.position, losMask, QueryTriggerInteraction.Ignore))
+                return true;
+
+        return false;
+    }
+
     private void HandleVisionEnter(VisionCone origin, GameObject other)
     {
         if (other.TryGetComponent(out VisualInterest visualInterest))

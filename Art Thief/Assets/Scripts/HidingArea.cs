@@ -29,14 +29,10 @@ public class HidingArea : MonoBehaviour
         for(int i = 0; i < threats.Count; ++i)
         {
             GuardAgent guard = threats[i];
-            float angleToArea = Vector3.Angle(guard.transform.forward, (transform.position - guard.transform.position).normalized);
-            if (angleToArea <= 50f)
+            if(guard.GuardSenses.IsInLOS(transform.position))
             {
-                if (!Physics.Linecast(guard.transform.position, transform.position, guard.Senses.LosMask, QueryTriggerInteraction.Ignore))
-                {
-                    IsSafe = false;
-                    return;
-                }
+                IsSafe = false;
+                return;
             }
         }
         IsSafe = true;

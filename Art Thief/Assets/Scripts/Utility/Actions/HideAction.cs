@@ -109,16 +109,10 @@ public class HideAction : UtilityAction
                 if (guardPosition == hit.position)
                     guardDirection = guard.transform.forward;
 
-                // Get the angle from guard's looking vector to thief position
-                float angleToThief = Vector3.Angle(guardDirection, thiefPosition-guardPosition);
+                // If guard has line of sight to thief, report this path as being unsafe
+                if (guard.GuardSenses.IsInLOS(thiefPosition, guardDirection))
+                    return false;
 
-                // If thief is in viewing angle to guard
-                if (angleToThief <= 50f)
-                {
-                    // If guard has line of sight to thief, report this path as being unsafe
-                    if (!Physics.Linecast(guardPosition, thiefPosition, guard.Senses.LosMask, QueryTriggerInteraction.Ignore))
-                        return false;
-                }
                 guardPosition = hit.position;
 
                 // If terminated that means we reached the end of the current path
