@@ -68,7 +68,7 @@ public abstract class SensoryModule : MonoBehaviour
         LayerMask.GetMask("Interest", "Thief", "Guard"),
         QueryTriggerInteraction.Collide);
 
-        List<GameObject> desiredInterests = new List<GameObject>();
+        List<GameObject> desiredInterests = new();
         foreach(Collider c in nearbyInterests)
         {
             if (c.CompareTag(interestTag) && c.gameObject != owner.gameObject)

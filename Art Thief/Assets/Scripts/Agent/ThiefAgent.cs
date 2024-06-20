@@ -32,8 +32,13 @@ public class ThiefAgent : Agent
         float danger = 0f;
         float aggression = 0f;
         var guards = ThiefSenses.AwareGuards;
+        int guardThreats = 0;
         foreach(var g in guards)
         {
+            if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
+                continue;
+
+            ++guardThreats;
             bool hasLos = g.GuardSenses.IsInLOS(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
@@ -44,8 +49,8 @@ public class ThiefAgent : Agent
             if (hasLos)
                 danger += 0.5f;
         }
-        danger /= Mathf.Max(guards.Count, 1);
-        danger += guards.Count * 0.1f;
+        danger /= Mathf.Max(guardThreats, 1);
+        danger += guardThreats * 0.1f;
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
         storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
         AgentBlackboard.SetVariable("danger", storedDanger);

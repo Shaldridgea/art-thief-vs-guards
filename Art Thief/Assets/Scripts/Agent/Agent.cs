@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using NaughtyAttributes;
 
 public class Agent : MonoBehaviour
 {
@@ -105,6 +106,10 @@ public class Agent : MonoBehaviour
     /// <param name="updatePositionOnly"></param>
     public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
     {
+        navAgent.updatePosition = true;
+        navAgent.updateRotation = true;
+        navAgent.updateUpAxis = true;
+
         navAgent.SetDestination(newPosition);
         LeanTween.cancel(AgentView.AgentRoot.gameObject);
 
@@ -131,6 +136,10 @@ public class Agent : MonoBehaviour
     /// <param name="updatePositionOnly"></param>
     public void MoveAgent(NavMeshPath newPath, bool updatePositionOnly = false)
     {
+        navAgent.updatePosition = true;
+        navAgent.updateRotation = true;
+        navAgent.updateUpAxis = true;
+
         navAgent.SetPath(newPath);
         LeanTween.cancel(AgentView.AgentRoot.gameObject);
 
@@ -186,11 +195,36 @@ public class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
-    public void PlayFightingAnimation(bool beingAttacked)
+    public void PlayFightSequence(bool isWinner)
     {
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? 15f : -15f, 0.5f);
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 1f).setFrom(beingAttacked ? 15f : -15f).setDelay(0.5f).setLoopPingPong(2);
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setFrom(beingAttacked ? 15f : -15f).setDelay(4.5f);
+        StartCoroutine(EnumerateFightSequence(isWinner));
+    }
+
+    private IEnumerator EnumerateFightSequence(bool isWinner)
+    {
+        PlayFightingAnimation(!isWinner);
+        yield return new WaitForSeconds(3f);
+        PlayFightOutcomeAnimation(isWinner);
+        yield return new WaitForSeconds(1f);
+        if(!isWinner)
+        {
+            AgentBlackboard.SetVariable("isInteracting", false);
+            AgentBlackboard.SetVariable("isStunned", true);
+        }
+    }
+
+    private void PlayFightingAnimation(bool beingAttacked)
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? 15f : -15f, 0.3f);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 0.6f).setFrom(beingAttacked ? 15f : -15f).setDelay(0.3f).setLoopPingPong(2);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.3f).setFrom(beingAttacked ? 15f : -15f).setDelay(2.7f);
+    }
+
+    private void PlayFightOutcomeAnimation(bool isWinner)
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 40f : -90f, isWinner ? 0.2f : 0.4f);
+        if(isWinner)
+            LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setDelay(0.4f);
     }
 
     protected virtual void OnDrawGizmosSelected()

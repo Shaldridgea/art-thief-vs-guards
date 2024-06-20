@@ -27,9 +27,15 @@ public class DoorwayArea : MonoBehaviour
     {
         Risk = 0f;
         Risk += Mathf.InverseLerp(5f, 25f, Vector3.Distance(GetNearestPoint(thief.transform.position), thief.transform.position));
+        int threatCount = 0;
         for (int i = 0; i < threats.Count; ++i)
         {
             GuardAgent guard = threats[i];
+
+            if (guard.AgentBlackboard.GetVariable<bool>("isStunned"))
+                continue;
+
+            ++threatCount;
             Vector3 nearPoint = GetNearestPoint(guard.transform.position);
             Risk += Mathf.InverseLerp(18f, 7f, Vector3.Distance(nearPoint, guard.transform.position));
             float angleToDoorway = Vector3.Angle(guard.transform.forward, (nearPoint - guard.transform.position).normalized);
@@ -44,7 +50,7 @@ public class DoorwayArea : MonoBehaviour
             if (angleGuardToDoorway <= 35f)
                 Risk += 0.4f;
         }
-        Risk /= Mathf.Max(threats.Count, 1);
+        Risk /= Mathf.Max(threatCount, 1);
     }
 
     public Vector3 GetNearestPoint(Vector3 position)

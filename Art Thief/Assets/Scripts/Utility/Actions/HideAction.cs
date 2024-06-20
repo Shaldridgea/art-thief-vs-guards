@@ -96,6 +96,9 @@ public class HideAction : UtilityAction
         {
             GuardAgent guard = guardThreats[i];
 
+            if (guard.AgentBlackboard.GetVariable<bool>("isStunned"))
+                continue;
+
             // Store our initial guard position before simulation
             Vector3 guardPosition = guard.transform.position;
             // Simulate in steps of 2 seconds, for 8 seconds into the future

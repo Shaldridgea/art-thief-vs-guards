@@ -19,6 +19,6 @@ public class SuspicionEditorVisualisation : Editor
         GUI.color = color;
 
         foreach(var k in data)
-            Handles.Label(k.Key.gameObject.transform.position, $"Visible: {k.Value.Visible}\nAware: {k.Value.Awareness}");
+            Handles.Label(k.Key.transform.position, $"Visible: {k.Value.Visible}\nAware: {k.Value.Awareness}");
     }
 }
