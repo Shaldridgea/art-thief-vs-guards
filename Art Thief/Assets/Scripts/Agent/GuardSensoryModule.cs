@@ -8,11 +8,11 @@ public class GuardSensoryModule : SensoryModule
     [SerializeField]
     private VisionCone[] visionCones;
 
-    private List<SenseInterest> inConeObjects = new List<SenseInterest>();
+    private List<SenseInterest> inConeObjects = new();
 
-    private Dictionary<SenseInterest, bool> visibilityMap = new Dictionary<SenseInterest, bool>();
+    private Dictionary<SenseInterest, bool> visibilityMap = new();
 
-    private Dictionary<SenseInterest, int> entryCountMap = new Dictionary<SenseInterest, int>();
+    private Dictionary<SenseInterest, int> entryCountMap = new();
 
     private float losCheckTimer;
 
@@ -29,7 +29,7 @@ public class GuardSensoryModule : SensoryModule
     public bool IsInLOS(Vector3 checkPosition, Vector3 guardForward = default)
     {
         if (guardForward == default)
-            guardForward = transform.forward;
+            guardForward = owner.AgentView.AgentEyeRoot.forward;
 
         float lookAngle = Vector3.Angle(guardForward,
             (checkPosition.ZeroY() - transform.position.ZeroY()).normalized);

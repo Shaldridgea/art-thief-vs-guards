@@ -29,7 +29,7 @@ public abstract class SensoryModule : MonoBehaviour
 
     public event SenseDelegate SoundHeard;
 
-    public const float VIEW_ANGLE = 50f;
+    public const float VIEW_ANGLE = 75f;
 
     protected Agent owner;
 

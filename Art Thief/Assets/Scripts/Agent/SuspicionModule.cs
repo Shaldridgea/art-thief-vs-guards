@@ -6,15 +6,15 @@ public class SuspicionModule : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("How long in seconds for a suspicious thing to be spotted")]
-    private float spottedTimerMax;
+    private float reactionTimerMax;
 
-    private float spottedTimer;
+    private float reactionTimer;
 
-    private Dictionary<SuspiciousInterest, (bool Visible, float Awareness)> visualSuspectMap = new Dictionary<SuspiciousInterest, (bool Visible, float Awareness)>();
+    private Dictionary<SuspiciousInterest, (bool Visible, float Awareness)> visualSuspectMap = new();
 
-    private List<SuspiciousInterest> visualSuspectList = new List<SuspiciousInterest>();
+    private List<SuspiciousInterest> visualSuspectList = new();
 
-    private List<SuspiciousInterest> ignoreList = new List<SuspiciousInterest>();
+    private List<SuspiciousInterest> ignoreList = new();
 
     private int suspicionPriority;
 
@@ -26,7 +26,7 @@ public class SuspicionModule : MonoBehaviour
     void Start()
     {
         suspicionPriority = -1;
-        spottedTimer = -1f;
+        reactionTimer = -1f;
         if (TryGetComponent(out Agent myAgent))
             owner = myAgent;
     }
@@ -34,45 +34,55 @@ public class SuspicionModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool checkReaction = false;
+        if (reactionTimer == 0f)
+        {
+            checkReaction = true;
+            reactionTimer = -1f;
+        }
+        else if (reactionTimer > 0f)
+            reactionTimer = Mathf.Max(reactionTimer - Time.deltaTime, 0f);
+
         bool newSuspicionSet = false;
         foreach(var key in visualSuspectList)
         {
-            if (ignoreList.Contains(key))
-                continue;
-
             var suspectValues = visualSuspectMap[key];
-            suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime * (suspectValues.Visible ? 1f : -1f)), 0f, 1f);
+            float compareAware = suspectValues.Awareness;
+            suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime * (suspectValues.Visible ? 1f : -1f)), 0f, 2f);
             visualSuspectMap[key] = suspectValues;
 
-            if(visualSuspectMap[key].Awareness >= 1f)
+            if(suspectValues.Awareness >= 1f)
             {
-                SetSuspicion(key);
-                newSuspicionSet = true;
-                spottedTimer = spottedTimerMax;
-                break;
+                if (compareAware < 1f)
+                {
+                    SetSuspicion(key);
+                    newSuspicionSet = true;
+                    reactionTimer = reactionTimerMax;
+                    break;
+                }
+
+                if(checkReaction)
+                    if(suspectValues.Awareness >= 2f)
+                        owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
+                    else
+                        owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
             }
         }
         if (newSuspicionSet)
             CullSuspects();
-
-        if (spottedTimer == 0f)
-        {
-            owner.AgentBlackboard.SetVariable("suspicionConfirmed", true);
-            spottedTimer = -1f;
-        }
-        else if(spottedTimer > 0f)
-            spottedTimer = Mathf.Max(spottedTimer - Time.deltaTime, 0f);
     }
 
-    private void SetSuspicion(SuspiciousInterest newInterest)
+    protected virtual void SetSuspicion(SuspiciousInterest newInterest)
     {
         currentSuspicion = newInterest;
         suspicionPriority = currentSuspicion.Priority;
         owner.AgentBlackboard.SetVariable("suspicious", true);
-        owner.AgentBlackboard.SetVariable("suspicionFound", true);
+        owner.AgentBlackboard.SetVariable("suspicionStatus", "reacting");
         owner.AgentBlackboard.SetVariable("suspicion", currentSuspicion.gameObject);
-        owner.AgentBlackboard.SetVariable("thiefFound", currentSuspicion.CompareTag("Thief"));
-        ignoreList.Add(newInterest);
+        bool isThief = currentSuspicion.CompareTag("Thief");
+        owner.AgentBlackboard.SetVariable("thiefFound", isThief);
+        if(!isThief)
+            ignoreList.Add(newInterest);
     }
 
     private void CullSuspects()

@@ -128,6 +128,9 @@ public static class BehaviourTreeFactory
 
             case Consts.BehaviourType.IsTurningHead:
                 return new IsTurningHead(tree);
+
+            case Consts.BehaviourType.HasLineOfSight:
+                return new HasLoS(tree, dataNode.GetParameters());
         }
         return newNode;
     }

@@ -13,17 +13,28 @@ public class EvadeAction : UtilityAction
 
     private Queue<Room> recentRooms = new();
 
+    private float speedBoostStamina;
+
     public EvadeAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
     {
         FindSafeExit(thief);
+        speedBoostStamina = 0.5f;
+        thief.NavAgent.speed += speedBoostStamina;
     }
 
     public override void PerformAction(ThiefAgent thief)
     {
         if (targetDoorway != null && !thief.NavAgent.hasPath)
             thief.MoveAgent(targetPoint);
+
+        if(speedBoostStamina > 0f)
+        {
+            float lossDelta = Mathf.Min(Time.deltaTime / 3f, speedBoostStamina);
+            speedBoostStamina -= lossDelta;
+            thief.NavAgent.speed -= lossDelta;
+        }
 
         if (!thief.NavAgent.pathPending && thief.NavAgent.remainingDistance < thief.NavAgent.radius)
         {

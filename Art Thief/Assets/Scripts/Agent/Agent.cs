@@ -176,6 +176,7 @@ public class Agent : MonoBehaviour
 
     public void TurnHead(float turnAngle, float time)
     {
+        LeanTween.cancel(AgentView.AgentHeadRoot.gameObject);
         // Adjust our turning angle to be clamped so the head doesn't turn all the way around like an owl
         turnAngle = Mathf.Clamp(turnAngle, -100f, 100f);
 
@@ -190,6 +191,7 @@ public class Agent : MonoBehaviour
 
     public void TurnBody(float turnAngle, float time)
     {
+        LeanTween.cancel(AgentView.AgentRoot.gameObject);
         LeanTween.rotateAroundLocal(AgentView.AgentRoot.gameObject, Vector3.up, turnAngle, time);
     }
 

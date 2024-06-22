@@ -33,7 +33,8 @@ public static class Consts
         SetPointFromGameObject,
         StopMoving,
         TurnHead,
-        IsTurningHead
+        IsTurningHead,
+        HasLineOfSight
     }
 
     public enum RepeatCondition
