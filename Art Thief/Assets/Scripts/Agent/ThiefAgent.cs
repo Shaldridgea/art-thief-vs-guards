@@ -33,6 +33,7 @@ public class ThiefAgent : Agent
         float aggression = 0f;
         var guards = ThiefSenses.AwareGuards;
         int guardThreats = 0;
+        bool beingChased = false;
         foreach(var g in guards)
         {
             if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
@@ -48,9 +49,13 @@ public class ThiefAgent : Agent
                 aggression += 0.5f;
             if (hasLos)
                 danger += 0.5f;
+            if (g.AgentBlackboard.GetVariable<string>("guardMode") == "chase")
+                beingChased = true;
         }
         danger /= Mathf.Max(guardThreats, 1);
         danger += guardThreats * 0.1f;
+        if (beingChased)
+            danger += 1f;
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
         storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
         AgentBlackboard.SetVariable("danger", storedDanger);

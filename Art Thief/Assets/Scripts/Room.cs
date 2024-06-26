@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using NaughtyAttributes;
 
 public class Room : MonoBehaviour
 {
@@ -24,5 +25,25 @@ public class Room : MonoBehaviour
         style.fontSize = 40;
         style.alignment = TextAnchor.MiddleCenter;
         Handles.Label(transform.position + Vector3.up * 2f, roomID, style);
+    }
+
+    [Button("Scan doorways", EButtonEnableMode.Editor)]
+    private void ScanDoorways()
+    {
+        if (TryGetComponent(out BoxCollider box))
+        {
+            var overlaps = Physics.OverlapBox(
+                transform.position + box.center,
+                box.size / 2f, Quaternion.identity,
+                LayerMask.GetMask("Default"),
+                QueryTriggerInteraction.Collide);
+
+            if (overlaps.Length > 0)
+                Doorways.Clear();
+
+            foreach (var o in overlaps)
+                if (o.CompareTag("Doorway"))
+                    Doorways.Add(o.GetComponent<DoorwayArea>());
+        }
     }
 }

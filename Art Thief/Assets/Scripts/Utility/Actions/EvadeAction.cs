@@ -69,6 +69,10 @@ public class EvadeAction : UtilityAction
             currentRoom = room;
         }
 
+        // If we're in a dead end we no longer care about avoiding previous rooms
+        if (currentRoom.Doorways.Count == 1)
+            recentRooms.Clear();
+
         List<DoorwayArea> leastRisk = new(room.Doorways.Count);
         List<DoorwayArea> validCandidates = new();
         // Calculate risk of every doorway in the room, make a list of them,

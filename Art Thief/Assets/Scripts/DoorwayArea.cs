@@ -13,6 +13,9 @@ public class DoorwayArea : MonoBehaviour
     [SerializeField]
     private BoxCollider boxArea;
 
+    [SerializeField]
+    private float baseRisk;
+
     public float Risk { get; private set; }
 
     public List<Room> ConnectedRooms { get; private set; } = new();
@@ -51,6 +54,7 @@ public class DoorwayArea : MonoBehaviour
                 Risk += 0.4f;
         }
         Risk /= Mathf.Max(threatCount, 1);
+        Risk += baseRisk;
     }
 
     public Vector3 GetNearestPoint(Vector3 position)
@@ -84,8 +88,8 @@ public class DoorwayArea : MonoBehaviour
         gizColor.a = 0.3f;
         Gizmos.color = gizColor;
         Gizmos.DrawCube(transform.position + boxArea.center, boxArea.size);
-        foreach (Vector3 p in EndPoints)
-            Gizmos.DrawSphere(p, 0.25f);
+        foreach (Transform t in endPoints)
+            Gizmos.DrawSphere(t.position, 0.25f);
     }
 
     private void UpdateEndPoints()
