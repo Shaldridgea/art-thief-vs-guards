@@ -131,6 +131,9 @@ public static class BehaviourTreeFactory
 
             case Consts.BehaviourType.HasLineOfSight:
                 return new HasLoS(tree, dataNode.GetParameters());
+
+            case Consts.BehaviourType.CallMethod:
+                return new CallMethod(tree, dataNode.GetParameters());
         }
         return newNode;
     }

@@ -229,6 +229,11 @@ public class Agent : MonoBehaviour
             LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setDelay(0.4f);
     }
 
+    public void PlayWakeupAnimation()
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 2f);
+    }
+
     protected virtual void OnDrawGizmosSelected()
     {
         if (navAgent.hasPath && !navAgent.isPathStale)

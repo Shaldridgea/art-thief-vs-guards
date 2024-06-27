@@ -2053,6 +2053,38 @@ MonoBehaviour:
     boolValue: 0
     stringValue: breaktime
     vector3Value: {x: 0, y: 0, z: 0}
+--- !u!114 &-4453815625937583341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb23a23bdc3890f439835beeaa7c6bd8, type: 3}
+  m_Name: Wait
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -88, y: 1240}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -4453815625937583341}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 6
+        node: {fileID: 8492545156083403774}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 8
+  waitTime: 4
 --- !u!114 &-4294629469072886702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,6 +2160,38 @@ MonoBehaviour:
   checkConditions:
   - guardMode == "passive"
   - thiefFound == false
+--- !u!114 &-4201196430343688776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff89d166e740a84cb9b6e3ec6d859d7, type: 3}
+  m_Name: Call Method
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -88, y: 1144}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -4201196430343688776}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 5
+        node: {fileID: 8492545156083403774}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 21
+  methodName: PlayWakeupAnimation
 --- !u!114 &-4121646803242706734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3684,6 +3748,8 @@ MonoBehaviour:
   - {fileID: -4977229330243584366}
   - {fileID: -5826307486495019599}
   - {fileID: -1956377598067040278}
+  - {fileID: -4201196430343688776}
+  - {fileID: -4453815625937583341}
 --- !u!114 &94470562830326798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7235,6 +7301,8 @@ MonoBehaviour:
     - childNodes 2
     - childNodes 3
     - childNodes 4
+    - childNodes 5
+    - childNodes 6
     values:
     - _fieldName: parentNode
       _node: {fileID: 8492545156083403774}
@@ -7318,6 +7386,32 @@ MonoBehaviour:
       connections:
       - fieldName: parentNode
         node: {fileID: 2735189802663632621}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+    - _fieldName: childNodes 5
+      _node: {fileID: 8492545156083403774}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: -4201196430343688776}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+    - _fieldName: childNodes 6
+      _node: {fileID: 8492545156083403774}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: -4453815625937583341}
         reroutePoints: []
       _direction: 1
       _connectionType: 1

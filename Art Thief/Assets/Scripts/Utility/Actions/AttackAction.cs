@@ -23,7 +23,7 @@ public class AttackAction : UtilityAction
                 continue;
 
             float angleToGuard = Vector3.Angle(thief.transform.forward, (g.transform.position - thief.transform.position).normalized);
-            if (angleToGuard <= 20f)
+            if (angleToGuard <= thief.AggroAngle)
             {
                 float distanceToGuard = Vector3.Distance(thief.transform.position, g.transform.position);
                 if(distanceToGuard <= beatDistance)
@@ -39,17 +39,7 @@ public class AttackAction : UtilityAction
         // or rotating the agents during their animated interaction
         if (targetGuard != null)
         {
-            thief.transform.LookAt(targetGuard.transform, Vector3.up);
-            thief.NavAgent.ResetPath();
-            thief.NavAgent.updatePosition = false;
-            thief.NavAgent.updateRotation = false;
-            thief.NavAgent.updateUpAxis = false;
-
-            targetGuard.transform.LookAt(thief.transform, Vector3.up);
-            targetGuard.NavAgent.ResetPath();
-            targetGuard.NavAgent.updatePosition = false;
-            targetGuard.NavAgent.updateRotation = false;
-            targetGuard.NavAgent.updateUpAxis = false;
+            SetupAttack(thief);
         }
     }
 
@@ -91,6 +81,21 @@ public class AttackAction : UtilityAction
 
         animationStarted = false;
         targetGuard = null;
+    }
+
+    private void SetupAttack(ThiefAgent thief)
+    {
+        thief.transform.LookAt(targetGuard.transform, Vector3.up);
+        thief.NavAgent.ResetPath();
+        thief.NavAgent.updatePosition = false;
+        thief.NavAgent.updateRotation = false;
+        thief.NavAgent.updateUpAxis = false;
+
+        targetGuard.transform.LookAt(thief.transform, Vector3.up);
+        targetGuard.NavAgent.ResetPath();
+        targetGuard.NavAgent.updatePosition = false;
+        targetGuard.NavAgent.updateRotation = false;
+        targetGuard.NavAgent.updateUpAxis = false;
     }
 
     public override void OnSceneGUI()

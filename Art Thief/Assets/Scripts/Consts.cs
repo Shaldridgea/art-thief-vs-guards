@@ -34,7 +34,8 @@ public static class Consts
         StopMoving,
         TurnHead,
         IsTurningHead,
-        HasLineOfSight
+        HasLineOfSight,
+        CallMethod
     }
 
     public enum RepeatCondition

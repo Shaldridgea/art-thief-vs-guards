@@ -12,6 +12,15 @@ public class ThiefAgent : Agent
     [SerializeField]
     private float dangerDistanceMax = 20f;
 
+    [SerializeField]
+    [Tooltip("Distance thief must be within to aggro on guard")]
+    private float aggroRadius = 1f;
+    public float AggroRadius => aggroRadius;
+    [SerializeField]
+    [Tooltip("Vision angle of thief to aggro on a guard")]
+    private float aggroAngle = 15f;
+    public float AggroAngle => aggroAngle;
+
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
 
     private Transform artGoal;
@@ -43,9 +52,10 @@ public class ThiefAgent : Agent
             bool hasLos = g.GuardSenses.IsInLOS(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
-            if (distanceToGuard < 1f)
+
+            if (distanceToGuard < aggroRadius)
                 aggression += 0.5f;
-            if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= 15f)
+            if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
                 aggression += 0.5f;
             if (hasLos)
                 danger += 0.5f;
