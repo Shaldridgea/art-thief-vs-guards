@@ -54,9 +54,8 @@ public class ThiefAgent : Agent
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
             if (distanceToGuard < aggroRadius)
-                aggression += 0.5f;
-            if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
-                aggression += 0.5f;
+                if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
+                    aggression += 1f;
             if (hasLos)
                 danger += 0.5f;
             if (g.AgentBlackboard.GetVariable<string>("guardMode") == "chase")
@@ -67,7 +66,8 @@ public class ThiefAgent : Agent
         if (beingChased)
             danger += 1f;
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
-        storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
+        //storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
+        storedDanger = danger;
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
     }
