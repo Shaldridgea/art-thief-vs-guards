@@ -20,14 +20,14 @@ public class SuspicionModule : MonoBehaviour
 
     private SuspiciousInterest currentSuspicion;
 
-    private Agent owner;
+    private GuardAgent owner;
 
     // Start is called before the first frame update
     void Start()
     {
         suspicionPriority = -1;
         reactionTimer = -1f;
-        if (TryGetComponent(out Agent myAgent))
+        if (TryGetComponent(out GuardAgent myAgent))
             owner = myAgent;
     }
 
@@ -48,7 +48,19 @@ public class SuspicionModule : MonoBehaviour
         {
             var suspectValues = visualSuspectMap[key];
             float compareAware = suspectValues.Awareness;
-            suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime * (suspectValues.Visible ? 1f : -1f)), 0f, 2f);
+
+            // Awareness delta is how fast the guard becomes aware/suspicious of something
+            // 1 is the baseline of taking 1 second to become aware
+            // 2 would take 2 seconds, 0.5 would be half a second etc.
+            float awarenessDelta = 1f;
+            if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
+                awarenessDelta += 1.5f;
+            awarenessDelta *= Mathf.Lerp(0.25f, 2f,
+                Mathf.InverseLerp(5f, 20f,
+                Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
+            suspectValues.Awareness =
+                Mathf.Clamp(suspectValues.Awareness +
+                (Time.deltaTime / (suspectValues.Visible ? awarenessDelta : -1f)), 0f, 2f);
             visualSuspectMap[key] = suspectValues;
 
             if(suspectValues.Awareness >= 1f)

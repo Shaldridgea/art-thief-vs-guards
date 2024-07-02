@@ -14,6 +14,8 @@ public class GuardSensoryModule : SensoryModule
 
     private Dictionary<SenseInterest, int> entryCountMap = new();
 
+    private Dictionary<GameObject, bool> centralVisionMap = new();
+
     private float losCheckTimer;
 
     protected override void Start()
@@ -41,6 +43,9 @@ public class GuardSensoryModule : SensoryModule
         return false;
     }
 
+    public bool IsInCentralVision(GameObject interest) =>
+        centralVisionMap.TryGetValue(interest, out bool value) ? value : false;
+
     private void HandleVisionEnter(VisionCone origin, GameObject other)
     {
         if (other.TryGetComponent(out VisualInterest visualInterest))
@@ -48,10 +53,15 @@ public class GuardSensoryModule : SensoryModule
             {
                 inConeObjects.Add(visualInterest);
                 visibilityMap[visualInterest] = false;
+                centralVisionMap[other] = origin.IsCentralVision;
                 entryCountMap[visualInterest] = 1;
             }
             else
+            {
                 entryCountMap[visualInterest]++;
+                if (origin.IsCentralVision)
+                    centralVisionMap[other] = true;
+            }
     }
 
     private void HandleVisionExit(VisionCone origin, GameObject other)
@@ -59,6 +69,9 @@ public class GuardSensoryModule : SensoryModule
         if (other.TryGetComponent(out VisualInterest visualInterest))
             if (inConeObjects.Contains(visualInterest))
             {
+                if (origin.IsCentralVision)
+                    centralVisionMap[other] = false;
+
                 if (--entryCountMap[visualInterest] == 0)
                 {
                     if(visibilityMap[visualInterest])
