@@ -28,16 +28,10 @@ public class HideAction : UtilityAction
             if (c.TryGetComponent(out HidingArea area))
                 areaList.Add(( area, Vector3.Distance(thief.transform.position, area.transform.position) ));
 
-        // Sort our areas by safety, then distance, shortest to farthest
+        // Sort our areas by distance, shortest to farthest
         areaList.Sort(delegate((HidingArea area, float distance) x, (HidingArea area, float distance) y)
         {
-            if (x.area.AreaType == Consts.HidingAreaType.Safe &&
-                y.area.AreaType != Consts.HidingAreaType.Safe)
-                return -1;
-            else if (y.area.AreaType == Consts.HidingAreaType.Safe &&
-                    x.area.AreaType != Consts.HidingAreaType.Safe)
-                return 1;
-            else if (x.distance < y.distance)
+            if (x.distance < y.distance)
                 return -1;
             else if (x.distance > y.distance)
                 return 1;
