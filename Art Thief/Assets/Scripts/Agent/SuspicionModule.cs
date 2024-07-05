@@ -10,15 +10,15 @@ public class SuspicionModule : MonoBehaviour
 
     private float reactionTimer;
 
-    private Dictionary<SuspiciousInterest, (bool Visible, float Awareness)> visualSuspectMap = new();
+    private Dictionary<SenseInterest, (bool Visible, float Awareness)> visualSuspectMap = new();
 
-    private List<SuspiciousInterest> visualSuspectList = new();
+    private List<SenseInterest> visualSuspectList = new();
 
-    private List<SuspiciousInterest> ignoreList = new();
+    private List<SenseInterest> ignoreList = new();
 
     private int suspicionPriority;
 
-    private SuspiciousInterest currentSuspicion;
+    private SenseInterest currentSuspicion;
 
     private GuardAgent owner;
 
@@ -53,11 +53,19 @@ public class SuspicionModule : MonoBehaviour
             // 1 is the baseline of taking 1 second to become aware
             // 2 would take 2 seconds, 0.5 would be half a second etc.
             float awarenessDelta = 1f;
+            // Add 1.5 seconds to awareness if we're in peripheral vision
             if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
                 awarenessDelta += 1.5f;
+
+            // Change awareness factor based on distance
             awarenessDelta *= Mathf.Lerp(0.25f, 2f,
                 Mathf.InverseLerp(5f, 20f,
                 Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
+
+            // Change awareness factor to take 3 times as long if interest is in the dark
+            if (!(key as VisualInterest).IsLitUp)
+                awarenessDelta *= 3f;
+
             suspectValues.Awareness =
                 Mathf.Clamp(suspectValues.Awareness +
                 (Time.deltaTime / (suspectValues.Visible ? awarenessDelta : -1f)), 0f, 2f);
@@ -84,7 +92,7 @@ public class SuspicionModule : MonoBehaviour
             CullSuspects();
     }
 
-    protected virtual void SetSuspicion(SuspiciousInterest newInterest)
+    protected virtual void SetSuspicion(SenseInterest newInterest)
     {
         currentSuspicion = newInterest;
         suspicionPriority = currentSuspicion.Priority;
@@ -110,7 +118,7 @@ public class SuspicionModule : MonoBehaviour
         }
     }
 
-    public bool OnSuspicionSensed(SuspiciousInterest newInterest, Consts.SuspicionType suspicionType)
+    public bool OnSuspicionSensed(SenseInterest newInterest, Consts.SuspicionType suspicionType)
     {
         if (ignoreList.Contains(newInterest))
             return false;
@@ -141,7 +149,7 @@ public class SuspicionModule : MonoBehaviour
         return false;
     }
 
-    public void OnVisualSuspectLost(SuspiciousInterest lostInterest)
+    public void OnVisualSuspectLost(SenseInterest lostInterest)
     {
         if (ignoreList.Contains(lostInterest))
             return;
@@ -151,5 +159,5 @@ public class SuspicionModule : MonoBehaviour
         visualSuspectMap[lostInterest] = value;
     }
 
-    public Dictionary<SuspiciousInterest, (bool Visible, float Awareness)> GetSuspectData() => visualSuspectMap;
+    public Dictionary<SenseInterest, (bool Visible, float Awareness)> GetSuspectData() => visualSuspectMap;
 }

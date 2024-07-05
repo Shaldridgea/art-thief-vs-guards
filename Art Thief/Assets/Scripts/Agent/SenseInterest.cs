@@ -10,6 +10,11 @@ public class SenseInterest : MonoBehaviour
     public bool IsSuspicious => isSuspicious;
 
     [SerializeField]
+    private int priority;
+
+    public int Priority => priority;
+
+    [SerializeField]
     private GameObject owner;
 
     public GameObject Owner => owner;

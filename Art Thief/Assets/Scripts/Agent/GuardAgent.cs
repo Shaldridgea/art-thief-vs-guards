@@ -61,10 +61,7 @@ public class GuardAgent : Agent
         if (sound.OwnerTeam == Consts.Team.GUARD && !sound.IsSuspicious)
             return;
 
-        if (!sound.TryGetComponent(out SuspiciousInterest suspect))
-            return;
-
-        suspicion.OnSuspicionSensed(suspect, Consts.SuspicionType.Sound);
+        suspicion.OnSuspicionSensed(sound, Consts.SuspicionType.Sound);
     }
 
     public override void HandleVisualFound(SenseInterest visual)
@@ -74,10 +71,7 @@ public class GuardAgent : Agent
         if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
             return;
 
-        if (!visual.TryGetComponent(out SuspiciousInterest suspect))
-            return;
-
-        suspicion.OnSuspicionSensed(suspect, Consts.SuspicionType.Visual);
+        suspicion.OnSuspicionSensed(visual, Consts.SuspicionType.Visual);
     }
 
     public override void HandleVisualLost(SenseInterest visual)
@@ -87,10 +81,7 @@ public class GuardAgent : Agent
         if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
             return;
 
-        if (!visual.TryGetComponent(out SuspiciousInterest suspect))
-            return;
-
-        suspicion.OnVisualSuspectLost(suspect);
+        suspicion.OnVisualSuspectLost(visual);
     }
 
     public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)

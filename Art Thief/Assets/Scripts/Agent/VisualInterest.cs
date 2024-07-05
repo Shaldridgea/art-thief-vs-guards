@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class VisualInterest : SenseInterest
 {
-    public bool IsInLight { get; private set; }
+    private int litCount;
+
+    public bool IsLitUp {
+        get => litCount > 0;
+        set {
+            if (value)
+                ++litCount;
+            else
+                --litCount;
+        }
+    }
 
 }
