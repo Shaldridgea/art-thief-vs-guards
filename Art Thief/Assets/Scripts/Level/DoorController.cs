@@ -20,18 +20,12 @@ public class DoorController : MonoBehaviour
     [SerializeField]
     private DoorData[] targetDoors;
 
-    public enum DoorSide
-    {
-        LEFT,
-        RIGHT
-    }
-
     // Start is called before the first frame update
     void Start()
     {
         foreach(var d in targetDoors)
         {
-            d.startAngle = d.doorPivot.localEulerAngles.y;
+            d.startAngle = d.doorPivot.eulerAngles.y;
             d.doorObstacle.enabled = false;
         }
     }
