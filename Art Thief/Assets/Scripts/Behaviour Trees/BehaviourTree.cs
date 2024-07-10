@@ -10,6 +10,12 @@ public class BehaviourTree
 
     protected BehaviourNode rootNode;
 
+    public BehaviourNode RootNode => rootNode;
+
+    public delegate void NodeDelegate(BehaviourNode node);
+
+    public event NodeDelegate NodeRanEvent;
+
     protected Stack<BehaviourNode> runningStack;
 
     protected List<BehaviourNode> monitoringList;
@@ -51,7 +57,11 @@ public class BehaviourTree
         rootNode.Tick();
     }
 
-    public void PushRunningNode(BehaviourNode newNode) => runningStack.Push(newNode);
+    public void PushRunningNode(BehaviourNode newNode)
+    {
+        runningStack.Push(newNode);
+        NodeRanEvent?.Invoke(newNode);
+    }
 
     public void PopRunningNode() => runningStack.Pop();
 

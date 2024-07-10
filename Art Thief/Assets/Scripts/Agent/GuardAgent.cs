@@ -21,6 +21,8 @@ public class GuardAgent : Agent
 
     private BehaviourTree agentTree;
 
+    public BehaviourTree BehaviourTree => agentTree;
+
     private Transform targetPoint;
 
     private int patrolIndex;

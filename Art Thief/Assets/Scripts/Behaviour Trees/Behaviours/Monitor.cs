@@ -62,4 +62,10 @@ public class Monitor : Decorator
         else
             checkNode = addNode;
     }
+
+    public override bool TryGetChildNodes(out List<BehaviourNode> children)
+    {
+        children = new() { childNode, checkNode };
+        return true;
+    }
 }

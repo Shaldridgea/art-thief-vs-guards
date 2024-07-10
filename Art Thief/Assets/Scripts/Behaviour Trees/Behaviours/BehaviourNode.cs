@@ -1,8 +1,11 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BehaviourNode
 {
+    public string Name { get; set; }
+
     protected BehaviourTree ParentTree { get; private set; }
 
     public Consts.NodeStatus Status { get; private set; }
@@ -44,6 +47,12 @@ public abstract class BehaviourNode
     }
 
     public virtual void AddChild(BehaviourNode addNode, string portName = "") { }
+
+    public virtual bool TryGetChildNodes(out List<BehaviourNode> children)
+    { 
+        children = null;
+        return false;
+    }
 
     /// <summary>
     /// Helper function to handle changing board targets in variable statements by using an accessor operator

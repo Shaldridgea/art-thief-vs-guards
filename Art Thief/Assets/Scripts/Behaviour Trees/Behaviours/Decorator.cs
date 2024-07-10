@@ -15,4 +15,10 @@ public abstract class Decorator : BehaviourNode
     {
         childNode = addNode;
     }
+
+    public override bool TryGetChildNodes(out List<BehaviourNode> children)
+    {
+        children = new() { childNode };
+        return true;
+    }
 }

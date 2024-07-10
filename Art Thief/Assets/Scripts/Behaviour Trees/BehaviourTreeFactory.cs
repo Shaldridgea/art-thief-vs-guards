@@ -70,71 +70,94 @@ public static class BehaviourTreeFactory
         switch (dataNode.BehaviourType)
         {
             case Consts.BehaviourType.Sequence:
-                return new Sequence(tree, dataNode.GetParameters());
+                newNode = new Sequence(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Selector:
-                return new Selector(tree, dataNode.GetParameters());
+                newNode = new Selector(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Repeat:
-                return new Repeat(tree, dataNode.GetParameters());
+                newNode = new Repeat(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Invert:
-                return new Invert(tree);
+                newNode = new Invert(tree);
+            break;
 
             case Consts.BehaviourType.ForceSuccess:
-                return new ForceSuccess(tree);
+                newNode = new ForceSuccess(tree);
+            break;
 
             case Consts.BehaviourType.RandomChance:
-                return new RandomChance(tree, dataNode.GetParameters());
+                newNode = new RandomChance(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Monitor:
-                return new Monitor(tree);
+                newNode = new Monitor(tree);
+            break;
 
             case Consts.BehaviourType.SetVariable:
-                return new SetVariable(tree, dataNode.GetParameters());
+                newNode = new SetVariable(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Wait:
-                return new Wait(tree, dataNode.GetParameters());
+                newNode = new Wait(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Condition:
-                return new Condition(tree, dataNode.GetParameters());
+                newNode = new Condition(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.HasArrived:
-                return new HasArrived(tree, dataNode.GetParameters());
+                newNode = new HasArrived(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.MoveToPoint:
-                return new MoveToPoint(tree, dataNode.GetParameters());
+                newNode = new MoveToPoint(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.SetPointFromPatrol:
-                return new SetPointFromPatrol(tree, dataNode.GetParameters());
+                newNode = new SetPointFromPatrol(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.Cooldown:
-                return new Cooldown(tree, dataNode.GetParameters());
+                newNode = new Cooldown(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.StoreVisibleInterests:
-                return new StoreVisibleInterests(tree, dataNode.GetParameters());
+                newNode = new StoreVisibleInterests(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.SetRandomInterest:
-                return new SetRandomInterest(tree, dataNode.GetParameters());
+                newNode = new SetRandomInterest(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.SetPointFromGameObject:
-                return new SetPointFromGameObject(tree, dataNode.GetParameters());
+                newNode = new SetPointFromGameObject(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.StopMoving:
-                return new StopMoving(tree);
+                newNode = new StopMoving(tree);
+            break;
 
             case Consts.BehaviourType.TurnHead:
-                return new TurnHead(tree, dataNode.GetParameters());
+                newNode = new TurnHead(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.IsTurningHead:
-                return new IsTurningHead(tree);
+                newNode = new IsTurningHead(tree);
+            break;
 
             case Consts.BehaviourType.HasLineOfSight:
-                return new HasLoS(tree, dataNode.GetParameters());
+                newNode = new HasLoS(tree, dataNode.GetParameters());
+            break;
 
             case Consts.BehaviourType.CallMethod:
-                return new CallMethod(tree, dataNode.GetParameters());
+                newNode = new CallMethod(tree, dataNode.GetParameters());
+            break;
         }
+        newNode.Name = dataNode.name;
         return newNode;
     }
 }
