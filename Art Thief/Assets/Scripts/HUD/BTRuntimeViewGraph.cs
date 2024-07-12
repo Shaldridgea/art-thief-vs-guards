@@ -7,9 +7,6 @@ using TMPro;
 public class BTRuntimeViewGraph : MonoBehaviour
 {
     [SerializeField]
-    private GuardAgent target;
-
-    [SerializeField]
     private GameObject rowTemplate;
 
     [SerializeField]
@@ -17,6 +14,8 @@ public class BTRuntimeViewGraph : MonoBehaviour
 
     [SerializeField]
     private GameObject nodeTemplate;
+
+    private GuardAgent target;
 
     private BehaviourTree tree;
 
@@ -29,17 +28,17 @@ public class BTRuntimeViewGraph : MonoBehaviour
     private Dictionary<BehaviourNode, BTRuntimeNodeUI> nodeLayoutMap = new();
 
     // Start is called before the first frame update
-    IEnumerator Start()
+    void Start()
     {
-        // Wait a frame for Guards to create their behaviour trees
-        yield return new WaitForEndOfFrame();
-        tree = target.BehaviourTree;
-        tree.NodeRanEvent += OnNodeRun;
-        ProcessNode(tree.RootNode, transform, nodeList);
 
+    }
+
+    private IEnumerator CreateGraph()
+    {
+        ProcessNode(tree.RootNode, transform, nodeList);
         // Dirty hack to make the tree visualisation expand out correctly as
         // Unity's UI system doesn't expand everything on its own for some reason
-        foreach(var n in nodeList)
+        foreach (var n in nodeList)
         {
             ContentSizeFitter fitter = nodeLayoutMap[n].transform.parent.GetComponent<ContentSizeFitter>();
             fitter.enabled = false;
@@ -146,8 +145,18 @@ public class BTRuntimeViewGraph : MonoBehaviour
         }        
     }
 
+    public void SetTarget(GuardAgent guard)
+    {
+        if (target != null)
+            target.BehaviourTree.NodeRanEvent -= OnNodeRun;
+        target = guard;
+        tree = target.BehaviourTree;
+        tree.NodeRanEvent += OnNodeRun;
+        StartCoroutine(CreateGraph());
+    }
+
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         // Update status colour and recently ran outline of nodes
         foreach(var n in nodeList)

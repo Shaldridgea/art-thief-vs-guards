@@ -76,12 +76,6 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Speed up the game
-        if (Input.GetKey(KeyCode.Space))
-            Time.timeScale = 8f;
-        else
-            Time.timeScale = 1f;
-
         // Reload the whole scene
         if(Input.GetKeyDown(KeyCode.R))
         {

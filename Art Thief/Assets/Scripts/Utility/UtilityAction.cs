@@ -43,6 +43,8 @@ public abstract class UtilityAction
 
     protected ScoreCurve[] scoreCurves;
 
+    public ScoreCurve[] ScoreCurves => scoreCurves;
+
     protected Coroutine actionCoroutine;
 
     public float Score { get; private set; }

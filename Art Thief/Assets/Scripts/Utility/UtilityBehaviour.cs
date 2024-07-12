@@ -17,7 +17,7 @@ public class UtilityBehaviour : MonoBehaviour
 
     private List<UtilityAction> actionList = new List<UtilityAction>();
 
-    private List<UtilityAction> sortedActions;
+    public List<UtilityAction> ActionList => actionList;
 
     private UtilityAction currentAction;
 
@@ -29,7 +29,6 @@ public class UtilityBehaviour : MonoBehaviour
         // Create our actions and give the actions their relvant motives
         for (int i = 0; i < actionData.Count; ++i)
             actionList.Add(Consts.GetUtilityAction(actionData[i]));
-        sortedActions = new List<UtilityAction>(actionList);
     }
 
     // Update is called once per frame
@@ -70,9 +69,6 @@ public class UtilityBehaviour : MonoBehaviour
             }
         }
 
-        // Sort our actions by their score for visualisation purposes
-        sortedActions.Sort((x, y) => y.Score.CompareTo(x.Score));
-
         // If the action we want to perform is different from the one we were doing before
         if (favouredAction != currentAction)
         {
@@ -81,16 +77,6 @@ public class UtilityBehaviour : MonoBehaviour
             currentAction = favouredAction;
             currentAction.EnterAction(agent);
         }
-    }
-
-    private void OnGUI()
-    {
-        GUIStyle style = new GUIStyle("box");
-        style.fontSize = 20;
-        GUILayout.Box(name, style);
-        style.fontSize = 15;
-        for (int i = 0; i < actionList.Count; ++i)
-            GUILayout.Box($"{actionData[i].Action}: {actionList[i].Score}", style);
     }
 
     public UtilityAction.DebugDrawCallback GetDebugDrawCallback(){
