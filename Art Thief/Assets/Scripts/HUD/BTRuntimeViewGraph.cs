@@ -35,6 +35,9 @@ public class BTRuntimeViewGraph : MonoBehaviour
 
     private IEnumerator CreateGraph()
     {
+        if (nodeList.Count > 0)
+            ClearGraph();
+
         ProcessNode(tree.RootNode, transform, nodeList);
         // Dirty hack to make the tree visualisation expand out correctly as
         // Unity's UI system doesn't expand everything on its own for some reason
@@ -104,6 +107,15 @@ public class BTRuntimeViewGraph : MonoBehaviour
         }
     }
 
+    private void ClearGraph()
+    {
+        Destroy(transform.GetChild(0));
+        Destroy(transform.GetChild(1));
+        nodeList.Clear();
+        nodeLayoutMap.Clear();
+        updatedNodesList.Clear();
+    }
+
     private void ProcessNode(BehaviourNode nextNode, Transform nodeParent, List<BehaviourNode> list)
     {
         if (!list.Contains(nextNode))
@@ -147,6 +159,9 @@ public class BTRuntimeViewGraph : MonoBehaviour
 
     public void SetTarget(GuardAgent guard)
     {
+        if (guard == target)
+            return;
+
         if (target != null)
             target.BehaviourTree.NodeRanEvent -= OnNodeRun;
         target = guard;

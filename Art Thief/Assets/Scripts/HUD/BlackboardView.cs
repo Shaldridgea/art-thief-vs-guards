@@ -12,9 +12,6 @@ public class BlackboardView : MonoBehaviour
     [SerializeField]
     private GameObject entryTemplate;
 
-    [SerializeField]
-    private Button closeButton;
-
     private Agent target;
 
     private List<GameObject> entries = new();
@@ -22,7 +19,7 @@ public class BlackboardView : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        closeButton.onClick.AddListener(CloseView);
+
     }
 
     private void LateUpdate()
@@ -31,11 +28,6 @@ public class BlackboardView : MonoBehaviour
     }
 
     public void SetTarget(Agent newTarget) => target = newTarget;
-
-    private void CloseView()
-    {
-        gameObject.SetActive(false);
-    }
 
     private void UpdateView()
     {
@@ -48,6 +40,7 @@ public class BlackboardView : MonoBehaviour
         int i = 0;
         foreach(var d in allData)
         {
+            // Create new UI boxes for entries if there's less than we need
             if(entries.Count < allData.Count)
                 entries.Add(Instantiate(entryTemplate, contentParent));
 
@@ -59,6 +52,7 @@ public class BlackboardView : MonoBehaviour
             ++i;
         }
 
+        // Turn off entry boxes that are going unused
         if(entries.Count > allData.Count)
         {
             int deactivateCount = entries.Count - allData.Count;

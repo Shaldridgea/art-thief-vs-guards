@@ -18,7 +18,9 @@ public class HideAction : UtilityAction
     public override void EnterAction(ThiefAgent thief)
     {
         turnedAround = false;
-        Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, 15f, LayerMask.GetMask("Hide"), QueryTriggerInteraction.Collide);
+        Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, 15f,
+            LayerMask.GetMask("Hide"),
+            QueryTriggerInteraction.Collide);
         ThiefSensoryModule senses = thief.ThiefSenses;
 
         List<(HidingArea area, float distance)> areaList = new List<(HidingArea area, float distance)>();
@@ -39,9 +41,13 @@ public class HideAction : UtilityAction
                 return 0;
         });
 
+        bool beingChased = thief.AgentBlackboard.GetVariable<bool>("inChase");
         // Check if any of these areas are safe to go to, preferring closest first
-        foreach(var (area, distance) in areaList)
+        foreach (var (area, distance) in areaList)
         {
+            if (area.AreaType == Consts.HidingAreaType.Conditional && beingChased)
+                continue;
+
             area.CheckForSafety(senses.AwareGuards);
             if (area.IsSafe)
             {

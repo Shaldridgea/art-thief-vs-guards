@@ -80,8 +80,13 @@ public class SimulationHUD : MonoBehaviour
                 Camera.main.ScreenPointToRay(Input.mousePosition),
                 out RaycastHit hitInfo, 300f, agentLayerMask.value))
             {
-                Debug.Log(hitInfo.transform.gameObject);
                 contextMenu.SetActive(true);
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(transform as RectTransform,
+                    Input.mousePosition, null, out Vector2 localPoint))
+                { 
+                    (contextMenu.transform as RectTransform).anchoredPosition = localPoint;
+                }
+
                 if(hitInfo.transform.TryGetComponent(out ThiefAgent thief))
                 {
                     contextAgentTarget = thief;

@@ -63,6 +63,7 @@ public class ThiefAgent : Agent
         }
         danger /= Mathf.Max(guardThreats, 1);
         danger += guardThreats * 0.1f;
+        AgentBlackboard.SetVariable("inChase", beingChased);
         if (beingChased)
             danger += 1f;
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");

@@ -12,9 +12,6 @@ public class ThiefUtilityView : MonoBehaviour
     [SerializeField]
     private GameObject entryTemplate;
 
-    [SerializeField]
-    private Button closeButton;
-
     private ThiefAgent target;
 
     private UtilityBehaviour utilityScorer;
@@ -26,31 +23,29 @@ public class ThiefUtilityView : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        closeButton.onClick.AddListener(CloseView);
+
     }
 
     private void CreateEntries()
     {
         foreach(var a in utilityScorer.ActionList)
         {
+            // Create box entries for each action
             var newEntry = Instantiate(entryTemplate, contentParent);
             actionEntryMap.Add(a, newEntry.transform);
             newEntry.SetActive(true);
+
             TextMeshProUGUI actionText = newEntry.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
             actionText.text = a.Name;
-            Transform motiveLayout = newEntry.transform.GetChild(1);
-            for(int i = 0; i < a.ScoreCurves.Length; ++i)
-            {
-                var curve = a.ScoreCurves[i];
-                if (i > 0)
-                    Instantiate(motiveLayout.GetChild(0), motiveLayout);
 
-                motiveLayout.GetChild(i).GetComponent<TextMeshProUGUI>().text = 
-                    $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard)}";
-            }
-            TextMeshProUGUI scoreText = newEntry.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-            scoreText.text = a.Score.ToString();
+            // Get the VerticalLayoutGroup that holds our contributing motives for the action
+            Transform motiveLayout = newEntry.transform.GetChild(1);
+            // The first motive score text already exists,
+            // so we only need to make clones of it after the first
+            for (int i = 1; i < a.ScoreCurves.Length; ++i)
+                Instantiate(motiveLayout.GetChild(0), motiveLayout);
         }
+        UpdateView();
     }
 
     private void UpdateView()
@@ -61,15 +56,20 @@ public class ThiefUtilityView : MonoBehaviour
         {
             var a = sortedActions[i];
             Transform entry = actionEntryMap[a];
-            entry.SetSiblingIndex(i+2);
+            // Re-order our actions in the layout from highest to lowest score
+            entry.SetSiblingIndex(i);
+
             Transform motiveLayout = entry.transform.GetChild(1);
             for (int j = 0; j < a.ScoreCurves.Length; ++j)
             {
                 var curve = a.ScoreCurves[j];
 
+                // Set each motive name and score
                 motiveLayout.GetChild(j).GetComponent<TextMeshProUGUI>().text =
                     $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard)}";
             }
+
+            // Total action score text
             TextMeshProUGUI scoreText = entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
             scoreText.text = a.Score.ToString();
         }
@@ -78,17 +78,14 @@ public class ThiefUtilityView : MonoBehaviour
     public void SetTarget(ThiefAgent newThief)
     {
         target = newThief;
+        // Don't perform set up if we've already done it
+        // Since we only have one Thief to care about
         if (sortedActions.Count > 0)
             return;
 
         utilityScorer = target.GetComponent<UtilityBehaviour>();
         sortedActions.AddRange(utilityScorer.ActionList);
         CreateEntries();
-    }
-
-    private void CloseView()
-    {
-        gameObject.SetActive(false);
     }
 
     private void LateUpdate()
