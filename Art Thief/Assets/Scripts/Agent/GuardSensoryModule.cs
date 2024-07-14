@@ -37,7 +37,7 @@ public class GuardSensoryModule : SensoryModule
             (checkPosition.ZeroY() - transform.position.ZeroY()).normalized);
 
         if (lookAngle <= VIEW_ANGLE)
-            if (!Physics.Linecast(checkPosition, owner.AgentView.AgentEyeRoot.position, losMask, QueryTriggerInteraction.Ignore))
+            if (!Physics.Linecast(checkPosition, owner.AgentView.AgentEyeRoot.position, losMask, QueryTriggerInteraction.Collide))
                 return true;
 
         return false;
@@ -91,7 +91,8 @@ public class GuardSensoryModule : SensoryModule
             for (int i = 0; i < inConeObjects.Count; ++i)
             {
                 SenseInterest target = inConeObjects[i];
-                bool isSeen = !Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position, losMask.value);
+                bool isSeen = !Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position,
+                    losMask.value, QueryTriggerInteraction.Collide);
 
                 if (!visibilityMap[target] && isSeen)
                     NotifyVisualFound(target);
