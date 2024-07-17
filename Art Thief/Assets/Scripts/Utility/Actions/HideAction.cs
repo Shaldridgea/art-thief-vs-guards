@@ -33,6 +33,13 @@ public class HideAction : UtilityAction
         // Sort our areas by distance, shortest to farthest
         areaList.Sort(delegate((HidingArea area, float distance) x, (HidingArea area, float distance) y)
         {
+            float xDist = x.distance;
+            float yDist = y.distance;
+            if (x.area.AreaType == Consts.HidingAreaType.Safe)
+                xDist /= 2f;
+            if (y.area.AreaType == Consts.HidingAreaType.Safe)
+                yDist /= 2f;
+            
             if (x.distance < y.distance)
                 return -1;
             else if (x.distance > y.distance)

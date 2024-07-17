@@ -24,6 +24,8 @@ public class ThiefAgent : Agent
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
 
     private Transform artGoal;
+
+    private bool usingOffMeshLink;
     
     // Start is called before the first frame update
     protected override void Start()
@@ -33,6 +35,12 @@ public class ThiefAgent : Agent
 
     private void Update()
     {
+        if (!usingOffMeshLink && navAgent.hasPath && navAgent.isOnOffMeshLink)
+        {
+            StartCoroutine(FollowPathOffMeshLink());
+            usingOffMeshLink = true;
+        }
+
         if (artGoal == null)
             artGoal = GameController.Instance.ArtGoal;
 
@@ -71,6 +79,35 @@ public class ThiefAgent : Agent
         storedDanger = danger;
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
+    }
+
+    private IEnumerator FollowPathOffMeshLink()
+    {
+        bool reachedStartFirst = false;
+        float frameMovementSpeed;
+        do
+        {
+            frameMovementSpeed = navAgent.speed * Time.deltaTime;
+
+            Vector3 goalPos = reachedStartFirst ?
+                navAgent.currentOffMeshLinkData.endPos : navAgent.currentOffMeshLinkData.startPos;
+            goalPos.y = transform.position.y;
+
+            transform.position = Vector3.MoveTowards(
+                transform.position, goalPos, frameMovementSpeed);
+
+            transform.rotation = Quaternion.RotateTowards(transform.rotation,
+                Quaternion.LookRotation(goalPos.ZeroY() - transform.position.ZeroY(), Vector3.up),
+                navAgent.angularSpeed * Time.deltaTime);
+
+            if (!reachedStartFirst && Vector3.Distance(transform.position.ZeroY(), goalPos.ZeroY()) <= frameMovementSpeed)
+                reachedStartFirst = true;
+
+            yield return null;
+        }
+        while (Vector3.Distance(transform.position.ZeroY(), navAgent.currentOffMeshLinkData.endPos.ZeroY()) > frameMovementSpeed);
+        navAgent.CompleteOffMeshLink();
+        usingOffMeshLink = false;
     }
 
     public void TakeArt()

@@ -26,7 +26,8 @@ public class DoorController : MonoBehaviour
         foreach(var d in targetDoors)
         {
             d.startAngle = d.doorPivot.eulerAngles.y;
-            d.doorObstacle.enabled = false;
+            if(d.doorObstacle)
+                d.doorObstacle.enabled = false;
         }
     }
 
@@ -37,7 +38,8 @@ public class DoorController : MonoBehaviour
             if(d.name == target)
             {
                 ++d.triggerCount;
-                d.doorObstacle.enabled = true;
+                if(d.doorObstacle)
+                    d.doorObstacle.enabled = true;
                 break;
             }
         }
@@ -51,7 +53,8 @@ public class DoorController : MonoBehaviour
             {
                 --d.triggerCount;
                 if(d.triggerCount == 0)
-                    d.doorObstacle.enabled = false;
+                    if (d.doorObstacle)
+                        d.doorObstacle.enabled = false;
                 break;
             }
         }
