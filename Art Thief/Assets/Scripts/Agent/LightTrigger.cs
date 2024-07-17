@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class LightTrigger : MonoBehaviour
 {
+    [SerializeField]
+    private Light lightSource;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out VisualInterest interest))
-            interest.IsLitUp = true;
+            interest.EnteredLight(lightSource);
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent(out VisualInterest interest))
-            interest.IsLitUp = false;
+            interest.ExitedLight(lightSource);
     }
 }
