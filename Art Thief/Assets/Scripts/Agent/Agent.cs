@@ -36,6 +36,7 @@ public class Agent : MonoBehaviour
 
     private List<Room> roomList = new();
 
+    // Get the room at the end of the list if it's not empty
     public Room CurrentRoom => roomList.Count == 0 ? null : roomList[^1];
 
     // Start is called before the first frame update
@@ -43,9 +44,6 @@ public class Agent : MonoBehaviour
     {
         // Make a new blackboard for this agent
         AgentBlackboard = new Blackboard();
-        senses.SoundHeard += HandleSoundHeard;
-        senses.VisualFound += HandleVisualFound;
-        senses.VisualLost += HandleVisualLost;
 
         // Set our default blackboard values by parsing the strings for their keys and values
         foreach (string s in blackboardDefaults)
@@ -82,21 +80,6 @@ public class Agent : MonoBehaviour
             else
                 AgentBlackboard.SetVariable(left, right);
         }
-    }
-
-    public virtual void HandleSoundHeard(SenseInterest sound)
-    {
-        
-    }
-
-    public virtual void HandleVisualFound(SenseInterest visual)
-    {
-
-    }
-
-    public virtual void HandleVisualLost(SenseInterest visual)
-    {
-
     }
 
     /// <summary>

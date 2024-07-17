@@ -5,106 +5,33 @@ using UnityEngine.AI;
 
 public class GuardSensoryModule : SensoryModule
 {
-    [SerializeField]
-    private VisionCone[] visionCones;
-
-    private List<SenseInterest> inConeObjects = new();
-
-    private Dictionary<SenseInterest, bool> visibilityMap = new();
-
-    private Dictionary<SenseInterest, int> entryCountMap = new();
-
-    private Dictionary<GameObject, bool> centralVisionMap = new();
-
-    private float losCheckTimer;
-
-    protected override void Start()
+    public override void NotifySound(SenseInterest sound)
     {
-        base.Start();
-        foreach (VisionCone v in visionCones)
-        {
-            v.TriggerEnter += HandleVisionEnter;
-            v.TriggerExit += HandleVisionExit;
-        }
+        base.NotifySound(sound);
+        // Don't treat unimportant friendly sounds as suspicious
+        if (sound.OwnerTeam == Consts.Team.GUARD && !sound.IsSuspicious)
+            return;
+
+        (owner as GuardAgent).Suspicion.OnSuspicionSensed(sound, Consts.SuspicionType.Sound);
     }
 
-    public bool IsInLOS(Vector3 checkPosition, Vector3 guardForward = default)
+    public override void NotifyVisualFound(SenseInterest visual)
     {
-        if (guardForward == default)
-            guardForward = owner.AgentView.AgentEyeRoot.forward;
+        base.NotifyVisualFound(visual);
+        // Exit if this interest belongs to a guard and it's not flagged as suspicious
+        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+            return;
 
-        float lookAngle = Vector3.Angle(guardForward,
-            (checkPosition.ZeroY() - transform.position.ZeroY()).normalized);
-
-        if (lookAngle <= VIEW_ANGLE)
-            if (!Physics.Linecast(checkPosition, owner.AgentView.AgentEyeRoot.position, losMask, QueryTriggerInteraction.Collide))
-                return true;
-
-        return false;
+        (owner as GuardAgent).Suspicion.OnSuspicionSensed(visual, Consts.SuspicionType.Visual);
     }
 
-    public bool IsInCentralVision(GameObject interest) =>
-        centralVisionMap.TryGetValue(interest, out bool value) ? value : false;
-
-    private void HandleVisionEnter(VisionCone origin, GameObject other)
+    public override void NotifyVisualLost(SenseInterest visual)
     {
-        if (other.TryGetComponent(out VisualInterest visualInterest))
-            if (!inConeObjects.Contains(visualInterest))
-            {
-                inConeObjects.Add(visualInterest);
-                visibilityMap[visualInterest] = false;
-                centralVisionMap[other] = origin.IsCentralVision;
-                entryCountMap[visualInterest] = 1;
-            }
-            else
-            {
-                entryCountMap[visualInterest]++;
-                if (origin.IsCentralVision)
-                    centralVisionMap[other] = true;
-            }
-    }
+        base.NotifyVisualLost(visual);
+        // Exit if this interest belongs to a guard and it's not flagged as suspicious
+        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+            return;
 
-    private void HandleVisionExit(VisionCone origin, GameObject other)
-    {
-        if (other.TryGetComponent(out VisualInterest visualInterest))
-            if (inConeObjects.Contains(visualInterest))
-            {
-                if (origin.IsCentralVision)
-                    centralVisionMap[other] = false;
-
-                if (--entryCountMap[visualInterest] == 0)
-                {
-                    if(visibilityMap[visualInterest])
-                        NotifyVisualLost(visualInterest);
-
-                    inConeObjects.Remove(visualInterest);
-                    visibilityMap.Remove(visualInterest);
-                    entryCountMap.Remove(visualInterest);
-                }
-            }
-    }
-
-    private void FixedUpdate()
-    {
-        if(losCheckTimer <= 0f)
-        {
-            for (int i = 0; i < inConeObjects.Count; ++i)
-            {
-                SenseInterest target = inConeObjects[i];
-                bool isSeen = !Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position,
-                    losMask.value, QueryTriggerInteraction.Collide);
-
-                if (!visibilityMap[target] && isSeen)
-                    NotifyVisualFound(target);
-                else if (visibilityMap[target] && !isSeen)
-                    NotifyVisualLost(target);
-
-                visibilityMap[target] = isSeen;
-            }
-
-            losCheckTimer = losCheckInterval;
-        }
-        else
-            losCheckTimer -= Time.fixedDeltaTime;
+        (owner as GuardAgent).Suspicion.OnVisualSuspectLost(visual);
     }
 }

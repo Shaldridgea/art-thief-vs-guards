@@ -13,12 +13,14 @@ public class HideAction : UtilityAction
 
     private bool turnedAround;
 
+    public const float CHECK_RADIUS = 15f;
+
     public HideAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
     {
         turnedAround = false;
-        Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, 15f,
+        Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, CHECK_RADIUS,
             LayerMask.GetMask("Hide"),
             QueryTriggerInteraction.Collide);
         ThiefSensoryModule senses = thief.ThiefSenses;

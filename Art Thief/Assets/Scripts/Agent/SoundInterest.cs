@@ -10,6 +10,8 @@ public class SoundInterest : SenseInterest
     [SerializeField]
     private SphereCollider trigger;
 
+    public float TriggerRadius => trigger.radius;
+
     [SerializeField]
     private bool testing;
 
@@ -29,22 +31,25 @@ public class SoundInterest : SenseInterest
     {
         bool isAgent = other.CompareTag("Thief") || other.CompareTag("Guard");
         // If this sound trigger hits a thief or guard, notify it
-        if(isAgent)
-            if(other.TryGetComponent(out SensoryModule senses))
-                senses.NotifySound(this);
+        if (isAgent)
+            if (other.TryGetComponent(out SensoryModule senses))
+                if(senses.IsSoundHeard(this))
+                    senses.NotifySound(this);
     }
 
     public void PlaySound()
     {
-        // Play the audio source
         sources[sourceIndex].Play();
+
         // Set trigger radius to match our currently playing source
         trigger.radius = sources[sourceIndex].maxDistance;
         trigger.enabled = true;
+
         // Stop any currently running coroutines on this sound trigger
         StopAllCoroutines();
-        // Start a coroutine that will keep the trigger on for the duration of the sound clip
+        // Start a coroutine that will turn the trigger off when the sound ends
         StartCoroutine(SoundStopped(sourceIndex));
+
         // Loop through sources if we have multiple
         ++sourceIndex;
         sourceIndex %= sources.Length;

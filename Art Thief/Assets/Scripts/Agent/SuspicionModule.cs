@@ -62,13 +62,20 @@ public class SuspicionModule : MonoBehaviour
                 Mathf.InverseLerp(5f, 20f,
                 Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
 
+            VisualInterest visual = (key as VisualInterest);
+
+            // Reduce the reaction time if the visual interest is moving
+            if (visual.IsMoving)
+                awarenessDelta *= 0.5f;
+
             // Change awareness factor to take 3 times as long if interest is in the dark
-            if (!(key as VisualInterest).IsLitUp)
+            if (!visual.IsLitUp)
                 awarenessDelta *= 3f;
 
             suspectValues.Awareness =
                 Mathf.Clamp(suspectValues.Awareness +
                 (Time.deltaTime / (suspectValues.Visible ? awarenessDelta : -1f)), 0f, 2f);
+
             visualSuspectMap[key] = suspectValues;
 
             if(suspectValues.Awareness >= 1f)

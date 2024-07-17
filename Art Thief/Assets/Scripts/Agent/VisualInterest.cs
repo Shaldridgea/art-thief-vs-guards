@@ -7,6 +7,13 @@ public class VisualInterest : SenseInterest
     [SerializeField]
     private LayerMask raycastMask;
 
+    [SerializeField]
+    private bool trackMovement;
+
+    public bool IsMoving { get; private set; }
+
+    private Vector3 lastPosition;
+
     private int litCount;
 
     public bool IsLitUp {
@@ -49,5 +56,16 @@ public class VisualInterest : SenseInterest
             else if (!lightVisibleMap[l] && !lightBlocked)
                 ++litCount;
         }
+
+        if (!trackMovement)
+            return;
+
+        if (transform.position != lastPosition)
+        {
+            IsMoving = true;
+            lastPosition = transform.position;
+        }
+        else
+            IsMoving = false;
     }
 }

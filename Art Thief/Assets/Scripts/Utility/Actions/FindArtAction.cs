@@ -8,14 +8,22 @@ public class FindArtAction : UtilityAction
 
     public override void EnterAction(ThiefAgent thief)
     {
-        thief.AgentBlackboard.SetVariable("artPosition", GameController.Instance.ArtGoal.transform.position);
-        Debug.Log(thief.AgentBlackboard.GetVariable<Vector3>("artPosition"));
+        if (thief.ArtGoal == null)
+            return;
+
+        thief.AgentBlackboard.SetVariable("artPosition", thief.ArtGoal.transform.position);
     }
 
     public override void PerformAction(ThiefAgent thief)
     {
-        if(!thief.NavAgent.hasPath)
+        if (thief.ArtGoal == null)
+            return;
+
+        if (!thief.NavAgent.hasPath)
             thief.MoveAgent(thief.AgentBlackboard.GetVariable<Vector3>("artPosition"));
+
+        thief.AgentBlackboard.SetVariable("nearToArt",
+            Vector3.Distance(thief.transform.position.ZeroY(), thief.ArtGoal.transform.position.ZeroY()) <= 1f ? 1f : 0f);
     }
 
     public override void ExitAction(ThiefAgent thief)

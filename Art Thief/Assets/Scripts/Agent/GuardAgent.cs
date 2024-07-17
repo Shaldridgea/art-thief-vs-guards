@@ -29,7 +29,7 @@ public class GuardAgent : Agent
 
     private float treeUpdateTimer;
 
-    private SuspicionModule suspicion;
+    public SuspicionModule Suspicion { get; private set; }
 
     static GuardAgent debuggingAgent;
 
@@ -38,7 +38,7 @@ public class GuardAgent : Agent
     {
         base.Start();
         if (TryGetComponent(out SuspicionModule susModule))
-            suspicion = susModule;
+            Suspicion = susModule;
 
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
@@ -54,36 +54,6 @@ public class GuardAgent : Agent
             agentTree.Update();
             return;
         }
-    }
-
-    public override void HandleSoundHeard(SenseInterest sound)
-    {
-        base.HandleSoundHeard(sound);
-        // Don't treat unimportant friendly sounds as suspicious
-        if (sound.OwnerTeam == Consts.Team.GUARD && !sound.IsSuspicious)
-            return;
-
-        suspicion.OnSuspicionSensed(sound, Consts.SuspicionType.Sound);
-    }
-
-    public override void HandleVisualFound(SenseInterest visual)
-    {
-        base.HandleVisualFound(visual);
-        // Check if other guards appear suspicious or not i.e. unconscious on the ground
-        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
-            return;
-
-        suspicion.OnSuspicionSensed(visual, Consts.SuspicionType.Visual);
-    }
-
-    public override void HandleVisualLost(SenseInterest visual)
-    {
-        base.HandleVisualLost(visual);
-        // Check if other guards appear suspicious or not i.e. unconscious on the ground
-        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
-            return;
-
-        suspicion.OnVisualSuspectLost(visual);
     }
 
     public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)

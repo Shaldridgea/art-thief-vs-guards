@@ -23,7 +23,7 @@ public class ThiefAgent : Agent
 
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
 
-    private Transform artGoal;
+    public Transform ArtGoal { get; private set; }
 
     private bool usingOffMeshLink;
     
@@ -31,6 +31,9 @@ public class ThiefAgent : Agent
     protected override void Start()
     {
         base.Start();
+
+        if (ArtGoal == null)
+            ArtGoal = GameController.Instance.ArtGoal;
     }
 
     private void Update()
@@ -40,11 +43,6 @@ public class ThiefAgent : Agent
             StartCoroutine(FollowPathOffMeshLink());
             usingOffMeshLink = true;
         }
-
-        if (artGoal == null)
-            artGoal = GameController.Instance.ArtGoal;
-
-        AgentBlackboard.SetVariable("nearToArt", Vector3.Distance(transform.position.ZeroY(), artGoal.position.ZeroY()) <= 1f ? 1f : 0f);
 
         float danger = 0f;
         float aggression = 0f;
@@ -112,33 +110,18 @@ public class ThiefAgent : Agent
 
     public void TakeArt()
     {
-        if (artGoal == null)
+        if (ArtGoal == null)
             return;
 
-        artGoal.SetParent(transform, true);
+        ArtGoal.SetParent(transform, true);
         AgentBlackboard.SetVariable("artStolen", 1f);
-    }
-
-    public override void HandleSoundHeard(SenseInterest sound)
-    {
-        // Ignore our own sounds
-        if (sound.OwnerTeam == Consts.Team.THIEF)
-            return;
-
-        if (sound.Owner != null)
-            if (sound.Owner.TryGetComponent(out GuardAgent guard))
-            {
-                var list = ThiefSenses.AwareGuards;
-                if(!list.Contains(guard))
-                    list.Add(guard);
-            }
     }
 
     protected override void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 15f);
+        Gizmos.DrawWireSphere(transform.position, HideAction.CHECK_RADIUS);
         Handles.DrawWireDisc(transform.position + new Vector3(0f, 0.5f), Vector3.up, dangerDistanceMin);
         Handles.DrawWireDisc(transform.position + new Vector3(0f, 0.5f), Vector3.up, dangerDistanceMax);
 
