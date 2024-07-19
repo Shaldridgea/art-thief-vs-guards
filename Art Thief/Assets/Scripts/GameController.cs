@@ -20,29 +20,6 @@ public class GameController : MonoBehaviour
         GlobalBlackboard = new Blackboard();
     }
 
-    [SerializeField]
-    private TextMeshProUGUI spyWonText;
-
-    [SerializeField]
-    private TextMeshProUGUI guardsWonText;
-
-    [SerializeField]
-    private GameObject panel;
-
-    [SerializeField]
-    private Button startButton;
-
-    [SerializeField]
-    private Transform exitGoal;
-
-    public Vector3 ExitPosition => exitGoal.position;
-
-    [SerializeField]
-    private GameObject chooseButtonPrefab;
-
-    [SerializeField]
-    private Transform buttonLayout;
-
     public Transform ArtGoal { get; set; }
 
     [SerializeField]
@@ -51,26 +28,14 @@ public class GameController : MonoBehaviour
     public List<GuardAgent> Guards => guards;
     
     [SerializeField]
-    private ThiefAgent spy;
+    private ThiefAgent thief;
 
     public Blackboard GlobalBlackboard { get; private set; }
 
     // Start is called before the first frame update
-    IEnumerator Start()
+    private void Start()
     {
-        yield break;
-        spyWonText.enabled = false;
-        guardsWonText.enabled = false;
-        // Turn agents off so they don't start working till we want them to
-        spy.gameObject.SetActive(false);
-        foreach (GuardAgent g in guards)
-            g.gameObject.SetActive(false);
-        startButton.interactable = false;
-
-        // Wait a frame before showing the painting options, since when reloading the scene for some reason
-        // the textures won't be set properly
-        yield return new WaitForEndOfFrame();
-        startButton.onClick.AddListener(StartGame);
+        
     }
 
     // Update is called once per frame
@@ -90,21 +55,8 @@ public class GameController : MonoBehaviour
         // Start game by activating the AI agents and removing the UI
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        panel.SetActive(false);
-        spy.gameObject.SetActive(true);
+        thief.gameObject.SetActive(true);
         foreach (GuardAgent g in guards)
             g.gameObject.SetActive(true);
     }
-
-    public void SpyWon()
-    {
-        spyWonText.enabled = true;
-    }
-
-    public void GuardsWon()
-    {
-        guardsWonText.enabled = true;
-    }
-
-    public void SetArtGoal(Transform goal) { ArtGoal = goal; startButton.interactable = true; }
 }

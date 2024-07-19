@@ -6,9 +6,8 @@ public class Level : MonoBehaviour
 {
     private static Level _instance;
 
-    public static Level Instance
-    {
-        get{
+    public static Level Instance {
+        get {
             if (_instance == null)
                 _instance = FindObjectOfType<Level>();
 
@@ -23,16 +22,63 @@ public class Level : MonoBehaviour
     {
         if (_instance == null)
             _instance = this;
-        else if(_instance != this)
+        else if (_instance != this)
             Destroy(gameObject);
     }
 
     [SerializeField]
     private List<GameObject> artList;
 
+    public List<GameObject> ArtList => artList;
+
+    public List<BoxCollider> MedievalArtList { get; private set; } = new(30);
+
+    public List<BoxCollider> AbstractArtList { get; private set; } = new(15);
+
+    public List<BoxCollider> SculptureArtList { get; private set; } = new(4);
+
+    [SerializeField]
+    private List<BoxCollider> medievalArtRooms;
+
+    [SerializeField]
+    private List<BoxCollider> abstractArtRooms;
+
+    [SerializeField]
+    private List<BoxCollider> sculptureRooms;
+
+    [SerializeField]
+    private List<Transform> thiefStartTransforms;
+
+    public List<Transform> ThiefStartList => thiefStartTransforms;
+
+    [SerializeField]
+    private Transform levelMiddleTransform;
+
+    public Vector3 LevelMiddlePoint => levelMiddleTransform.position;
+
     // Start is called before the first frame update
     void Start()
     {
-        GameController.Instance.ArtGoal = artList[0].transform;
+        GetArtByRooms(medievalArtRooms, MedievalArtList);
+        GetArtByRooms(abstractArtRooms, AbstractArtList);
+        GetArtByRooms(sculptureRooms, SculptureArtList);
+    }
+
+    private void GetArtByRooms(List<BoxCollider> roomsList, List<BoxCollider> targetArtList)
+    {
+        foreach (var c in roomsList)
+        {
+            Collider[] overlaps = Physics.OverlapBox(
+                c.transform.position + c.center, c.size / 2f,
+                c.transform.rotation, LayerMask.GetMask("Interest"));
+
+            foreach (var o in overlaps)
+            {
+                if (o.CompareTag("Art"))
+                {
+                    targetArtList.Add(o.gameObject.GetComponent<BoxCollider>());
+                }
+            }
+        }
     }
 }
