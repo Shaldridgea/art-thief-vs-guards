@@ -34,6 +34,9 @@ public class UtilityBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!agent.AgentActivated)
+            return;
+
         // Toggle visualisation of our values
         if (Input.GetKeyDown(KeyCode.G))
             toggleGUI = !toggleGUI;

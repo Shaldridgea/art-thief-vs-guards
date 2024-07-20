@@ -50,13 +50,14 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void StartGame()
+    public void StartGame(int startingGuardCount, Transform artGoal)
     {
-        // Start game by activating the AI agents and removing the UI
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        thief.gameObject.SetActive(true);
-        foreach (GuardAgent g in guards)
-            g.gameObject.SetActive(true);
+        Level.Instance.Thief.ActivateAgent();
+        Level.Instance.Thief.ArtGoal = artGoal;
+        for (int i = 0; i < startingGuardCount; ++i)
+        {
+            GuardAgent guard = Level.Instance.GuardList[i];
+            guard.ActivateAgent();
+        }
     }
 }

@@ -71,7 +71,6 @@ public static class Consts
     public enum HidingAreaType
     {
         Safe,
-        Dynamic,
         Conditional
     }
 

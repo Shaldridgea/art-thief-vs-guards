@@ -47,6 +47,7 @@ public class EvadeAction : UtilityAction
     {
         recentRooms.Clear();
         thief.NavAgent.ResetPath();
+        thief.NavAgent.speed -= speedBoostStamina;
     }
 
     private void FindSafeExit(ThiefAgent thief)

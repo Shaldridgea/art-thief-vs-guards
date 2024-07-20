@@ -46,6 +46,9 @@ public class GuardAgent : Agent
 
     private void Update()
     {
+        if (!AgentActivated)
+            return;
+
         // Update our behaviour tree
         treeUpdateTimer -= Time.deltaTime;
         if (treeUpdateTimer <= 0f)

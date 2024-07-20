@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.AI;
 
 public class StartScreen : MonoBehaviour
 {
@@ -60,14 +61,14 @@ public class StartScreen : MonoBehaviour
 
         artFocusList = Level.Instance.MedievalArtList;
         thiefStartFocus = Level.Instance.ThiefStartList[0];
+        if (NavMesh.SamplePosition(thiefStartFocus.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+            Level.Instance.Thief.NavAgent.Warp(hit.position);
+
+        guardCountMax = Level.Instance.GuardList.Count;
+        currentGuardCount = guardCountMax;
+        guardCountInput.SetTextWithoutNotify(currentGuardCount.ToString());
 
         UpdateLevelCameraView();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void ChangeCameraFocus(CameraFocus newFocus)
@@ -120,7 +121,8 @@ public class StartScreen : MonoBehaviour
 
     private void ConfirmButton()
     {
-        
+        GameController.Instance.StartGame(currentGuardCount, artFocusList[artFocusIndex].transform);
+        gameObject.SetActive(false);
     }
 
     private void ArtCategoryChanged(int index)
@@ -161,9 +163,9 @@ public class StartScreen : MonoBehaviour
                 guardCountInput.SetTextWithoutNotify(result.ToString());
             }
             currentGuardCount = result;
+            currentFocus = CameraFocus.Guard;
+            UpdateLevelCameraView();
         }
-        currentFocus = CameraFocus.Guard;
-        UpdateLevelCameraView();
     }
 
     private void UpdateLevelCameraView()
@@ -174,7 +176,12 @@ public class StartScreen : MonoBehaviour
             case CameraFocus.Steal:
                 Transform artFocusTransform = artFocusList[artFocusIndex].transform;
                 BoxCollider artFocusBox = artFocusList[artFocusIndex];
-                levelViewCamera.transform.position = artFocusTransform.position + artFocusTransform.forward *
+
+                // Push our camera far enough away to adequately frame the painting
+                // Get the largest world bound size of the collider as the unit length
+                // to move away as all our paintings are rotated and scaled with no consistency
+                levelViewCamera.transform.position = artFocusTransform.position +
+                    artFocusTransform.forward *
                     Mathf.Clamp(
                         Mathf.Max(
                          artFocusBox.bounds.size.x,
@@ -187,6 +194,10 @@ public class StartScreen : MonoBehaviour
             case CameraFocus.Start:
                 levelViewCamera.transform.position = thiefStartFocus.position;
                 levelViewCamera.transform.rotation = thiefStartFocus.rotation;
+                if(NavMesh.SamplePosition(thiefStartFocus.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+                {
+                    Level.Instance.Thief.NavAgent.Warp(hit.position);
+                }
                 break;
 
             case CameraFocus.Guard:
@@ -194,6 +205,10 @@ public class StartScreen : MonoBehaviour
                 levelViewCamera.transform.LookAt(Level.Instance.LevelMiddlePoint);
                 levelViewCamera.transform.Rotate(Vector3.forward, 270f);
                 levelViewCamera.orthographic = true;
+
+                var guardList = Level.Instance.GuardList;
+                for(int i = 0; i < guardCountMax; ++i)
+                    guardList[i].gameObject.SetActive(i < currentGuardCount);
                 break;
         }
     }

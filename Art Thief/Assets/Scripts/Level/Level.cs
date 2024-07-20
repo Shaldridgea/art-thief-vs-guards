@@ -27,6 +27,21 @@ public class Level : MonoBehaviour
     }
 
     [SerializeField]
+    private List<Transform> levelExits;
+
+    public List<Transform> LevelExits => levelExits;
+
+    [SerializeField]
+    private List<GuardAgent> guardList;
+
+    public List<GuardAgent> GuardList => guardList;
+
+    [SerializeField]
+    private ThiefAgent thief;
+
+    public ThiefAgent Thief => thief;
+
+    [SerializeField]
     private List<GameObject> artList;
 
     public List<GameObject> ArtList => artList;

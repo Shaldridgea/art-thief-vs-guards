@@ -23,7 +23,7 @@ public class ThiefAgent : Agent
 
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
 
-    public Transform ArtGoal { get; private set; }
+    public Transform ArtGoal { get; set; }
 
     private bool usingOffMeshLink;
     
@@ -31,13 +31,13 @@ public class ThiefAgent : Agent
     protected override void Start()
     {
         base.Start();
-
-        if (ArtGoal == null)
-            ArtGoal = GameController.Instance.ArtGoal;
     }
 
     private void Update()
     {
+        if (!AgentActivated)
+            return;
+
         if (!usingOffMeshLink && navAgent.hasPath && navAgent.isOnOffMeshLink)
         {
             StartCoroutine(FollowPathOffMeshLink());

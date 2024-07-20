@@ -50,10 +50,6 @@ public class HidingArea : MonoBehaviour
                 gizColor = Color.green;
                 break;
 
-            case Consts.HidingAreaType.Dynamic:
-                gizColor = Color.blue;
-                break;
-
             case Consts.HidingAreaType.Conditional:
                 gizColor = Color.red;
                 break;

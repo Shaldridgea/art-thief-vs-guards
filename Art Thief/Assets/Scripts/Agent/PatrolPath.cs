@@ -9,7 +9,7 @@ public class PatrolPath : MonoBehaviour
     private Color pathColour = Color.blue;
 
     [SerializeField]
-    private List<Transform> waypointList;
+    private List<Transform> waypointList = new();
 
     private List<Vector3> pointsList = new List<Vector3>(10);
 
@@ -62,10 +62,8 @@ public class PatrolPath : MonoBehaviour
         UpdatePoints();
     }
 
-    private void UpdatePoints(){
-        if (pointsList == null)
-            pointsList = new List<Vector3>(10);
-
+    private void UpdatePoints()
+    {
         pointsList.Clear();
 
         for (int i = 0; i < waypointList.Count; ++i)
@@ -73,5 +71,15 @@ public class PatrolPath : MonoBehaviour
             if (waypointList[i] != null)
                 pointsList.Add(waypointList[i].position);
         }
+    }
+
+    private void Reset()
+    {
+        waypointList.Clear();
+        for(int i = 0; i < transform.childCount; ++i)
+        {
+            waypointList.Add(transform.GetChild(i));
+        }
+        UpdatePoints();
     }
 }

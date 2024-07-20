@@ -39,6 +39,8 @@ public class Agent : MonoBehaviour
     // Get the room at the end of the list if it's not empty
     public Room CurrentRoom => roomList.Count == 0 ? null : roomList[^1];
 
+    public bool AgentActivated { get; protected set; }
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -80,6 +82,11 @@ public class Agent : MonoBehaviour
             else
                 AgentBlackboard.SetVariable(left, right);
         }
+    }
+
+    public void ActivateAgent()
+    {
+        AgentActivated = true;
     }
 
     /// <summary>
