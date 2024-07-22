@@ -46,6 +46,8 @@ public class StartScreen : MonoBehaviour
 
     private int artFocusIndex;
 
+    private float artCameraDistance = 2.5f;
+
     private Transform thiefStartFocus;
 
     // Start is called before the first frame update
@@ -82,16 +84,17 @@ public class StartScreen : MonoBehaviour
         switch (currentFocus)
         {
             case CameraFocus.Steal:
-                artFocusIndex = (artFocusIndex - 1) % artFocusList.Count;
+                artFocusIndex = artFocusIndex == 0 ? artFocusList.Count - 1 : artFocusIndex - 1;
             break;
 
             case CameraFocus.Start:
-                startTargetDropdown.value = (startTargetDropdown.value - 1) % startTargetDropdown.options.Count;
+                startTargetDropdown.value =
+                    startTargetDropdown.value == 0 ? startTargetDropdown.options.Count - 1 : startTargetDropdown.value - 1;
                 thiefStartFocus = Level.Instance.ThiefStartList[startTargetDropdown.value];
             break;
 
             case CameraFocus.Guard:
-                currentGuardCount = (currentGuardCount - 1) % guardCountMax;
+                currentGuardCount = currentGuardCount == 0 ? guardCountMax - 1 : currentGuardCount - 1;
                 guardCountInput.text = currentGuardCount.ToString();
             break;
         }
@@ -132,14 +135,17 @@ public class StartScreen : MonoBehaviour
         {
             case "medieval":
                 artFocusList = Level.Instance.MedievalArtList;
+                artCameraDistance = 2.5f;
                 break;
 
             case "abstract":
                 artFocusList = Level.Instance.AbstractArtList;
+                artCameraDistance = 2.5f;
                 break;
 
             case "sculpture":
                 artFocusList = Level.Instance.SculptureArtList;
+                artCameraDistance = 1.5f;
                 break;
         }
         artFocusIndex = 0;
@@ -186,7 +192,7 @@ public class StartScreen : MonoBehaviour
                         Mathf.Max(
                          artFocusBox.bounds.size.x,
                         artFocusBox.bounds.size.y,
-                        artFocusBox.bounds.size.z), 2.5f, 5f);
+                        artFocusBox.bounds.size.z), artCameraDistance, 5f);
 
                 levelViewCamera.transform.LookAt(artFocusTransform);
                 break;

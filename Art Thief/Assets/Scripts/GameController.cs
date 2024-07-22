@@ -23,19 +23,20 @@ public class GameController : MonoBehaviour
     public Transform ArtGoal { get; set; }
 
     [SerializeField]
-    private List<GuardAgent> guards;
+    private CameraControl gameCamera;
 
-    public List<GuardAgent> Guards => guards;
-    
     [SerializeField]
-    private ThiefAgent thief;
+    private SimulationHUD menuHUD;
+
+    [SerializeField]
+    private StartScreen startScreen;
 
     public Blackboard GlobalBlackboard { get; private set; }
 
     // Start is called before the first frame update
     private void Start()
     {
-        
+        gameCamera.enabled = false;
     }
 
     // Update is called once per frame
@@ -46,7 +47,7 @@ public class GameController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            SceneManager.LoadSceneAsync("gallery");
+            SceneManager.LoadSceneAsync(0);
         }
     }
 
@@ -59,5 +60,10 @@ public class GameController : MonoBehaviour
             GuardAgent guard = Level.Instance.GuardList[i];
             guard.ActivateAgent();
         }
+        gameCamera.transform.LookAt(Level.Instance.Thief.transform);
+        gameCamera.enabled = true;
+        menuHUD.gameObject.SetActive(true);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }

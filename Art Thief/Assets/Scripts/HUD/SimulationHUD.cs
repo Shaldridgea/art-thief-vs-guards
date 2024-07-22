@@ -74,35 +74,42 @@ public class SimulationHUD : MonoBehaviour
 
     private void Update()
     {
+        // Right click context menu for bringing up visual aids
         if(Input.GetMouseButtonDown(1))
         {
+            // Raycast for any agents we can right click on
             if(Physics.Raycast(
                 Camera.main.ScreenPointToRay(Input.mousePosition),
                 out RaycastHit hitInfo, 300f, agentLayerMask.value))
             {
                 contextMenu.SetActive(true);
+
+                // Set the context menu's position to be where we clicked
                 if (RectTransformUtility.ScreenPointToLocalPointInRectangle(transform as RectTransform,
                     Input.mousePosition, null, out Vector2 localPoint))
-                { 
+                {
                     (contextMenu.transform as RectTransform).anchoredPosition = localPoint;
                 }
 
+                // Change context menu prompts based on thief or guard
                 if(hitInfo.transform.TryGetComponent(out ThiefAgent thief))
                 {
                     contextAgentTarget = thief;
-                    monitorAgentButton.GetComponentInChildren<TextMeshProUGUI>().text = "Monitor Utility";
+                    monitorAgentButton.GetComponentInChildren<TextMeshProUGUI>().text = "View Utility";
                 }
                 else
                 if (hitInfo.transform.TryGetComponent(out GuardAgent guard))
                 {
                     contextAgentTarget = guard;
-                    monitorAgentButton.GetComponentInChildren<TextMeshProUGUI>().text = "Monitor Behaviour Tree";
+                    monitorAgentButton.GetComponentInChildren<TextMeshProUGUI>().text = "View Behaviour Tree";
                 }
             }
         }
+
         if (Input.GetMouseButtonUp(0))
-        {
             contextMenu.SetActive(false);
-        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            simulationSpeedSlider.value = Time.timeScale >= 1f ? 0f : 1f;
     }
 }
