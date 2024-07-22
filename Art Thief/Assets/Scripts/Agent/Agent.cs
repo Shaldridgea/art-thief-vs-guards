@@ -149,7 +149,7 @@ public class Agent : MonoBehaviour
     private IEnumerator MakeWalkingSound()
     {
         // Make the walking sound play as long as we're travelling to our destination
-        while(Vector3.Distance(transform.position, navAgent.destination) > 2f)
+        while(Vector3.Distance(transform.position, navAgent.destination) > 1f)
         {
             walkingSound.PlaySound();
             yield return new WaitForSeconds(walkSoundInterval);

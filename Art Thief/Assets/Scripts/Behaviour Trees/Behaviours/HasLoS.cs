@@ -18,7 +18,7 @@ public class HasLoS : BehaviourNode
 
         GameObject target = ParentTree.Owner.AgentBlackboard.GetVariable<GameObject>(targetKey);
         if (target != null)
-            if (ParentTree.Owner.GuardSenses.IsInLOS(target.transform.position))
+            if (ParentTree.Owner.GuardSenses.IsSeen(target.transform.position))
                 status = Consts.NodeStatus.SUCCESS;
 
         return status;

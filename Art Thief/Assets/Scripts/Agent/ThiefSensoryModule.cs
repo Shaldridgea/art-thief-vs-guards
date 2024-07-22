@@ -26,9 +26,21 @@ public class ThiefSensoryModule : SensoryModule
 
     private void Update()
     {
+        // Check if we start losing track of where a guard is or not
+        // and count down timer for losing track
         for(int i = awareGuards.Count - 1; i >= 0; --i)
         {
             GuardAgent guard = awareGuards[i];
+
+            // If we still know where the guard is then skip over them
+            if (IsInLOS(guard.transform.position))
+                continue;
+
+            // If the guard is not moving and we hadn't already started to lose them
+            // then we assume it's in the last place we knew and skip over them
+            if (!(guard.NavAgent.hasPath && guard.NavAgent.remainingDistance > 1f) &&
+                loseGuardTimerMap[guard] == loseGuardTime)
+                continue;
 
             if ((loseGuardTimerMap[guard] -= Time.deltaTime) <= 0f)
                 LoseGuard(guard);
@@ -78,18 +90,5 @@ public class ThiefSensoryModule : SensoryModule
 
         if(visual.Owner.TryGetComponent(out GuardAgent guard))
             NoticeGuard(guard);
-    }
-
-    public override void NotifyVisualLost(SenseInterest visual)
-    {
-        base.NotifyVisualLost(visual);
-        if (visual.OwnerTeam == Consts.Team.THIEF)
-            return;
-
-        if (visual.Owner == null)
-            return;
-
-        if (visual.Owner.TryGetComponent(out GuardAgent guard))
-            LoseGuard(guard);
     }
 }

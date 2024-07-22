@@ -78,7 +78,13 @@ public abstract class SensoryModule : MonoBehaviour
         SoundHeard?.Invoke(sound);
     }
 
-    public bool IsInLOS(Vector3 checkPosition, Vector3 agentForward = default)
+    public bool IsInLOS(Vector3 checkPosition)
+    {
+        return !Physics.Linecast(checkPosition,
+            owner.AgentView.AgentEyeRoot.position,losMask, QueryTriggerInteraction.Collide);
+    }
+
+    public bool IsSeen(Vector3 checkPosition, Vector3 agentForward = default)
     {
         if (agentForward == default)
             agentForward = owner.AgentView.AgentEyeRoot.forward;

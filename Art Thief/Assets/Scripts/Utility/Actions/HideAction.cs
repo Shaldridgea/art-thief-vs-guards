@@ -38,9 +38,9 @@ public class HideAction : UtilityAction
             float xDist = x.distance;
             float yDist = y.distance;
             if (x.area.AreaType == Consts.HidingAreaType.Safe)
-                xDist /= 2f;
+                xDist /= 3f;
             if (y.area.AreaType == Consts.HidingAreaType.Safe)
-                yDist /= 2f;
+                yDist /= 3f;
             
             if (x.distance < y.distance)
                 return -1;
@@ -70,6 +70,10 @@ public class HideAction : UtilityAction
                 }
             }
         }
+
+        // If we couldn't find a valid hiding spot
+        if (targetArea == null)
+            thief.AgentBlackboard.SetVariable("danger", thief.AgentBlackboard.GetVariable<float>("danger")+0.5f);
     }
 
     public override void PerformAction(ThiefAgent thief)
@@ -114,7 +118,8 @@ public class HideAction : UtilityAction
             for(int d = 2; d <= 6; d += 2)
             {
                 // Get the simulated position of where the guard will be in however many seconds on its path
-                bool terminated = guard.NavAgent.SamplePathPosition(guard.NavAgent.areaMask, Consts.GetPathDistance(guard.NavAgent.path), out var hit);
+                bool terminated = guard.NavAgent.SamplePathPosition(guard.NavAgent.areaMask,
+                    Consts.GetPathDistance(guard.NavAgent.path), out var hit);
 
                 // Get the simulated position of the thief however many seconds into the future
                 Vector3 thiefPosition = GetPositionAlongPath(path, thief.NavAgent.speed * d);
@@ -127,7 +132,7 @@ public class HideAction : UtilityAction
                     guardDirection = guard.transform.forward;
 
                 // If guard has line of sight to thief, report this path as being unsafe
-                if (guard.GuardSenses.IsInLOS(thiefPosition, guardDirection))
+                if (guard.GuardSenses.IsSeen(thiefPosition, guardDirection))
                     return false;
 
                 guardPosition = hit.position;

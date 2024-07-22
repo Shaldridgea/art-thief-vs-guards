@@ -84,7 +84,7 @@ public class DoorwayArea : MonoBehaviour
         if (boxArea == null)
             return;
 
-        Color gizColor = Color.black;
+        Color gizColor = Color.blue;
         gizColor.a = 0.3f;
         Gizmos.color = gizColor;
         Gizmos.DrawCube(transform.position + boxArea.center, boxArea.size);

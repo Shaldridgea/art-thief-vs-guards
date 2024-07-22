@@ -55,7 +55,7 @@ public class ThiefAgent : Agent
                 continue;
 
             ++guardThreats;
-            bool hasLos = g.GuardSenses.IsInLOS(transform.position);
+            bool hasLos = g.GuardSenses.IsSeen(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
@@ -73,8 +73,12 @@ public class ThiefAgent : Agent
         if (beingChased)
             danger += 1f;
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
-        //storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
-        storedDanger = danger;
+        // Immediately reflect calculated danger in blackboard if it's higher,
+        // otherwise bring it down slowly if it's lower
+        if (danger > storedDanger)
+            storedDanger = danger;
+        else
+            storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
     }
@@ -82,14 +86,21 @@ public class ThiefAgent : Agent
     private IEnumerator FollowPathOffMeshLink()
     {
         bool reachedStartFirst = false;
+
+        Vector3 startPos = navAgent.currentOffMeshLinkData.startPos;
+        startPos.y = transform.position.y;
+
+        Vector3 endPos = navAgent.currentOffMeshLinkData.endPos;
+        if (NavMesh.SamplePosition(endPos, out NavMeshHit hit, 3f, NavMesh.AllAreas))
+            endPos = hit.position;
+
         float frameMovementSpeed;
+
         do
         {
-            frameMovementSpeed = navAgent.speed * Time.deltaTime;
+            Vector3 goalPos = reachedStartFirst ? endPos : startPos;
 
-            Vector3 goalPos = reachedStartFirst ?
-                navAgent.currentOffMeshLinkData.endPos : navAgent.currentOffMeshLinkData.startPos;
-            goalPos.y = transform.position.y;
+            frameMovementSpeed = navAgent.speed * Time.deltaTime;
 
             transform.position = Vector3.MoveTowards(
                 transform.position, goalPos, frameMovementSpeed);
