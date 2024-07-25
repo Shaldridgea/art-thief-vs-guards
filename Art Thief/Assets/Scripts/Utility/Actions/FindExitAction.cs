@@ -1,19 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class FindExitAction : UtilityAction
 {
+    private NavMeshPath targetPath;
+
     public FindExitAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
     {
-        return;
+        float checkDist = float.MaxValue;
+        targetPath = null;
+        for(int i = 0; i < Level.Instance.LevelExits.Count; ++i)
+        {
+            NavMeshPath path = Consts.GetNewPath(
+                thief.transform.position,
+                Level.Instance.LevelExits[i].position);
+
+            if (path == null)
+                continue;
+
+            float pathDistance = Consts.GetPathDistance(path);
+            if(pathDistance < checkDist)
+            {
+                checkDist = pathDistance;
+                targetPath = path;
+            }
+        }
     }
 
     public override void PerformAction(ThiefAgent thief)
     {
-        thief.MoveAgent(new Vector3(0f, 1f, 0f));
+        if(!thief.NavAgent.hasPath)
+            thief.MoveAgent(targetPath);
     }
 
     public override void ExitAction(ThiefAgent thief)

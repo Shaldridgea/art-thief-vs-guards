@@ -38,9 +38,17 @@ public class HideAction : UtilityAction
             float xDist = x.distance;
             float yDist = y.distance;
             if (x.area.AreaType == Consts.HidingAreaType.Safe)
+            {
                 xDist /= 3f;
+                if (thief.CurrentRoom.HidingSpots.Contains(x.area))
+                    return -1;
+            }
             if (y.area.AreaType == Consts.HidingAreaType.Safe)
+            {
                 yDist /= 3f;
+                if (thief.CurrentRoom.HidingSpots.Contains(y.area))
+                    return 1;
+            }
             
             if (x.distance < y.distance)
                 return -1;

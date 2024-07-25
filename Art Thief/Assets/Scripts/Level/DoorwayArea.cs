@@ -29,7 +29,8 @@ public class DoorwayArea : MonoBehaviour
     public void CalculateRisk(ThiefAgent thief, List<GuardAgent> threats)
     {
         Risk = 0f;
-        Risk += Mathf.InverseLerp(5f, 25f, Vector3.Distance(GetNearestPoint(thief.transform.position), thief.transform.position));
+        Risk += Mathf.InverseLerp(5f, 25f,
+            Vector3.Distance(GetNearestPoint(thief.transform.position), thief.transform.position)) * 1.5f;
         int threatCount = 0;
         for (int i = 0; i < threats.Count; ++i)
         {

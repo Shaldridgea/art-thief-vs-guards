@@ -11,6 +11,8 @@ public class Room : MonoBehaviour
 
     public List<DoorwayArea> Doorways;
 
+    public List<HidingArea> HidingSpots = new();
+
     private void Start()
     {
         foreach (var d in Doorways)
