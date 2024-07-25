@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3117589219522412214}
   - component: {fileID: 2287975183170992777}
+  - component: {fileID: 3978169787700272021}
+  - component: {fileID: 4647660887395536151}
   m_Layer: 12
   m_Name: DetailFrame
   m_TagString: Art
@@ -47,6 +49,42 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.84160674, y: 1.1446271, z: 0.019952806}
   m_Center: {x: -0.000034034252, y: 0.0007276535, z: 0.000207684}
+--- !u!114 &3978169787700272021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3117589219522740254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 114a8a46615183e4ab449dc60c4ee22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMesh: {fileID: 3117589219520552880}
+  targetMaterialIndex: 0
+  woodReplaceMaterial: {fileID: 2100000, guid: dc15030a114f4c743be5749a21443050, type: 2}
+--- !u!114 &4647660887395536151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3117589219522740254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8610bfe5e50bb6a4d803f1b7c7415a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSuspicious: 0
+  priority: 1
+  owner: {fileID: 3117589219522740254}
+  ownerTeam: 1
+  raycastMask:
+    serializedVersion: 2
+    m_Bits: 0
+  trackMovement: 0
+  trackLighting: 0
 --- !u!1 &3117589219522768728
 GameObject:
   m_ObjectHideFlags: 0

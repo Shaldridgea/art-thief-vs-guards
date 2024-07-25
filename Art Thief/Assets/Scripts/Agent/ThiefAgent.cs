@@ -124,7 +124,17 @@ public class ThiefAgent : Agent
         if (ArtGoal == null)
             return;
 
-        ArtGoal.SetParent(transform, true);
+        if (ArtGoal.TryGetComponent(out GalleryArt art))
+        {
+            if (art.ShouldTakeObject)
+                art.TargetMesh.transform.SetParent(transform, true);
+            else
+                art.RemoveArtImage();
+
+            if (ArtGoal.TryGetComponent(out VisualInterest visual))
+                visual.SetSuspicious(true);
+        }
+        
         AgentBlackboard.SetVariable("artStolen", 1f);
     }
 

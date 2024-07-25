@@ -101,6 +101,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7108079257953517525}
   - component: {fileID: 7753381308252865130}
+  - component: {fileID: 6393715197841647176}
+  - component: {fileID: 4039084546530028812}
   m_Layer: 12
   m_Name: CherryFrame
   m_TagString: Art
@@ -137,3 +139,39 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.77555907, y: 0.90129673, z: 0.052578904}
   m_Center: {x: 0.0021606684, y: 0.019081831, z: -0.02}
+--- !u!114 &6393715197841647176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7633364700110284143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 114a8a46615183e4ab449dc60c4ee22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMesh: {fileID: 9218784912982931673}
+  targetMaterialIndex: 1
+  woodReplaceMaterial: {fileID: 2100000, guid: dc15030a114f4c743be5749a21443050, type: 2}
+--- !u!114 &4039084546530028812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7633364700110284143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8610bfe5e50bb6a4d803f1b7c7415a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSuspicious: 0
+  priority: 1
+  owner: {fileID: 7633364700110284143}
+  ownerTeam: 1
+  raycastMask:
+    serializedVersion: 2
+    m_Bits: 0
+  trackMovement: 0
+  trackLighting: 0

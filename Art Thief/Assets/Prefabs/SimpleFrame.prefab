@@ -175,6 +175,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6764567484180738960}
   - component: {fileID: 6764567484181211078}
+  - component: {fileID: 3613656758935551009}
+  - component: {fileID: 8344806387161845550}
   m_Layer: 12
   m_Name: SimpleFrame
   m_TagString: Art
@@ -212,3 +214,39 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.40999997, z: 0.014927593}
   m_Center: {x: 2.2952442e-19, y: 0, z: -0.00016998884}
+--- !u!114 &3613656758935551009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764567484181181236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 114a8a46615183e4ab449dc60c4ee22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMesh: {fileID: 6764567484183023828}
+  targetMaterialIndex: 0
+  woodReplaceMaterial: {fileID: 2100000, guid: dc15030a114f4c743be5749a21443050, type: 2}
+--- !u!114 &8344806387161845550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764567484181181236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8610bfe5e50bb6a4d803f1b7c7415a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSuspicious: 0
+  priority: 1
+  owner: {fileID: 6764567484181181236}
+  ownerTeam: 1
+  raycastMask:
+    serializedVersion: 2
+    m_Bits: 0
+  trackMovement: 0
+  trackLighting: 0
