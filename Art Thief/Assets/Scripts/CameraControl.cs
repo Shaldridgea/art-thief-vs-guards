@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-    enum CameraMode
+    public enum CameraMode
     {
-        Free,
-        Orbit
+        Orbit,
+        Free
     }
 
     [Header("Free")]
@@ -16,7 +16,7 @@ public class CameraControl : MonoBehaviour
 
     [Header("Orbiting")]
     [SerializeField]
-    private Vector3 cameraDistance;
+    private float cameraDistance;
 
     [SerializeField]
     private float scrollSensitivity = 1f;
@@ -28,28 +28,39 @@ public class CameraControl : MonoBehaviour
 
     private Camera cam;
 
-    private Quaternion cameraAngle;
-
     private CameraMode mode;
 
-    private Vector3 eulerAngles;
+    private Vector3 freeEuler, orbitEuler;
+
+    private Vector3 cameraVector;
 
     // Start is called before the first frame update
     void Start()
     {
         thief = Level.Instance.Thief;
         cam = Camera.main;
-        cameraAngle = Quaternion.Euler(-45f, 0f, 0f);
+        orbitEuler = new Vector3(-45f, 0f, 0f);
+        cameraVector = new Vector3(0f,0f,cameraDistance);
     }
 
     private void OnEnable()
     {
-        eulerAngles = transform.rotation.eulerAngles;
+        freeEuler = transform.rotation.eulerAngles;
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
+        // Toggle the cursor locking
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Cursor.visible = !Cursor.visible;
+            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+        }
+
+        if (Cursor.lockState != CursorLockMode.Locked)
+            return;
+
         switch (mode)
         {
             case CameraMode.Free:
@@ -60,14 +71,9 @@ public class CameraControl : MonoBehaviour
                 UpdateOrbitingCam();
                 break;
         }
-
-        // Toggle the cursor locking
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
-        }
     }
+
+    public void SetCameraMode(CameraMode newMode) => mode = newMode;
 
     private void UpdateFreeCam()
     {
@@ -75,27 +81,43 @@ public class CameraControl : MonoBehaviour
             Input.GetAxisRaw("FreeCam_X"), Input.GetAxisRaw("FreeCam_Y"), Input.GetAxisRaw("FreeCam_Z")).normalized;
 
         float camSpeed = speed * (Input.GetKey(KeyCode.LeftShift) ? 2f : 1f);
-        cam.transform.position += cam.transform.TransformVector(movementVector) * camSpeed * Time.unscaledDeltaTime;
+        cam.transform.position += camSpeed * Time.unscaledDeltaTime * cam.transform.TransformVector(movementVector);
 
         Vector3 turnVector =
             new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * turnSensitivity * Time.unscaledDeltaTime;
-        eulerAngles = new Vector3(Mathf.Clamp(eulerAngles.x+turnVector.x, -90f, 90f), eulerAngles.y + turnVector.y);
-        cam.transform.rotation = Quaternion.Euler(eulerAngles);
+        freeEuler = new Vector3(Mathf.Clamp(freeEuler.x+turnVector.x, -90f, 90f), freeEuler.y + turnVector.y);
+        cam.transform.rotation = Quaternion.Euler(freeEuler);
     }
 
     private void UpdateOrbitingCam()
     {
         // Turn camera using the mouse
-        cameraAngle.eulerAngles += new Vector3(
-            Input.GetAxis("Mouse Y") * turnSensitivity,
-            Input.GetAxis("Mouse X") * turnSensitivity, 0f) * Time.unscaledDeltaTime;
+        orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
+            Input.GetAxis("Mouse Y"),
+            Input.GetAxis("Mouse X"), 0f);
 
+        orbitEuler.x = Mathf.Clamp(orbitEuler.x, -89f, 89f);
+
+        Vector3 thiefOrigin = thief.AgentView.AgentHeadRoot.position;
         // Move camera around the spy and make the camera look at the spy
-        cam.transform.position = thief.transform.position + cameraAngle * cameraDistance;
-        cam.transform.LookAt(thief.transform);
+        float rayDistance = cameraDistance;
+        Vector3 desiredPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
+        if (Physics.Raycast(thiefOrigin, (desiredPoint - thiefOrigin).normalized,
+            out RaycastHit info, cameraDistance, LayerMask.GetMask("Default", "Floor")))
+            rayDistance = info.distance-0.1f;
+
+        if (Mathf.Abs(cameraVector.z-rayDistance) > 0.1f)
+            cameraVector.z = Mathf.Lerp(cameraVector.z, rayDistance, 4f * Time.unscaledDeltaTime);
+        else
+            cameraVector.z = Mathf.MoveTowards(cameraVector.z, rayDistance, 0.1f * Time.unscaledDeltaTime);
+        cam.transform.position = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
+        cam.transform.LookAt(thiefOrigin);
 
         // Zoom the camera in or out
         if (Input.mouseScrollDelta.y != 0f)
-            cameraDistance.z += (Input.mouseScrollDelta.y * scrollSensitivity) * Time.unscaledDeltaTime;
+        {
+            cameraDistance += (-Input.mouseScrollDelta.y * scrollSensitivity) * Time.unscaledDeltaTime;
+            cameraDistance = Mathf.Clamp(cameraDistance, 1f, 10f);
+        }
     }
 }

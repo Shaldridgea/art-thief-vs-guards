@@ -15,6 +15,12 @@ public class SimulationHUD : MonoBehaviour
     [SerializeField]
     private LayerMask agentLayerMask;
 
+    [SerializeField]
+    private Toggle lockCameraToggle;
+
+    [SerializeField]
+    private CameraControl gameCameraControl;
+
     [Header("Agent Info Views")]
     [SerializeField]
     private GameObject blackboardView;
@@ -43,6 +49,7 @@ public class SimulationHUD : MonoBehaviour
         simulationSpeedSlider.onValueChanged.AddListener(HandleSpeedSliderChange);
         monitorBoardButton.onClick.AddListener(HandleMonitorBlackboard);
         monitorAgentButton.onClick.AddListener(HandleMonitorAgent);
+        lockCameraToggle.onValueChanged.AddListener(HandleLockCameraToggle);
     }
 
     private void HandleSpeedSliderChange(float newValue)
@@ -70,6 +77,11 @@ public class SimulationHUD : MonoBehaviour
             treeView.SetActive(true);
             treeView.GetComponentInChildren<BTRuntimeViewGraph>().SetTarget(guard);
         }
+    }
+
+    private void HandleLockCameraToggle(bool toggle)
+    {
+        gameCameraControl.SetCameraMode(toggle ? CameraControl.CameraMode.Orbit : CameraControl.CameraMode.Free);
     }
 
     private void Update()
