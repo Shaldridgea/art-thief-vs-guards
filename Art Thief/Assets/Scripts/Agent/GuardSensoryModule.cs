@@ -9,7 +9,7 @@ public class GuardSensoryModule : SensoryModule
     {
         base.NotifySound(sound);
         // Don't treat unimportant friendly sounds as suspicious
-        if (sound.OwnerTeam == Consts.Team.GUARD && !sound.IsSuspicious)
+        if (!sound.IsSuspicious)
             return;
 
         (owner as GuardAgent).Suspicion.OnSuspicionSensed(sound, Consts.SuspicionType.Sound);
@@ -19,7 +19,7 @@ public class GuardSensoryModule : SensoryModule
     {
         base.NotifyVisualFound(visual);
         // Exit if this interest belongs to a guard and it's not flagged as suspicious
-        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+        if (!visual.IsSuspicious)
             return;
 
         (owner as GuardAgent).Suspicion.OnSuspicionSensed(visual, Consts.SuspicionType.Visual);
@@ -29,7 +29,7 @@ public class GuardSensoryModule : SensoryModule
     {
         base.NotifyVisualLost(visual);
         // Exit if this interest belongs to a guard and it's not flagged as suspicious
-        if (visual.OwnerTeam == Consts.Team.GUARD && !visual.IsSuspicious)
+        if (!visual.IsSuspicious)
             return;
 
         (owner as GuardAgent).Suspicion.OnVisualSuspectLost(visual);

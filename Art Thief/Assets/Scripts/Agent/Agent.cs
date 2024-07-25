@@ -106,15 +106,6 @@ public class Agent : MonoBehaviour
         if (walkingSound == null)
             return;
 
-        // TODO: Fix walking sounds
-        // Stop the walking coroutine that creates the step sound if we aren't just
-        // updating position only
-        if (walkingCoroutine != null && !updatePositionOnly)
-        {
-            StopCoroutine(walkingCoroutine);
-            walkingCoroutine = null;
-        }
-
         if(walkingCoroutine == null)
             walkingCoroutine = StartCoroutine(MakeWalkingSound());
     }
@@ -136,12 +127,6 @@ public class Agent : MonoBehaviour
         if (walkingSound == null)
             return;
 
-        if (walkingCoroutine != null && !updatePositionOnly)
-        {
-            StopCoroutine(walkingCoroutine);
-            walkingCoroutine = null;
-        }
-
         if (walkingCoroutine == null)
             walkingCoroutine = StartCoroutine(MakeWalkingSound());
     }
@@ -155,6 +140,7 @@ public class Agent : MonoBehaviour
             yield return new WaitForSeconds(walkSoundInterval);
         }
 
+        walkingCoroutine = null;
         yield break;
     }
 

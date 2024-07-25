@@ -25,4 +25,6 @@ public class SenseInterest : MonoBehaviour
     public Consts.Team OwnerTeam => ownerTeam;
 
     public void SetSuspicious(bool newSuspicious) => isSuspicious = newSuspicious;
+
+    public void SetTeam(Consts.Team newTeam) => ownerTeam = newTeam;
 }

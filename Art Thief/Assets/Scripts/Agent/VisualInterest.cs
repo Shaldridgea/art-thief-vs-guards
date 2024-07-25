@@ -10,6 +10,9 @@ public class VisualInterest : SenseInterest
     [SerializeField]
     private bool trackMovement;
 
+    [SerializeField]
+    private bool trackLighting;
+
     public bool IsMoving { get; private set; }
 
     private Vector3 lastPosition;
@@ -32,12 +35,18 @@ public class VisualInterest : SenseInterest
 
     public void EnteredLight(Light newSource)
     {
+        if (!trackLighting)
+            return;
+
         lightSources.Add(newSource);
         lightVisibleMap.Add(newSource, false);
     }
 
     public void ExitedLight(Light newSource)
     {
+        if (!trackLighting)
+            return;
+
         if(lightVisibleMap[newSource])
             --litCount;
         lightSources.Remove(newSource);

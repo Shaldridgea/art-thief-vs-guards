@@ -24,21 +24,25 @@ public class PatrolPath : MonoBehaviour
     {
         float compareDistance = float.MaxValue;
         int compareIndex = -1;
+        startPosition = startPosition.ZeroY();
         for(int i = 0; i < pointsList.Count; ++i)
         {
-            float checkDistance = Vector3.Distance(startPosition, pointsList[i]);
+            float checkDistance = Vector3.Distance(startPosition, pointsList[i].ZeroY());
             if (checkDistance < compareDistance)
             {
                 compareDistance = checkDistance;
                 compareIndex = i;
             }
         }
-        if(compareDistance <= 5f)
-        {
-            ++compareIndex;
-            if (compareIndex >= pointsList.Count)
-                compareIndex = 0;
-        }
+
+        Vector3 nextPoint = pointsList[(compareIndex + 1) % pointsList.Count].ZeroY();
+        Vector3 comparePoint = pointsList[compareIndex].ZeroY();
+        Vector3 pathAngle = (nextPoint - comparePoint).normalized;
+        Vector3 startAngle = (comparePoint - startPosition).normalized;
+
+        if (Vector3.Dot(pathAngle, startAngle) < 0.3f)
+            compareIndex = (compareIndex + 1) % pointsList.Count;
+
         return pointsList[compareIndex];
     }
 

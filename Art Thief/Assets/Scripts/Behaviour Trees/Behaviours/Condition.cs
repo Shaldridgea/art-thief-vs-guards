@@ -84,7 +84,7 @@ public class Condition : BehaviourNode
         {
             int leftBracketIndex = newString.IndexOf('(') + 1;
             int rightBracketIndex = newString.IndexOf(')');
-            string vectorValueString = newString.Substring(leftBracketIndex, rightBracketIndex - leftBracketIndex);
+            string vectorValueString = newString[leftBracketIndex..rightBracketIndex];
             string[] vectorSplit = vectorValueString.Split(',');
             float[] vectorComponents = new float[3];
             for(int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
