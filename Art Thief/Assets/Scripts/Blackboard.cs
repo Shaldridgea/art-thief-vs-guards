@@ -28,6 +28,14 @@ public class Blackboard
             return default;
     }
 
+    public object GetVariableGeneric(string variableName)
+    {
+        if (variablesDict.TryGetValue(variableName, out object val))
+            return val;
+        else
+            return default;
+    }
+
     public Type GetVariableType(string variableName)
     {
         if (typeDict.TryGetValue(variableName, out Type val))

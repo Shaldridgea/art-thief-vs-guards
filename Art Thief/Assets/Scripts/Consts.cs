@@ -35,7 +35,9 @@ public static class Consts
         TurnHead,
         IsTurningHead,
         HasLineOfSight,
-        CallMethod
+        CallMethod,
+        SetDistanceFromPoint,
+        CopyVariables
     }
 
     public enum RepeatCondition

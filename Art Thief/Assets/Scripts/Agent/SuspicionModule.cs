@@ -87,13 +87,13 @@ public class SuspicionModule : MonoBehaviour
                     reactionTimer = reactionTimerMax;
                     break;
                 }
-
-                if(checkReaction)
-                    if(suspectValues.Awareness >= 2f)
-                        owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
-                    else
-                        owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
             }
+
+            if (checkReaction)
+                if (suspectValues.Awareness >= 2f)
+                    owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
+                else
+                    owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
         }
         if (newSuspicionSet)
             CullSuspects();
@@ -159,6 +159,9 @@ public class SuspicionModule : MonoBehaviour
     public void OnVisualSuspectLost(SenseInterest lostInterest)
     {
         if (ignoreList.Contains(lostInterest))
+            return;
+
+        if (!visualSuspectList.Contains(lostInterest))
             return;
 
         var value = visualSuspectMap[lostInterest];

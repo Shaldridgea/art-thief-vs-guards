@@ -156,6 +156,14 @@ public static class BehaviourTreeFactory
             case Consts.BehaviourType.CallMethod:
                 newNode = new CallMethod(tree, dataNode.GetParameters());
             break;
+
+            case Consts.BehaviourType.SetDistanceFromPoint:
+                newNode = new SetDistanceFromPoint(tree, dataNode.GetParameters());
+            break;
+
+            case Consts.BehaviourType.CopyVariables:
+                newNode = new CopyVariables(tree, dataNode.GetParameters());
+            break;
         }
         newNode.Name = dataNode.name;
         return newNode;

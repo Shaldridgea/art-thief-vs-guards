@@ -17,6 +17,12 @@ public class GuardAgent : Agent
     [SerializeField]
     private PatrolPath perimeterPatrol;
 
+    [SerializeField]
+    private Transform walkieTalkieTransform;
+
+    [SerializeField]
+    private Transform walkieTalkieUseTransform;
+
     public GuardSensoryModule GuardSenses => (GuardSensoryModule)senses;
 
     private BehaviourTree agentTree;
@@ -31,7 +37,7 @@ public class GuardAgent : Agent
 
     public SuspicionModule Suspicion { get; private set; }
 
-    static GuardAgent debuggingAgent;
+    private LTBezierPath walkieTalkiePath;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -42,6 +48,12 @@ public class GuardAgent : Agent
 
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
+
+        walkieTalkiePath = new LTBezierPath(new Vector3[]{
+            walkieTalkieTransform.position,
+            walkieTalkieTransform.position + walkieTalkieTransform.right * 0.2f,
+            walkieTalkieTransform.position + walkieTalkieTransform.right * 0.3f + walkieTalkieUseTransform.up * 0.2f,
+            walkieTalkieUseTransform.position });
     }
 
     private void Update()
@@ -66,22 +78,16 @@ public class GuardAgent : Agent
         return point;
     }
 
-    private void OnMouseDown()
+    public void PlayReportAnimation()
     {
-        debuggingAgent = this;
-    }
+        Vector3 walkieStartAngles = walkieTalkieTransform.eulerAngles;
+        LeanTween.value(walkieTalkieTransform.gameObject,
+            (float value) => walkieTalkieTransform.position = walkieTalkiePath.point(value), 0f, 1f, 1.5f);
+        LeanTween.rotate(walkieTalkieTransform.gameObject, walkieTalkieUseTransform.eulerAngles, 1.5f);
 
-    private void OnGUI()
-    {
-        if (debuggingAgent != this)
-            return;
-
-        GUIStyle style = new GUIStyle("box");
-        style.fontSize = 20;
-        GUILayout.Box(name, style);
-        style.fontSize = 15;
-        foreach (var i in AgentBlackboard.GetData())
-            GUILayout.Box($"{i.Key}: {i.Value}", style);
+        LeanTween.value(walkieTalkieTransform.gameObject,
+            (float value) => walkieTalkieTransform.position = walkieTalkiePath.point(value), 1f, 0f, 1.5f).setDelay(2.5f);
+        LeanTween.rotate(walkieTalkieTransform.gameObject, walkieStartAngles, 1.5f).setDelay(2.5f);
     }
 
     [Button("Test head turn", EButtonEnableMode.Playmode)]
@@ -94,6 +100,12 @@ public class GuardAgent : Agent
     private void TestBodyTurn()
     {
         TurnBodyToPoint(regularPatrol.GetPoint(0), 2f);
+    }
+
+    [Button("Test report animation", EButtonEnableMode.Playmode)]
+    private void TestReport()
+    {
+        PlayReportAnimation();
     }
 
     protected override void OnDrawGizmosSelected()
