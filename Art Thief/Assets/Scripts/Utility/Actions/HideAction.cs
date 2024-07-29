@@ -68,7 +68,12 @@ public class HideAction : UtilityAction
             area.CheckForSafety(senses.AwareGuards);
             if (area.IsSafe)
             {
-                var newPath = Consts.GetNewPath(thief.transform.position, area.transform.position);
+                Vector3 thiefPos = thief.transform.position;
+                if (!thief.NavAgent.isOnNavMesh)
+                    if (thief.NavAgent.FindClosestEdge(out NavMeshHit hit))
+                        thiefPos = hit.position;
+                
+                var newPath = Consts.GetNewPath(thiefPos, area.transform.position);
                 if (IsPathSafe(thief, newPath, senses.AwareGuards))
                 {
                     targetArea = area;

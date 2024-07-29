@@ -78,7 +78,7 @@ public class ThiefAgent : Agent
         if (danger > storedDanger)
             storedDanger = danger;
         else
-            storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime);
+            storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime / 3f);
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
     }
@@ -95,6 +95,8 @@ public class ThiefAgent : Agent
             endPos = hit.position;
 
         float frameMovementSpeed;
+
+        navAgent.velocity = Vector3.zero;
 
         do
         {
@@ -114,7 +116,8 @@ public class ThiefAgent : Agent
 
             yield return null;
         }
-        while (Vector3.Distance(transform.position.ZeroY(), navAgent.currentOffMeshLinkData.endPos.ZeroY()) > frameMovementSpeed);
+        while (Vector3.Distance(transform.position.ZeroY(), endPos.ZeroY()) > frameMovementSpeed
+        && navAgent.isOnOffMeshLink);
         navAgent.CompleteOffMeshLink();
         usingOffMeshLink = false;
     }
