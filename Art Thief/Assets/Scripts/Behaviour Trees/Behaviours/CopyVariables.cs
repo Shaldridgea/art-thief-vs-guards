@@ -21,7 +21,7 @@ public class CopyVariables : BehaviourNode
 
         string[] copyKeys = board.GetVariable<string>(copyKey).Split(",");
 
-        for(int i = 0; i < copyKey.Length; ++i)
+        for (int i = 0; i < copyKeys.Length; ++i)
             ParentTree.Owner.AgentBlackboard.SetVariable(copyKeys[i], board.GetVariableGeneric(copyKeys[i]));
 
         return status;

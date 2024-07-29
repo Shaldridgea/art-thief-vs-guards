@@ -64,6 +64,7 @@ MonoBehaviour:
   targetMesh: {fileID: 3117589219520552880}
   targetMaterialIndex: 0
   woodReplaceMaterial: {fileID: 2100000, guid: dc15030a114f4c743be5749a21443050, type: 2}
+  shouldTakeObject: 0
 --- !u!114 &4647660887395536151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,9 +83,8 @@ MonoBehaviour:
   ownerTeam: 1
   raycastMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 65601
   trackMovement: 0
-  trackLighting: 0
 --- !u!1 &3117589219522768728
 GameObject:
   m_ObjectHideFlags: 0

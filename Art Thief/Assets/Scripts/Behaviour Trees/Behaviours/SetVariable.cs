@@ -53,24 +53,6 @@ public class SetVariable : BehaviourNode
                 else
                     value = newValueName;
             }
-            else
-            {
-                if(board.GetData().ContainsKey(valueString))
-                {
-                    object tempValue = board.GetVariable<object>(valueString);
-                    System.Type type = board.GetVariableType(valueString);
-                    if (type == typeof(int))
-                        value = (int)tempValue;
-                    else if (type == typeof(float))
-                        value = (float)tempValue;
-                    else if (type == typeof(bool))
-                        value = (bool)tempValue;
-                    else if (type == typeof(string))
-                        value = (string)tempValue;
-                    else if (type == typeof(Vector3))
-                        value = (Vector3)tempValue;
-                }
-            }
         }
 
         switch (value.type)

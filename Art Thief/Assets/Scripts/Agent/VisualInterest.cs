@@ -11,7 +11,7 @@ public class VisualInterest : SenseInterest
     private bool trackMovement;
 
     [SerializeField]
-    private bool trackLighting;
+    private bool trackDynamicLighting;
 
     public bool IsMoving { get; private set; }
 
@@ -33,48 +33,53 @@ public class VisualInterest : SenseInterest
 
     private Dictionary<Light, bool> lightVisibleMap = new();
 
+    private bool checkLightingNextUpdate;
+
     public void EnteredLight(Light newSource)
     {
-        if (!trackLighting)
-            return;
-
         lightSources.Add(newSource);
         lightVisibleMap.Add(newSource, false);
+
+        if (!trackDynamicLighting)
+            checkLightingNextUpdate = true;
     }
 
     public void ExitedLight(Light newSource)
     {
-        if (!trackLighting)
-            return;
-
         if(lightVisibleMap[newSource])
             --litCount;
         lightSources.Remove(newSource);
         lightVisibleMap.Remove(newSource);
+
+        if (!trackDynamicLighting)
+            checkLightingNextUpdate = true;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        foreach(var l in lightSources)
+        if (trackMovement)
+            if (transform.position != lastPosition)
+            {
+                IsMoving = true;
+                lastPosition = transform.position;
+            }
+            else
+                IsMoving = false;
+
+        if (trackDynamicLighting || checkLightingNextUpdate)
         {
-            bool lightBlocked = Physics.Linecast(l.transform.position,
-                transform.position, raycastMask.value, QueryTriggerInteraction.Collide);
+            foreach (var l in lightSources)
+            {
+                bool lightBlocked = Physics.Linecast(l.transform.position,
+                    transform.position, raycastMask.value, QueryTriggerInteraction.Collide);
 
-            if (lightVisibleMap[l] && lightBlocked)
-                --litCount;
-            else if (!lightVisibleMap[l] && !lightBlocked)
-                ++litCount;
+                if (lightVisibleMap[l] && lightBlocked)
+                    --litCount;
+                else if (!lightVisibleMap[l] && !lightBlocked)
+                    ++litCount;
+            }
+
+            checkLightingNextUpdate = false;
         }
-
-        if (!trackMovement)
-            return;
-
-        if (transform.position != lastPosition)
-        {
-            IsMoving = true;
-            lastPosition = transform.position;
-        }
-        else
-            IsMoving = false;
     }
 }

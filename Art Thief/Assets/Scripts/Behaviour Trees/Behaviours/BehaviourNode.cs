@@ -69,12 +69,19 @@ public abstract class BehaviourNode
             string right = splitResult[1];
 
             modifiedStatement = right;
+            if(left.ToLower() == "self")
+            {
+                newTargetBoard = ParentTree.Owner.AgentBlackboard;
+                return true;
+            }
+
             if (left.ToLower() == "global")
             {
                 newTargetBoard = ParentTree.GlobalBlackboard;
                 return true;
             } // Check if our source board has the GameObject and associated Agent we expect it to have stored
-            else if (sourceBoard.GetData().ContainsKey(left))
+            
+            if (sourceBoard.GetData().ContainsKey(left))
             {
                 if (sourceBoard.GetVariableType(left).Name.Contains("GameObject"))
                 {

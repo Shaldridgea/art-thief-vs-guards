@@ -151,6 +151,9 @@ public abstract class SensoryModule : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!owner.AgentActivated)
+            return;
+
         if (losCheckTimer <= 0f)
         {
             for (int i = 0; i < inConeObjects.Count; ++i)

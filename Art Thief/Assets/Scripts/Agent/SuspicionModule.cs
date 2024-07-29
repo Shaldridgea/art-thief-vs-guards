@@ -52,13 +52,13 @@ public class SuspicionModule : MonoBehaviour
             // Awareness delta is how fast the guard becomes aware/suspicious of something
             // 1 is the baseline of taking 1 second to become aware
             // 2 would take 2 seconds, 0.5 would be half a second etc.
-            float awarenessDelta = 1f;
-            // Add 1.5 seconds to awareness if we're in peripheral vision
+            float awarenessDelta = 0.5f;
+            // Add more time to awareness if we're in peripheral vision
             if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
-                awarenessDelta += 1.5f;
+                awarenessDelta += 1f;
 
             // Change awareness factor based on distance
-            awarenessDelta *= Mathf.Lerp(0.25f, 2f,
+            awarenessDelta *= Mathf.Lerp(0.25f, 1.5f,
                 Mathf.InverseLerp(5f, 20f,
                 Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
 
@@ -89,7 +89,7 @@ public class SuspicionModule : MonoBehaviour
                 }
             }
 
-            if (checkReaction)
+            if (currentSuspicion == key && checkReaction)
                 if (suspectValues.Awareness >= 2f)
                     owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
                 else
@@ -99,7 +99,7 @@ public class SuspicionModule : MonoBehaviour
             CullSuspects();
     }
 
-    protected virtual void SetSuspicion(SenseInterest newInterest)
+    private void SetSuspicion(SenseInterest newInterest)
     {
         currentSuspicion = newInterest;
         suspicionPriority = currentSuspicion.Priority;
@@ -158,9 +158,6 @@ public class SuspicionModule : MonoBehaviour
 
     public void OnVisualSuspectLost(SenseInterest lostInterest)
     {
-        if (ignoreList.Contains(lostInterest))
-            return;
-
         if (!visualSuspectList.Contains(lostInterest))
             return;
 

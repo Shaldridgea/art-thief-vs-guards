@@ -37,8 +37,6 @@ public class GuardAgent : Agent
 
     public SuspicionModule Suspicion { get; private set; }
 
-    private LTBezierPath walkieTalkiePath;
-
     // Start is called before the first frame update
     protected override void Start()
     {
@@ -48,12 +46,6 @@ public class GuardAgent : Agent
 
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
-
-        walkieTalkiePath = new LTBezierPath(new Vector3[]{
-            walkieTalkieTransform.position,
-            walkieTalkieTransform.position + walkieTalkieTransform.right * 0.2f,
-            walkieTalkieTransform.position + walkieTalkieTransform.right * 0.3f + walkieTalkieUseTransform.up * 0.2f,
-            walkieTalkieUseTransform.position });
     }
 
     private void Update()
@@ -80,6 +72,12 @@ public class GuardAgent : Agent
 
     public void PlayReportAnimation()
     {
+        LTBezierPath walkieTalkiePath = new LTBezierPath(new Vector3[]{
+            walkieTalkieTransform.position,
+            walkieTalkieTransform.position + transform.forward * 0.2f,
+            walkieTalkieTransform.position + transform.forward * 0.3f + walkieTalkieUseTransform.up * 0.2f,
+            walkieTalkieUseTransform.position });
+
         Vector3 walkieStartAngles = walkieTalkieTransform.eulerAngles;
         LeanTween.value(walkieTalkieTransform.gameObject,
             (float value) => walkieTalkieTransform.position = walkieTalkiePath.point(value), 0f, 1f, 1.5f);
