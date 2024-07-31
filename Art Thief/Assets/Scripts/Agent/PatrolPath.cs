@@ -40,7 +40,7 @@ public class PatrolPath : MonoBehaviour
         Vector3 pathAngle = (nextPoint - comparePoint).normalized;
         Vector3 startAngle = (comparePoint - startPosition).normalized;
 
-        if (Vector3.Dot(pathAngle, startAngle) < 0.3f)
+        if (Vector3.Distance(startPosition, comparePoint) < 2f || Vector3.Dot(pathAngle, startAngle) < 0.3f)
             compareIndex = (compareIndex + 1) % pointsList.Count;
 
         return pointsList[compareIndex];

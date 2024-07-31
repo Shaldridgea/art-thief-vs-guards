@@ -89,10 +89,10 @@ public class SuspicionModule : MonoBehaviour
                 }
             }
 
-            if (currentSuspicion == key && checkReaction)
+            if (currentSuspicion == key)
                 if (suspectValues.Awareness >= 2f)
                     owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
-                else
+                else if(checkReaction)
                     owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
         }
         if (newSuspicionSet)

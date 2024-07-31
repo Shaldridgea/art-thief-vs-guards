@@ -21,6 +21,9 @@ public class ThiefAgent : Agent
     private float aggroAngle = 15f;
     public float AggroAngle => aggroAngle;
 
+    [SerializeField]
+    private Transform artHolderTransform;
+
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
 
     public Transform ArtGoal { get; set; }
@@ -130,7 +133,10 @@ public class ThiefAgent : Agent
         if (ArtGoal.TryGetComponent(out GalleryArt art))
         {
             if (art.ShouldTakeObject)
-                art.TargetMesh.transform.SetParent(transform, true);
+            {
+                art.TargetMesh.transform.SetParent(artHolderTransform, false);
+                art.TargetMesh.transform.localPosition = Vector3.zero;
+            }
             else
                 art.RemoveArtImage();
 

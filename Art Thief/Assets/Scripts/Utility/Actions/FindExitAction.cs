@@ -35,6 +35,11 @@ public class FindExitAction : UtilityAction
     {
         if(!thief.NavAgent.hasPath)
             thief.MoveAgent(targetPath);
+        else
+        {
+            if (thief.NavAgent.remainingDistance < 1f)
+                GameController.Instance.EndGame(Consts.Team.THIEF);
+        }
     }
 
     public override void ExitAction(ThiefAgent thief)

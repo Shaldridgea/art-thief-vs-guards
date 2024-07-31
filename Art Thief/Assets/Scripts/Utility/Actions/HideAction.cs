@@ -15,11 +15,14 @@ public class HideAction : UtilityAction
 
     public const float CHECK_RADIUS = 15f;
 
+    private const float FEAR_WAIT_LENGTH = 5f;
+
+    private float fearWaitStart;
+
     public HideAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
     {
-        turnedAround = false;
         Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, CHECK_RADIUS,
             LayerMask.GetMask("Hide"),
             QueryTriggerInteraction.Collide);
@@ -101,9 +104,13 @@ public class HideAction : UtilityAction
             if (thief.NavAgent.remainingDistance <= 1f)
             {
                 thief.TurnBody(180f, 1.5f);
-                thief.AgentBlackboard.SetVariable("hiding", 0f);
+                fearWaitStart = Time.time;
                 turnedAround = true;
             }
+
+        if(turnedAround)
+            if(Time.time >= fearWaitStart + FEAR_WAIT_LENGTH)
+                thief.AgentBlackboard.SetVariable("hiding", 0f);
     }
 
     public override void ExitAction(ThiefAgent thief)
@@ -111,6 +118,7 @@ public class HideAction : UtilityAction
         targetArea = null;
         thief.AgentBlackboard.SetVariable("hiding", 0f);
         thief.NavAgent.ResetPath();
+        turnedAround = false;
     }
 
     private bool IsPathSafe(ThiefAgent thief, NavMeshPath path, List<GuardAgent> guardThreats)

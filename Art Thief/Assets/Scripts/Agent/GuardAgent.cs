@@ -6,6 +6,12 @@ using NaughtyAttributes;
 public class GuardAgent : Agent
 {
     [SerializeField]
+    private List<GameObject> breakroomMarkerList;
+
+    [SerializeField]
+    private List<GameObject> toiletMarkerList;
+
+    [SerializeField]
     private BTGraph behaviourTreeGraph;
 
     [SerializeField]
@@ -41,6 +47,10 @@ public class GuardAgent : Agent
     protected override void Start()
     {
         base.Start();
+
+        AgentBlackboard.SetVariable("breakroomList", breakroomMarkerList);
+        AgentBlackboard.SetVariable("toiletList", toiletMarkerList);
+
         if (TryGetComponent(out SuspicionModule susModule))
             Suspicion = susModule;
 
