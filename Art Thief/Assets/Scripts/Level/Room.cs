@@ -19,6 +19,7 @@ public class Room : MonoBehaviour
             d.AddRoomConnection(this);
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Handles.color = Color.black;
@@ -48,4 +49,5 @@ public class Room : MonoBehaviour
                     Doorways.Add(o.GetComponent<DoorwayArea>());
         }
     }
+#endif
 }

@@ -94,7 +94,7 @@ public class StartScreen : MonoBehaviour
             break;
 
             case CameraFocus.Guard:
-                currentGuardCount = currentGuardCount == 0 ? guardCountMax - 1 : currentGuardCount - 1;
+                currentGuardCount = currentGuardCount == 0 ? guardCountMax : currentGuardCount - 1;
                 guardCountInput.text = currentGuardCount.ToString();
             break;
         }
@@ -115,7 +115,7 @@ public class StartScreen : MonoBehaviour
                 break;
 
             case CameraFocus.Guard:
-                currentGuardCount = (currentGuardCount + 1) % guardCountMax;
+                currentGuardCount = (currentGuardCount + 1) % (guardCountMax+1);
                 guardCountInput.text = currentGuardCount.ToString();
             break;
         }
@@ -126,6 +126,7 @@ public class StartScreen : MonoBehaviour
     {
         GameController.Instance.StartGame(currentGuardCount, artFocusList[artFocusIndex].transform);
         gameObject.SetActive(false);
+        levelViewCamera.enabled = false;
     }
 
     private void ArtCategoryChanged(int index)
@@ -183,9 +184,9 @@ public class StartScreen : MonoBehaviour
                 Transform artFocusTransform = artFocusList[artFocusIndex].transform;
                 BoxCollider artFocusBox = artFocusList[artFocusIndex];
 
-                // Push our camera far enough away to adequately frame the painting
+                // Push our camera far enough away to adequately frame the art
                 // Get the largest world bound size of the collider as the unit length
-                // to move away as all our paintings are rotated and scaled with no consistency
+                // to move away as all our art pieces are rotated and scaled with no consistency
                 levelViewCamera.transform.position = artFocusTransform.position +
                     artFocusTransform.forward *
                     Mathf.Clamp(

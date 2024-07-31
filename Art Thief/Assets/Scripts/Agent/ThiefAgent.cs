@@ -141,6 +141,7 @@ public class ThiefAgent : Agent
         AgentBlackboard.SetVariable("artStolen", 1f);
     }
 
+#if UNITY_EDITOR
     protected override void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
@@ -159,4 +160,5 @@ public class ThiefAgent : Agent
         style.alignment = TextAnchor.MiddleCenter;
         Handles.Label(transform.position, $"Danger: {AgentBlackboard.GetVariable<float>("danger")}", style);
     }
+#endif
 }

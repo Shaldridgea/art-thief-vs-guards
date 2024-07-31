@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         gameCamera.enabled = false;
+        menuHUD.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -63,7 +64,17 @@ public class GameController : MonoBehaviour
         gameCamera.transform.LookAt(Level.Instance.Thief.transform);
         gameCamera.enabled = true;
         menuHUD.gameObject.SetActive(true);
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void EndGame(Consts.Team winner)
+    {
+        Level.Instance.Thief.DeactivateAgent();
+        for (int i = 0; i < Level.Instance.GuardList.Count; ++i)
+        {
+            GuardAgent guard = Level.Instance.GuardList[i];
+            guard.DeactivateAgent();
+        }
+
+        menuHUD.ShowWinnerText(winner);
     }
 }

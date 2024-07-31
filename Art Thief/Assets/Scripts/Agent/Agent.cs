@@ -89,6 +89,11 @@ public class Agent : MonoBehaviour
         AgentActivated = true;
     }
 
+    public void DeactivateAgent()
+    {
+        AgentActivated = false;
+    }
+
     /// <summary>
     /// Set an agent to move to a specified position
     /// </summary>

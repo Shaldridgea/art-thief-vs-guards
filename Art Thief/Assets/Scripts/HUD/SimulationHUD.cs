@@ -7,19 +7,26 @@ using TMPro;
 public class SimulationHUD : MonoBehaviour
 {
     [SerializeField]
+    private LayerMask agentLayerMask;
+
+    [SerializeField]
+    private CameraControl gameCameraControl;
+
+    [Header("Simulation UI")]
+    [SerializeField]
     private Slider simulationSpeedSlider;
 
     [SerializeField]
     private TextMeshProUGUI speedText;
 
     [SerializeField]
-    private LayerMask agentLayerMask;
-
-    [SerializeField]
     private Toggle lockCameraToggle;
 
     [SerializeField]
-    private CameraControl gameCameraControl;
+    private TextMeshProUGUI thiefWinText;
+
+    [SerializeField]
+    private TextMeshProUGUI guardsWinText;
 
     [Header("Agent Info Views")]
     [SerializeField]
@@ -50,6 +57,12 @@ public class SimulationHUD : MonoBehaviour
         monitorBoardButton.onClick.AddListener(HandleMonitorBlackboard);
         monitorAgentButton.onClick.AddListener(HandleMonitorAgent);
         lockCameraToggle.onValueChanged.AddListener(HandleLockCameraToggle);
+    }
+
+    public void ShowWinnerText(Consts.Team winner)
+    {
+        guardsWinText.gameObject.SetActive(winner == Consts.Team.GUARD);
+        thiefWinText.gameObject.SetActive(winner == Consts.Team.THIEF);
     }
 
     private void HandleSpeedSliderChange(float newValue)
@@ -87,7 +100,7 @@ public class SimulationHUD : MonoBehaviour
     private void Update()
     {
         // Right click context menu for bringing up visual aids
-        if(Input.GetMouseButtonDown(1))
+        if(Input.GetMouseButtonUp(0) && !contextMenu.gameObject.activeSelf)
         {
             // Raycast for any agents we can right click on
             if(Physics.Raycast(
@@ -117,8 +130,8 @@ public class SimulationHUD : MonoBehaviour
                 }
             }
         }
-
-        if (Input.GetMouseButtonUp(0))
+        else
+        if (Input.GetMouseButtonUp(0) && contextMenu.gameObject.activeSelf)
             contextMenu.SetActive(false);
 
         if (Input.GetKeyDown(KeyCode.Space))

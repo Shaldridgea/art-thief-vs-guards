@@ -82,4 +82,10 @@ public class VisualInterest : SenseInterest
             checkLightingNextUpdate = false;
         }
     }
+
+    private void OnDisable()
+    {
+        lightSources.Clear();
+        lightVisibleMap.Clear();
+    }
 }

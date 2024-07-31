@@ -129,6 +129,7 @@ public class EvadeAction : UtilityAction
         return false;
     }
 
+#if UNITY_EDITOR
     public override void OnSceneGUI()
     {
         if (targetDoorway == null || currentRoom == null)
@@ -142,4 +143,5 @@ public class EvadeAction : UtilityAction
             if (!GoesToRecentRoom(d))
                 Handles.Label(d.transform.position, $"Risk: {d.Risk}");
     }
+#endif
 }

@@ -34,6 +34,8 @@ public class CameraControl : MonoBehaviour
 
     private Vector3 cameraVector;
 
+    private bool controllingCamera;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,14 +54,18 @@ public class CameraControl : MonoBehaviour
     void LateUpdate()
     {
         // Toggle the cursor locking
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetMouseButtonDown(1) && !controllingCamera)
         {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Confined;
+            controllingCamera = true;
         }
-
-        if (Cursor.lockState != CursorLockMode.Locked)
-            return;
+        else if(Input.GetMouseButtonUp(1) && controllingCamera)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            controllingCamera = false;
+        }
 
         switch (mode)
         {
@@ -81,18 +87,23 @@ public class CameraControl : MonoBehaviour
             Input.GetAxisRaw("FreeCam_X"), Input.GetAxisRaw("FreeCam_Y"), Input.GetAxisRaw("FreeCam_Z")).normalized;
 
         float camSpeed = speed * (Input.GetKey(KeyCode.LeftShift) ? 2f : 1f);
-        cam.transform.position += camSpeed * Time.unscaledDeltaTime * cam.transform.TransformVector(movementVector);
+        if(controllingCamera)
+            cam.transform.position += camSpeed * Time.unscaledDeltaTime * cam.transform.TransformVector(movementVector);
 
-        Vector3 turnVector =
+        if (controllingCamera)
+        {
+            Vector3 turnVector =
             new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * turnSensitivity * Time.unscaledDeltaTime;
-        freeEuler = new Vector3(Mathf.Clamp(freeEuler.x+turnVector.x, -90f, 90f), freeEuler.y + turnVector.y);
-        cam.transform.rotation = Quaternion.Euler(freeEuler);
+            freeEuler = new Vector3(Mathf.Clamp(freeEuler.x + turnVector.x, -90f, 90f), freeEuler.y + turnVector.y);
+            cam.transform.rotation = Quaternion.Euler(freeEuler);
+        }
     }
 
     private void UpdateOrbitingCam()
     {
         // Turn camera using the mouse
-        orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
+        if (controllingCamera)
+            orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
             Input.GetAxis("Mouse Y"),
             Input.GetAxis("Mouse X"), 0f);
 

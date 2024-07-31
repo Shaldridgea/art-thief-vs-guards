@@ -83,5 +83,5 @@ public abstract class UtilityAction
 
     public abstract void ExitAction(ThiefAgent thief);
 
-    public abstract void OnSceneGUI();
+    public virtual void OnSceneGUI() { }
 }
