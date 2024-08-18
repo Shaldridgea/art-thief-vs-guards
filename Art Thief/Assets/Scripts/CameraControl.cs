@@ -110,17 +110,27 @@ public class CameraControl : MonoBehaviour
         orbitEuler.x = Mathf.Clamp(orbitEuler.x, -89f, 89f);
 
         Vector3 thiefOrigin = thief.AgentView.AgentHeadRoot.position;
-        // Move camera around the spy and make the camera look at the spy
         float rayDistance = cameraDistance;
+        // Make a raycast out from the Agent's head to find any collision with the environment,
+        // so the camera will be pushed closer by walls
         Vector3 desiredPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         if (Physics.Raycast(thiefOrigin, (desiredPoint - thiefOrigin).normalized,
             out RaycastHit info, cameraDistance, LayerMask.GetMask("Default", "Floor")))
             rayDistance = info.distance-0.1f;
 
-        if (Mathf.Abs(cameraVector.z-rayDistance) > 0.1f)
-            cameraVector.z = Mathf.Lerp(cameraVector.z, rayDistance, 4f * Time.unscaledDeltaTime);
-        else
-            cameraVector.z = Mathf.MoveTowards(cameraVector.z, rayDistance, 0.1f * Time.unscaledDeltaTime);
+        // If the gotten ray distance is further than current camera position,
+        // lerp the camera's distance and move it to the ray's distance smoothly
+        if (rayDistance > cameraVector.z)
+        {
+            if (Mathf.Abs(cameraVector.z - rayDistance) > 0.05f)
+                cameraVector.z = Mathf.Lerp(cameraVector.z, rayDistance, 4f * Time.unscaledDeltaTime);
+            else
+                cameraVector.z = Mathf.MoveTowards(cameraVector.z, rayDistance, 0.05f * Time.unscaledDeltaTime);
+        }
+        else // If our distance is closer to the agent we instantly change it
+            cameraVector.z = rayDistance;
+
+        // Move camera around the spy and make the camera look at the spy
         cam.transform.position = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         cam.transform.LookAt(thiefOrigin);
 

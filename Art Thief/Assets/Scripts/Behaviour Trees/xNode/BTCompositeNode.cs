@@ -2,7 +2,6 @@
 using UnityEngine;
 using XNode;
 
-[NodeTint(0.2f, 0.3f, 0.7f)]
 public abstract class BTCompositeNode : BTGraphNode
 {
     [Output(dynamicPortList = true, connectionType = ConnectionType.Override)]

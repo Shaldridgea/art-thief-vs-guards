@@ -52,9 +52,12 @@ public class DoorController : MonoBehaviour
             if (d.name == target)
             {
                 --d.triggerCount;
-                if(d.triggerCount == 0)
+                if (d.triggerCount == 0)
                     if (d.doorObstacle)
+                    {
                         d.doorObstacle.enabled = false;
+                        d.doorObstacle.carving = false;
+                    }
                 break;
             }
         }
@@ -76,7 +79,10 @@ public class DoorController : MonoBehaviour
         {
             if (d.name == target)
             {
-                LeanTween.rotateY(d.doorPivot.gameObject, d.startAngle + swingAngle, 0.5f);
+                LeanTween.cancel(d.doorPivot.gameObject);
+                var tween = LeanTween.rotateY(d.doorPivot.gameObject, d.startAngle + swingAngle, 0.3f);
+                if (swingAngle != 0f)
+                    tween.setOnComplete(() => d.doorObstacle.carving = true);
                 break;
             }
         }

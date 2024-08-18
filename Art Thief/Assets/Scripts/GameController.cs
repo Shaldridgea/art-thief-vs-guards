@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour
     {
         gameCamera.enabled = false;
         menuHUD.gameObject.SetActive(false);
+        Application.targetFrameRate = 60;
     }
 
     // Update is called once per frame
@@ -48,6 +49,7 @@ public class GameController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            Time.timeScale = 1f;
             SceneManager.LoadSceneAsync(0);
         }
     }
