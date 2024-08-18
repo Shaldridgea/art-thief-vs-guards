@@ -164,6 +164,10 @@ public static class BehaviourTreeFactory
             case Consts.BehaviourType.CopyVariables:
                 newNode = new CopyVariables(tree, dataNode.GetParameters());
             break;
+
+            case Consts.BehaviourType.IsThiefHeard:
+                newNode = new IsThiefHeard(tree);
+            break;
         }
         newNode.Name = dataNode.name;
         return newNode;

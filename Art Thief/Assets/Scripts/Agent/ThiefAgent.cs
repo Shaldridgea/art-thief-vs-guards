@@ -13,15 +13,6 @@ public class ThiefAgent : Agent
     private float dangerDistanceMax = 20f;
 
     [SerializeField]
-    [Tooltip("Distance thief must be within to aggro on guard")]
-    private float aggroRadius = 1f;
-    public float AggroRadius => aggroRadius;
-    [SerializeField]
-    [Tooltip("Vision angle of thief to aggro on a guard")]
-    private float aggroAngle = 15f;
-    public float AggroAngle => aggroAngle;
-
-    [SerializeField]
     private Transform artHolderTransform;
 
     public ThiefSensoryModule ThiefSenses => (ThiefSensoryModule)senses;
@@ -29,6 +20,8 @@ public class ThiefAgent : Agent
     public Transform ArtGoal { get; set; }
 
     private bool usingOffMeshLink;
+
+    private float dangerVelocity;
     
     // Start is called before the first frame update
     protected override void Start()
@@ -79,9 +72,12 @@ public class ThiefAgent : Agent
         // Immediately reflect calculated danger in blackboard if it's higher,
         // otherwise bring it down slowly if it's lower
         if (danger > storedDanger)
+        {
             storedDanger = danger;
+            dangerVelocity = 0.1f;
+        }
         else
-            storedDanger = Mathf.MoveTowards(storedDanger, danger, Time.deltaTime / 3f);
+            storedDanger = Mathf.SmoothDamp(storedDanger, danger, ref dangerVelocity, 4f, 0.5f);
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
     }

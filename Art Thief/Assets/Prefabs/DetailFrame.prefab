@@ -78,13 +78,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isSuspicious: 0
-  priority: 1
+  priority: 5
+  alwaysImportant: 0
   owner: {fileID: 3117589219522740254}
   ownerTeam: 1
   raycastMask:
     serializedVersion: 2
     m_Bits: 65601
   trackMovement: 0
+  trackDynamicLighting: 0
 --- !u!1 &3117589219522768728
 GameObject:
   m_ObjectHideFlags: 0

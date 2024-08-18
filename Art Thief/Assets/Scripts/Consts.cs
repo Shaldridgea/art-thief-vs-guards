@@ -37,7 +37,8 @@ public static class Consts
         HasLineOfSight,
         CallMethod,
         SetDistanceFromPoint,
-        CopyVariables
+        CopyVariables,
+        IsThiefHeard
     }
 
     public enum RepeatCondition
@@ -55,7 +56,8 @@ public static class Consts
     public enum Team
     {
         GUARD,
-        THIEF
+        THIEF,
+        NEUTRAL
     }
 
     public enum SuspicionType

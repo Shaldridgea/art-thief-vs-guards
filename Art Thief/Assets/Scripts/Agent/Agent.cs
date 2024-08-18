@@ -22,10 +22,34 @@ public class Agent : MonoBehaviour
     public SensoryModule Senses => senses;
 
     [SerializeField]
+    [Tooltip("Distance agent must be within to aggro on enemy")]
+    protected float aggroRadius = 1f;
+    public float AggroRadius => aggroRadius;
+    [SerializeField]
+    [Tooltip("Vision angle of agent to attack enemy")]
+    protected float aggroAngle = 15f;
+    public float AggroAngle => aggroAngle;
+
+    [SerializeField]
     private SoundInterest walkingSound;
 
     [SerializeField]
     private float walkSoundInterval;
+
+    [SerializeField]
+    private SoundInterest doorOpenSound;
+
+    public SoundInterest DoorOpenSound => doorOpenSound;
+
+    [SerializeField]
+    private SoundInterest doorCloseSound;
+
+    public SoundInterest DoorCloseSound => doorCloseSound;
+
+    [SerializeField]
+    private SoundInterest doorSlamSound;
+
+    public SoundInterest DoorSlamSound => doorSlamSound;
 
     private Coroutine walkingCoroutine;
 

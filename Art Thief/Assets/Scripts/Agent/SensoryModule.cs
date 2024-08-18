@@ -59,18 +59,18 @@ public abstract class SensoryModule : MonoBehaviour
 
     public bool IsSoundHeard(SenseInterest sound)
     {
-        // If there's no obstruction then we heard the sound normally
-        if (!Physics.Linecast(sound.transform.position, owner.AgentView.AgentHeadRoot.position,
-            losMask, QueryTriggerInteraction.Collide))
-            return true;
+        // We model sound being muffled by first checking if we'd be
+        // beyond the sound radius were it 30% smaller
+        // and if we are, check if there's an object obstructing the sound
+        float distanceToSound = Vector3.Distance(sound.transform.position.ZeroY(), owner.AgentView.AgentHeadRoot.position.ZeroY());
+        if (distanceToSound > (sound as SoundInterest).TriggerRadius * 0.7f)
+        {
+            if (Physics.Linecast(sound.transform.position, owner.AgentView.AgentHeadRoot.position,
+             losMask, QueryTriggerInteraction.Collide))
+                return false;
+        }
 
-        // If there was an obstruction we model sound being muffled by checking
-        // if we'd still be in the sound radius were it 30% smaller
-        float distanceToSound = Vector3.Distance(sound.transform.position, owner.AgentView.AgentHeadRoot.position);
-        if (distanceToSound <= (sound as SoundInterest).TriggerRadius * 0.7f)
-            return true;
-
-        return false;
+        return true;
     }
 
     public virtual void NotifySound(SenseInterest sound)

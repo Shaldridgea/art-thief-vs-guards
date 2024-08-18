@@ -13,28 +13,17 @@ public class EvadeAction : UtilityAction
 
     private Queue<Room> recentRooms = new();
 
-    private float speedBoostStamina;
-
     public EvadeAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
     {
         FindSafeExit(thief);
-        speedBoostStamina = 0.5f;
-        thief.NavAgent.speed += speedBoostStamina;
     }
 
     public override void PerformAction(ThiefAgent thief)
     {
         if (targetDoorway != null && !thief.NavAgent.hasPath)
             thief.MoveAgent(targetPoint);
-
-        if(speedBoostStamina > 0f)
-        {
-            float lossDelta = Mathf.Min(Time.deltaTime / 3f, speedBoostStamina);
-            speedBoostStamina -= lossDelta;
-            thief.NavAgent.speed -= lossDelta;
-        }
 
         if (!thief.NavAgent.pathPending && thief.NavAgent.remainingDistance < thief.NavAgent.radius)
         {
@@ -47,7 +36,6 @@ public class EvadeAction : UtilityAction
     {
         recentRooms.Clear();
         thief.NavAgent.ResetPath();
-        thief.NavAgent.speed -= speedBoostStamina;
     }
 
     private void FindSafeExit(ThiefAgent thief)
@@ -77,12 +65,12 @@ public class EvadeAction : UtilityAction
         List<DoorwayArea> leastRisk = new(room.Doorways.Count);
         List<DoorwayArea> validCandidates = new();
         // Calculate risk of every doorway in the room, make a list of them,
-        // and make a list of doorways that go to rooms we haven't been in recently
+        // and make a list of doorways that don't go to recent rooms or a dead end
         foreach (var d in room.Doorways)
         {
             d.CalculateRisk(thief, thief.ThiefSenses.AwareGuards);
             leastRisk.Add(d);
-            if (!GoesToRecentRoom(d))
+            if (IsValidDoorway(d))
                 validCandidates.Add(d);
         }
 
@@ -105,7 +93,7 @@ public class EvadeAction : UtilityAction
         }
         else
         {
-            // Remove doorways that go back into rooms we've just visited
+            // Remove doorways that aren't valid exits
             for (int i = leastRisk.Count - 1; i >= 0; --i)
             {
                 if (!validCandidates.Contains(leastRisk[i]))
@@ -120,13 +108,13 @@ public class EvadeAction : UtilityAction
             targetPoint = targetDoorway.GetFurthestPoint(thief.transform.position);
     }
 
-    private bool GoesToRecentRoom(DoorwayArea doorway)
+    private bool IsValidDoorway(DoorwayArea doorway)
     {
         foreach (var r in doorway.ConnectedRooms)
-            if (recentRooms.Contains(r))
-                return true;
+            if (recentRooms.Contains(r) || r.Doorways.Count == 1)
+                return false;
 
-        return false;
+        return true;
     }
 
 #if UNITY_EDITOR
@@ -140,7 +128,7 @@ public class EvadeAction : UtilityAction
         GUI.color = color;
 
         foreach(var d in currentRoom.Doorways)
-            if (!GoesToRecentRoom(d))
+            if (IsValidDoorway(d))
                 Handles.Label(d.transform.position, $"Risk: {d.Risk}");
     }
 #endif

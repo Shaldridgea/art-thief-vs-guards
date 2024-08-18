@@ -12,12 +12,18 @@ public class SenseInterest : MonoBehaviour
     [SerializeField]
     private int priority;
 
+    [SerializeField]
     public int Priority => priority;
+
+    [SerializeField]
+    private bool alwaysImportant;
+
+    public bool AlwaysImportant => alwaysImportant;
 
     [SerializeField]
     private GameObject owner;
 
-    public GameObject Owner => owner;
+    public GameObject Owner { get => owner; protected set => owner = value; }
 
     [SerializeField]
     private Consts.Team ownerTeam;

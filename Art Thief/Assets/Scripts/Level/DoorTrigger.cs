@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class DoorTrigger : MonoBehaviour
 {
@@ -15,16 +16,49 @@ public class DoorTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!controller.IsDoorBeingUsed(doorName))
-            controller.SwingDoor(doorName, swingAngle);
+        bool doorBeingUsed = controller.IsDoorBeingUsed(doorName);
         controller.AgentEnter(doorName);
+        if (doorBeingUsed)
+            return;
+
+        controller.SwingDoor(doorName, swingAngle);
+        Agent agent = other.GetComponent<Agent>();
+        if (agent == null)
+            return;
+
+        bool inChase = agent.AgentBlackboard.GetVariable<bool>("inChase");
+        SoundInterest playSound;
+        if (inChase)
+            playSound = agent.DoorSlamSound;
+        else
+            playSound = agent.DoorOpenSound;
+
+        PlaceDoorSound(playSound);
+        playSound.PlaySound();
     }
 
     private void OnTriggerExit(Collider other)
     {
         controller.AgentExit(doorName);
-        if (!controller.IsDoorBeingUsed(doorName))
-            controller.SwingDoor(doorName, 0f);
+        if (controller.IsDoorBeingUsed(doorName))
+            return;
+
+        controller.SwingDoor(doorName, 0f);
+        Agent agent = other.GetComponent<Agent>();
+        if(agent != null)
+        {
+            PlaceDoorSound(agent.DoorCloseSound);
+            agent.DoorCloseSound.PlaySound();
+        }
+    }
+
+    private void PlaceDoorSound(SoundInterest doorSound)
+    {
+        PositionConstraint soundConstraint = doorSound.GetComponent<PositionConstraint>();
+        if (soundConstraint.sourceCount == 0)
+            soundConstraint.AddSource(new ConstraintSource());
+        soundConstraint.SetSource(0, new ConstraintSource() { sourceTransform = controller.transform, weight = 1f });
+        soundConstraint.constraintActive = true;
     }
 
     private void Reset()

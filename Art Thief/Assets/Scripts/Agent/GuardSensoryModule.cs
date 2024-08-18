@@ -8,9 +8,11 @@ public class GuardSensoryModule : SensoryModule
     public override void NotifySound(SenseInterest sound)
     {
         base.NotifySound(sound);
-        // Don't treat unimportant friendly sounds as suspicious
+        // Ignore un-suspicious sounds (usually friendly sounds)
         if (!sound.IsSuspicious)
             return;
+
+        owner.AgentBlackboard.SetVariable("lastHeardSound", sound);
 
         (owner as GuardAgent).Suspicion.OnSuspicionSensed(sound, Consts.SuspicionType.Sound);
     }

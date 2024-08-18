@@ -60,4 +60,33 @@ public class SoundInterest : SenseInterest
         yield return new WaitForSeconds(sources[index].clip.length);
         trigger.enabled = false;
     }
+
+    private void Reset()
+    {
+        if(!TryGetComponent(out AudioSource audio))
+        {
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            sources = new AudioSource[] { source };
+        }
+
+        if(!TryGetComponent(out SphereCollider sphere))
+        {
+            trigger = gameObject.AddComponent<SphereCollider>();
+            trigger.isTrigger = true;
+        }
+
+        if(!TryGetComponent(out Rigidbody rb))
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        }
+
+        Agent parentAgent = GetComponentInParent<Agent>();
+        if(parentAgent != null)
+            Owner = parentAgent.gameObject;
+        SetTeam(Consts.Team.NEUTRAL);
+        gameObject.layer = LayerMask.NameToLayer("Interest");
+    }
 }

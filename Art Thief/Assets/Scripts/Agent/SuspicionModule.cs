@@ -16,16 +16,15 @@ public class SuspicionModule : MonoBehaviour
 
     private List<SenseInterest> ignoreList = new();
 
-    private int suspicionPriority;
-
     private SenseInterest currentSuspicion;
 
     private GuardAgent owner;
 
+    private bool IsChasing => owner.AgentBlackboard.GetVariable<string>("guardMode") == "chase";
+
     // Start is called before the first frame update
     void Start()
     {
-        suspicionPriority = -1;
         reactionTimer = -1f;
         if (TryGetComponent(out GuardAgent myAgent))
             owner = myAgent;
@@ -43,7 +42,10 @@ public class SuspicionModule : MonoBehaviour
         else if (reactionTimer > 0f)
             reactionTimer = Mathf.Max(reactionTimer - Time.deltaTime, 0f);
 
-        bool newSuspicionSet = false;
+        if (IsChasing)
+            return;
+
+        bool shouldResetInterest = false;
         foreach(var key in visualSuspectList)
         {
             var suspectValues = visualSuspectMap[key];
@@ -83,59 +85,81 @@ public class SuspicionModule : MonoBehaviour
                 if (compareAware < 1f)
                 {
                     SetSuspicion(key);
-                    newSuspicionSet = true;
                     reactionTimer = reactionTimerMax;
                     break;
                 }
             }
 
             if (currentSuspicion == key)
+            {
                 if (suspectValues.Awareness >= 2f)
+                {
                     owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
-                else if(checkReaction)
+                    shouldResetInterest = true;
+                }
+                else if (checkReaction)
+                {
                     owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
+                    shouldResetInterest = true;
+                }
+            }
         }
-        if (newSuspicionSet)
+
+        if (checkReaction)
+            if (currentSuspicion is SoundInterest)
+            {
+                owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
+                shouldResetInterest = true;
+            }
+
+        if (shouldResetInterest)
             CullSuspects();
     }
 
     private void SetSuspicion(SenseInterest newInterest)
     {
         currentSuspicion = newInterest;
-        suspicionPriority = currentSuspicion.Priority;
         owner.AgentBlackboard.SetVariable("suspicious", true);
         owner.AgentBlackboard.SetVariable("suspicionStatus", "reacting");
         owner.AgentBlackboard.SetVariable("suspicion", currentSuspicion.gameObject);
         bool isThief = currentSuspicion.CompareTag("Thief");
         owner.AgentBlackboard.SetVariable("thiefFound", isThief);
-        if(!isThief)
+        if(!newInterest.AlwaysImportant)
             ignoreList.Add(newInterest);
     }
-
+    
     private void CullSuspects()
     {
-        for (int i = visualSuspectList.Count-1; i >= 0; --i)
+        if (currentSuspicion is VisualInterest)
         {
-            var key = visualSuspectList[i];
-            if(key.Priority < suspicionPriority)
+            for (int i = visualSuspectList.Count - 1; i >= 0; --i)
             {
-                visualSuspectList.RemoveAt(i);
-                visualSuspectMap.Remove(key);
+                var key = visualSuspectList[i];
+                if (!visualSuspectMap[key].Visible && visualSuspectMap[key].Awareness == 0f)
+                {
+                    visualSuspectList.RemoveAt(i);
+                    visualSuspectMap.Remove(key);
+                }
             }
         }
+
+        currentSuspicion = null;
     }
 
     public bool OnSuspicionSensed(SenseInterest newInterest, Consts.SuspicionType suspicionType)
     {
+        if (IsChasing)
+            return false;
+
         if (ignoreList.Contains(newInterest))
             return false;
 
-        if (currentSuspicion == null || newInterest.Priority >= suspicionPriority)
+        if (currentSuspicion == null || currentSuspicion.Priority <= newInterest.Priority)
         {
             if (suspicionType == Consts.SuspicionType.Sound)
             {
                 SetSuspicion(newInterest);
-                CullSuspects();
+                reactionTimer = reactionTimerMax;
             }
             else
             {
@@ -164,6 +188,18 @@ public class SuspicionModule : MonoBehaviour
         var value = visualSuspectMap[lostInterest];
         value.Visible = false;
         visualSuspectMap[lostInterest] = value;
+    }
+
+    public bool IsThiefHeard()
+    {
+        SoundInterest sound = owner.AgentBlackboard.GetVariable<SoundInterest>("lastHeardSound");
+        if (sound == null)
+            return false;
+
+        if(sound.OwnerTeam == Consts.Team.THIEF)
+            return sound.IsOngoing;
+
+        return false;
     }
 
     public Dictionary<SenseInterest, (bool Visible, float Awareness)> GetSuspectData() => visualSuspectMap;
