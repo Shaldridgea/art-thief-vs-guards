@@ -62,6 +62,11 @@ public class Level : MonoBehaviour
     private List<BoxCollider> sculptureRooms;
 
     [SerializeField]
+    private List<Room> allRooms;
+
+    public List<Room> AllRooms => allRooms;
+
+    [SerializeField]
     private List<Transform> thiefStartTransforms;
 
     public List<Transform> ThiefStartList => thiefStartTransforms;

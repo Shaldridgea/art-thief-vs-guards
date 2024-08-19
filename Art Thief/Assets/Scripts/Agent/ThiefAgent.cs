@@ -56,8 +56,12 @@ public class ThiefAgent : Agent
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
             if (distanceToGuard < aggroRadius)
+            {
+                //Debug.Log(Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized));
                 if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
                     aggression += 1f;
+
+            }
             if (hasLos)
                 danger += 0.5f;
             if (g.AgentBlackboard.GetVariable<string>("guardMode") == "chase")
@@ -141,6 +145,40 @@ public class ThiefAgent : Agent
         }
         
         AgentBlackboard.SetVariable("artStolen", 1f);
+    }
+
+    public override void AttackAgent(Agent targetAgent)
+    {
+        if(targetAgent.CanAttackBack(this))
+        {
+            bool winnerIsMe = false;
+            if(CanWinStruggle())
+            {
+                if (!targetAgent.CanWinStruggle())
+                    winnerIsMe = true;
+                else if (Random.value <= 0.5f)
+                    winnerIsMe = true;
+            }
+
+            // Start animated fight interaction between thief and guard
+            SetupAttack(this, targetAgent);
+            PlayStruggleSequence(winnerIsMe);
+            targetAgent.PlayStruggleSequence(!winnerIsMe);
+            // Mark everyone as interacting and unable to interrupt attack
+            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
+            AgentBlackboard.SetVariable("isInteracting", true);
+            DeactivateAgent();
+        }
+    }
+
+    public override bool CanAttackBack(Agent attacker)
+    {
+        return !AgentBlackboard.GetVariable<bool>("isInteracting") && Vector3.Dot(attacker.transform.forward, transform.forward) > 0.2f;
+    }
+
+    public override bool CanWinStruggle()
+    {
+        return true;
     }
 
 #if UNITY_EDITOR

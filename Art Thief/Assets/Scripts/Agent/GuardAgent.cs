@@ -24,6 +24,9 @@ public class GuardAgent : Agent
     private PatrolPath perimeterPatrol;
 
     [SerializeField]
+    private VisualInterest stunnedVisualInterest;
+
+    [SerializeField]
     private Transform walkieTalkieTransform;
 
     [SerializeField]
@@ -40,6 +43,8 @@ public class GuardAgent : Agent
     private int patrolIndex;
 
     private float treeUpdateTimer;
+
+    private bool hasFoughtThief;
 
     public SuspicionModule Suspicion { get; private set; }
 
@@ -76,7 +81,7 @@ public class GuardAgent : Agent
     public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)
     {
         PatrolPath path = pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
-        Vector3 point = path.GetNextPointFromPosition(transform.position);
+        Vector3 point = path.FindNextPointFromPosition(transform.position);
         return point;
     }
 
@@ -96,6 +101,71 @@ public class GuardAgent : Agent
         LeanTween.value(walkieTalkieTransform.gameObject,
             (float value) => walkieTalkieTransform.position = walkieTalkiePath.point(value), 1f, 0f, 1.5f).setDelay(2.5f);
         LeanTween.rotate(walkieTalkieTransform.gameObject, walkieStartAngles, 1.5f).setDelay(2.5f);
+    }
+
+    public bool CanAttackThief()
+    {
+        ThiefAgent thief = Level.Instance.Thief;
+
+        if(Vector3.Distance(transform.position, thief.transform.position) <= aggroRadius)
+        {
+            if(Vector3.Angle(transform.forward, (thief.transform.position - transform.position).normalized) <= aggroAngle)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public override void AttackAgent(Agent targetAgent)
+    {
+        if(targetAgent.CanAttackBack(this))
+        {
+            bool winnerIsMe = false;
+            if(CanWinStruggle())
+            {
+                if (!targetAgent.CanWinStruggle())
+                    winnerIsMe = true;
+                else if (Random.value <= 0.5f)
+                    winnerIsMe = true;
+            }
+
+            // Start animated fight interaction between thief and guard
+            SetupAttack(this, targetAgent);
+            PlayStruggleSequence(winnerIsMe);
+            targetAgent.PlayStruggleSequence(!winnerIsMe);
+            // Mark everyone as interacting and unable to interrupt attack
+            AgentBlackboard.SetVariable("isInteracting", true);
+            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
+            targetAgent.DeactivateAgent();
+        }
+        else
+        {
+            // Play tackling animation here
+            // also check if thief is already interacting/fighting and cancel its animations if so ig?
+        }
+    }
+
+    public override bool CanAttackBack(Agent attacker)
+    {
+        return true;
+    }
+
+    public override bool CanWinStruggle()
+    {
+        return hasFoughtThief;
+    }
+
+    public void EnableStunnedSuspicionFocus()
+    {
+        stunnedVisualInterest.gameObject.SetActive(true);
+    }
+
+    public void DisableStunnedSuspicionFocus()
+    {
+        stunnedVisualInterest.gameObject.SetActive(false);
+
     }
 
     [Button("Test head turn", EButtonEnableMode.Playmode)]

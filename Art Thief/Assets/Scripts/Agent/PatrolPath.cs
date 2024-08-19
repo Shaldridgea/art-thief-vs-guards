@@ -20,7 +20,7 @@ public class PatrolPath : MonoBehaviour
         UpdatePoints();
     }
 
-    public Vector3 GetNextPointFromPosition(Vector3 startPosition)
+    public Vector3 FindNextPointFromPosition(Vector3 startPosition)
     {
         float compareDistance = float.MaxValue;
         int compareIndex = -1;
@@ -49,6 +49,7 @@ public class PatrolPath : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = pathColour;
+        UpdatePoints();
         if(pointsList != null && pointsList.Count > 0)
         {
             for(int i = 0; i < pointsList.Count; ++i)

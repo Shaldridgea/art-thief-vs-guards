@@ -38,7 +38,9 @@ public static class Consts
         CallMethod,
         SetDistanceFromPoint,
         CopyVariables,
-        IsThiefHeard
+        IsThiefHeard,
+        CanAttackThief,
+        AttackThief
     }
 
     public enum RepeatCondition
@@ -69,7 +71,8 @@ public static class Consts
     public enum PatrolPathType
     {
         Regular,
-        Perimeter
+        Perimeter,
+        Room
     }
 
     public enum HidingAreaType

@@ -9,7 +9,14 @@ public class Room : MonoBehaviour
     [SerializeField]
     private string roomID;
 
+    [SerializeField]
+    private BoxCollider roomBox;
+
+    public BoxCollider RoomBox => roomBox;
+
     public List<DoorwayArea> Doorways;
+
+    public PatrolPath RoomPatrolPath;
 
     public List<HidingArea> HidingSpots = new();
 

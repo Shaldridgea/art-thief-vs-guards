@@ -168,6 +168,14 @@ public static class BehaviourTreeFactory
             case Consts.BehaviourType.IsThiefHeard:
                 newNode = new IsThiefHeard(tree);
             break;
+
+            case Consts.BehaviourType.CanAttackThief:
+                newNode = new CanAttackThief(tree);
+            break;
+
+            case Consts.BehaviourType.AttackThief:
+                newNode = new AttackThief(tree);
+            break;
         }
         newNode.Name = dataNode.name;
         return newNode;

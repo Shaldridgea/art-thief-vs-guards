@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using NaughtyAttributes;
 
-public class Agent : MonoBehaviour
+public abstract class Agent : MonoBehaviour
 {
     [SerializeField]
     protected NavMeshAgent navAgent;
@@ -202,32 +202,58 @@ public class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
-    public void PlayFightSequence(bool isWinner)
+    public abstract void AttackAgent(Agent targetAgent);
+
+    public abstract bool CanAttackBack(Agent attacker);
+
+    public abstract bool CanWinStruggle();
+
+    public void PlayStruggleSequence(bool isWinner)
     {
-        StartCoroutine(EnumerateFightSequence(isWinner));
+        StartCoroutine(EnumerateStruggleSequence(isWinner));
     }
 
-    private IEnumerator EnumerateFightSequence(bool isWinner)
+    protected void SetupAttack(Agent a, Agent b)
     {
-        PlayFightingAnimation(!isWinner);
+        // Immediately stop the thief and guard from moving, make them look at each other
+        // and stop the NavAgent components from moving
+        // or rotating the agents during their animated interaction
+        a.transform.LookAt(b.transform, Vector3.up);
+        a.navAgent.ResetPath();
+        a.navAgent.updatePosition = false;
+        a.navAgent.updateRotation = false;
+        a.navAgent.updateUpAxis = false;
+        a.navAgent.velocity = Vector3.zero;
+
+        b.transform.LookAt(a.transform, Vector3.up);
+        b.navAgent.ResetPath();
+        b.navAgent.updatePosition = false;
+        b.navAgent.updateRotation = false;
+        b.navAgent.updateUpAxis = false;
+        b.navAgent.velocity = Vector3.zero;
+    }
+
+    private IEnumerator EnumerateStruggleSequence(bool isWinner)
+    {
+        PlayStrugglingAnimation(!isWinner);
         yield return new WaitForSeconds(3f);
-        PlayFightOutcomeAnimation(isWinner);
+        PlayStruggleOutcomeAnimation(isWinner);
         yield return new WaitForSeconds(1f);
-        if(!isWinner)
-        {
-            AgentBlackboard.SetVariable("isInteracting", false);
+        AgentBlackboard.SetVariable("isInteracting", false);
+        if (!isWinner)
             AgentBlackboard.SetVariable("isStunned", true);
-        }
+        else
+            ActivateAgent();
     }
 
-    private void PlayFightingAnimation(bool beingAttacked)
+    private void PlayStrugglingAnimation(bool beingAttacked)
     {
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? 15f : -15f, 0.3f);
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 0.6f).setFrom(beingAttacked ? 15f : -15f).setDelay(0.3f).setLoopPingPong(2);
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.3f).setFrom(beingAttacked ? 15f : -15f).setDelay(2.7f);
     }
 
-    private void PlayFightOutcomeAnimation(bool isWinner)
+    private void PlayStruggleOutcomeAnimation(bool isWinner)
     {
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 40f : -90f, isWinner ? 0.2f : 0.4f);
         if(isWinner)
