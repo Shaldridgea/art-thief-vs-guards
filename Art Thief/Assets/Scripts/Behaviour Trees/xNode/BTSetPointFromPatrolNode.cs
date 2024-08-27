@@ -11,6 +11,9 @@ public class BTSetPointFromPatrolNode : BTActionNode
     private Consts.PatrolPathType pathType;
 
     [SerializeField]
+    private Consts.PatrolPointType pointType;
+
+    [SerializeField]
     private string variableName;
 
     [SerializeField]
@@ -28,6 +31,6 @@ public class BTSetPointFromPatrolNode : BTActionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { variableName, (int)pathType, roomPointKey };
+        return new NodeParameter[] { variableName, (int)pathType, (int)pointType, roomPointKey };
     }
 }

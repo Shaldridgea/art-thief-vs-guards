@@ -108,7 +108,7 @@ public abstract class Agent : MonoBehaviour
         }
     }
 
-    public void ActivateAgent()
+    public virtual void ActivateAgent()
     {
         AgentActivated = true;
     }

@@ -32,15 +32,14 @@ public class GuardAgent : Agent
     [SerializeField]
     private Transform walkieTalkieUseTransform;
 
+    [SerializeField]
+    private GameObject torchLight;
+
     public GuardSensoryModule GuardSenses => (GuardSensoryModule)senses;
 
     private BehaviourTree agentTree;
 
     public BehaviourTree BehaviourTree => agentTree;
-
-    private Transform targetPoint;
-
-    private int patrolIndex;
 
     private float treeUpdateTimer;
 
@@ -61,6 +60,8 @@ public class GuardAgent : Agent
 
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
+
+        torchLight.SetActive(false);
     }
 
     private void Update()
@@ -78,12 +79,14 @@ public class GuardAgent : Agent
         }
     }
 
-    public Vector3 GetNextPatrolPoint(Consts.PatrolPathType pathType)
+    public override void ActivateAgent()
     {
-        PatrolPath path = pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
-        Vector3 point = path.FindNextPointFromPosition(transform.position);
-        return point;
+        base.ActivateAgent();
+        torchLight.SetActive(true);
     }
+
+    public PatrolPath GetPatrol(Consts.PatrolPathType pathType) =>
+        pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
 
     public void PlayReportAnimation()
     {

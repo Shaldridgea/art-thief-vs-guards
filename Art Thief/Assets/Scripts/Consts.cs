@@ -40,7 +40,8 @@ public static class Consts
         CopyVariables,
         IsThiefHeard,
         CanAttackThief,
-        AttackThief
+        AttackThief,
+        TurnBody
     }
 
     public enum RepeatCondition
@@ -73,6 +74,12 @@ public static class Consts
         Regular,
         Perimeter,
         Room
+    }
+
+    public enum PatrolPointType
+    {
+        Follow,
+        Random
     }
 
     public enum HidingAreaType

@@ -1956,7 +1956,7 @@ MonoBehaviour:
       _typeConstraint: 0
       _dynamic: 0
   type: 5
-  chanceValue: 1
+  chanceValue: 0.2
 --- !u!114 &-6333872529844526293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5065,7 +5065,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe0907a1598220946afc8f2af21c4f1a, type: 3}
-  m_Name: Guard BT
+  m_Name: Large patrol guard
   m_EditorClassIdentifier: 
   nodes:
   - {fileID: 8492545156083403774}
@@ -8931,7 +8931,7 @@ MonoBehaviour:
       _typeConstraint: 0
       _dynamic: 0
   type: 5
-  chanceValue: 0.2
+  chanceValue: 0.1
 --- !u!114 &5291474348649193764
 MonoBehaviour:
   m_ObjectHideFlags: 0

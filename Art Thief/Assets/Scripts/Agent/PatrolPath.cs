@@ -46,6 +46,27 @@ public class PatrolPath : MonoBehaviour
         return pointsList[compareIndex];
     }
 
+    public Vector3 GetRandomPosition(Vector3 startPosition)
+    {
+        float compareDistance = float.MaxValue;
+        int compareIndex = -1;
+        startPosition = startPosition.ZeroY();
+        for (int i = 0; i < pointsList.Count; ++i)
+        {
+            float checkDistance = Vector3.Distance(startPosition, pointsList[i].ZeroY());
+            if (checkDistance < compareDistance)
+            {
+                compareDistance = checkDistance;
+                compareIndex = i;
+            }
+        }
+
+        List<Vector3> excludedPointsList = new(pointsList);
+        excludedPointsList.RemoveAt(compareIndex);
+
+        return excludedPointsList[Random.Range(0, excludedPointsList.Count)];
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = pathColour;

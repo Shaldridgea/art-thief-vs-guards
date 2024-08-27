@@ -52,9 +52,10 @@ public class Repeat : Decorator
         }
         else if(repeatCondition == Consts.RepeatCondition.NumberOfTimes)
         {
+            status = Status;
             while(repeatCounter < repeatNumber)
             {
-                if (Status == Consts.NodeStatus.RUNNING)
+                if (status == Consts.NodeStatus.RUNNING)
                 {
                     if (childNode.Status != Consts.NodeStatus.RUNNING)
                         status = childNode.Status;
@@ -74,5 +75,6 @@ public class Repeat : Decorator
     {
         base.Reset();
         setRunningByChild = false;
+        repeatCounter = 0;
     }
 }

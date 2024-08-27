@@ -176,6 +176,10 @@ public static class BehaviourTreeFactory
             case Consts.BehaviourType.AttackThief:
                 newNode = new AttackThief(tree);
             break;
+
+            case Consts.BehaviourType.TurnBody:
+                newNode = new TurnBody(tree, dataNode.GetParameters());
+            break;
         }
         newNode.Name = dataNode.name;
         return newNode;
