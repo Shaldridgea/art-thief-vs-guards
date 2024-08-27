@@ -20,6 +20,12 @@ public class SimulationHUD : MonoBehaviour
     private TextMeshProUGUI speedText;
 
     [SerializeField]
+    private Button changeCameraLeftButton;
+
+    [SerializeField]
+    private Button changeCameraRightButton;
+
+    [SerializeField]
     private Toggle lockCameraToggle;
 
     [SerializeField]
@@ -50,13 +56,22 @@ public class SimulationHUD : MonoBehaviour
 
     private Agent contextAgentTarget;
 
+    private List<Agent> cameraTargetList;
+
+    private int cameraTargetIndex;
+
     // Start is called before the first frame update
     void Start()
     {
         simulationSpeedSlider.onValueChanged.AddListener(HandleSpeedSliderChange);
         monitorBoardButton.onClick.AddListener(HandleMonitorBlackboard);
         monitorAgentButton.onClick.AddListener(HandleMonitorAgent);
+        changeCameraLeftButton.onClick.AddListener(HandleChangeCameraLeft);
+        changeCameraRightButton.onClick.AddListener(HandleChangeCameraRight);
         lockCameraToggle.onValueChanged.AddListener(HandleLockCameraToggle);
+        cameraTargetList = new(5);
+        cameraTargetList.Add(Level.Instance.Thief);
+        cameraTargetList.AddRange(Level.Instance.GuardList);
     }
 
     public void ShowWinnerText(Consts.Team winner)
@@ -90,6 +105,24 @@ public class SimulationHUD : MonoBehaviour
             treeView.SetActive(true);
             treeView.GetComponentInChildren<BTRuntimeViewGraph>().SetTarget(guard);
         }
+    }
+
+    private void HandleChangeCameraLeft()
+    {
+        --cameraTargetIndex;
+        if (cameraTargetIndex < 0)
+            cameraTargetIndex = cameraTargetList.Count - 1;
+
+        GameController.Instance.GameCamera.CameraTarget = cameraTargetList[cameraTargetIndex];
+    }
+
+    private void HandleChangeCameraRight()
+    {
+        ++cameraTargetIndex;
+        if (cameraTargetIndex >= cameraTargetList.Count)
+            cameraTargetIndex = 0;
+
+        GameController.Instance.GameCamera.CameraTarget = cameraTargetList[cameraTargetIndex];
     }
 
     private void HandleLockCameraToggle(bool toggle)

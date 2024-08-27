@@ -14,8 +14,15 @@ public class DoorTrigger : MonoBehaviour
     [SerializeField]
     private float swingAngle;
 
+    [SerializeField]
+    private bool ignoresGuards;
+
     private void OnTriggerEnter(Collider other)
     {
+        if (ignoresGuards)
+            if (other.CompareTag("Guard"))
+                return;
+
         bool doorBeingUsed = controller.IsDoorBeingUsed(doorName);
         controller.AgentEnter(doorName);
         if (doorBeingUsed)
@@ -39,6 +46,10 @@ public class DoorTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (ignoresGuards)
+            if (other.CompareTag("Guard"))
+                return;
+
         controller.AgentExit(doorName);
         if (controller.IsDoorBeingUsed(doorName))
             return;

@@ -81,7 +81,7 @@ public class DoorController : MonoBehaviour
             {
                 LeanTween.cancel(d.doorPivot.gameObject);
                 var tween = LeanTween.rotateY(d.doorPivot.gameObject, d.startAngle + swingAngle, 0.3f);
-                if (swingAngle != 0f)
+                if (swingAngle != 0f && d.doorObstacle != null)
                     tween.setOnComplete(() => d.doorObstacle.carving = true);
                 break;
             }

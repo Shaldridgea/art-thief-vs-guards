@@ -24,7 +24,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     private float turnSensitivity = 10f;
 
-    private ThiefAgent thief;
+    public Agent CameraTarget { get; set; }
 
     private Camera cam;
 
@@ -39,7 +39,7 @@ public class CameraControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        thief = Level.Instance.Thief;
+        CameraTarget = Level.Instance.Thief;
         cam = Camera.main;
         orbitEuler = new Vector3(-45f, 0f, 0f);
         cameraVector = new Vector3(0f,0f,cameraDistance);
@@ -109,7 +109,7 @@ public class CameraControl : MonoBehaviour
 
         orbitEuler.x = Mathf.Clamp(orbitEuler.x, -89f, 89f);
 
-        Vector3 thiefOrigin = thief.AgentView.AgentHeadRoot.position;
+        Vector3 thiefOrigin = CameraTarget.AgentView.AgentHeadRoot.position;
         float rayDistance = cameraDistance;
         // Make a raycast out from the Agent's head to find any collision with the environment,
         // so the camera will be pushed closer by walls

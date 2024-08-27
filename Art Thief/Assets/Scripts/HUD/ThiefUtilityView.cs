@@ -20,12 +20,6 @@ public class ThiefUtilityView : MonoBehaviour
 
     private List<UtilityAction> sortedActions = new();
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     private void CreateEntries()
     {
         foreach(var a in utilityScorer.ActionList)
@@ -66,7 +60,7 @@ public class ThiefUtilityView : MonoBehaviour
 
                 // Set each motive name and score
                 motiveLayout.GetChild(j).GetComponent<TextMeshProUGUI>().text =
-                    $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard)}";
+                    $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard):N3}";
             }
 
             // Total action score text

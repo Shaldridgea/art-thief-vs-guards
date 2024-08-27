@@ -25,6 +25,8 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private CameraControl gameCamera;
 
+    public CameraControl GameCamera => gameCamera;
+
     [SerializeField]
     private SimulationHUD menuHUD;
 

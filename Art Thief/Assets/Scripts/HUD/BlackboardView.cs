@@ -12,15 +12,14 @@ public class BlackboardView : MonoBehaviour
     [SerializeField]
     private GameObject entryTemplate;
 
+    [SerializeField]
+    private GameObject lineBreakTemplate;
+
     private Agent target;
 
     private List<GameObject> entries = new();
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+    private List<GameObject> lineBreaks = new();
 
     private void LateUpdate()
     {
@@ -41,8 +40,11 @@ public class BlackboardView : MonoBehaviour
         foreach(var d in allData)
         {
             // Create new UI boxes for entries if there's less than we need
-            if(entries.Count < allData.Count)
+            if (entries.Count < allData.Count)
+            {
                 entries.Add(Instantiate(entryTemplate, contentParent));
+                lineBreaks.Add(Instantiate(lineBreakTemplate, contentParent));
+            }
 
             entries[i].SetActive(true);
             TextMeshProUGUI keyText = entries[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>();
@@ -56,8 +58,11 @@ public class BlackboardView : MonoBehaviour
         if(entries.Count > allData.Count)
         {
             int deactivateCount = entries.Count - allData.Count;
-            for(int l = 0; l < deactivateCount;  ++l)
+            for (int l = 0; l < deactivateCount; ++l)
+            {
                 entries[entries.Count - 1 - l].SetActive(false);
+                lineBreaks[lineBreaks.Count - 1 - l].SetActive(false);
+            }
         }
     }
 }
