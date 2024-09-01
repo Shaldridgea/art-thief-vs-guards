@@ -43,9 +43,15 @@ public class GuardAgent : Agent
 
     private float treeUpdateTimer;
 
+    public SuspicionModule Suspicion { get; private set; }
+
     private bool hasFoughtThief;
 
-    public SuspicionModule Suspicion { get; private set; }
+    private Vector3 walkieLocalAngles;
+
+    private Vector3 walkieLocalPosition;
+
+    private float agentSpeed;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -62,6 +68,11 @@ public class GuardAgent : Agent
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
 
         torchLight.SetActive(false);
+
+        walkieLocalAngles = walkieTalkieTransform.localEulerAngles;
+        walkieLocalPosition = walkieTalkieTransform.localPosition;
+
+        agentSpeed = navAgent.speed;
     }
 
     private void Update()
@@ -88,6 +99,19 @@ public class GuardAgent : Agent
     public PatrolPath GetPatrol(Consts.PatrolPathType pathType) =>
         pathType == Consts.PatrolPathType.Regular ? regularPatrol : perimeterPatrol;
 
+    public void StartChaseSprint()
+    {
+        navAgent.speed += 0.8f;
+        LeanTween.value(agentView.AgentBodyRoot.gameObject, navAgent.speed, agentSpeed, 5f)
+            .setOnUpdate((f) => navAgent.speed = f).setDelay(5f);
+    }
+
+    public void CancelChaseSprint()
+    {
+        LeanTween.cancel(agentView.AgentBodyRoot.gameObject);
+        navAgent.speed = agentSpeed;
+    }
+
     public void PlayReportAnimation()
     {
         LTBezierPath walkieTalkiePath = new LTBezierPath(new Vector3[]{
@@ -106,11 +130,24 @@ public class GuardAgent : Agent
         LeanTween.rotate(walkieTalkieTransform.gameObject, walkieStartAngles, 1.5f).setDelay(2.5f);
     }
 
-    public bool CanAttackThief()
+    public void EndReportAnimation()
     {
+        LeanTween.cancel(walkieTalkieTransform.gameObject);
+        walkieTalkieTransform.localEulerAngles = walkieLocalAngles;
+        walkieTalkieTransform.localPosition = walkieLocalPosition;
+    }
+
+    public override bool CanAttackEnemy()
+    {
+        if (!base.CanAttackEnemy())
+            return false;
+
         ThiefAgent thief = Level.Instance.Thief;
 
-        if(Vector3.Distance(transform.position, thief.transform.position) <= aggroRadius)
+        if (thief.AgentBlackboard.GetVariable<bool>("isCaught"))
+            return false;
+
+        if (Vector3.Distance(transform.position, thief.transform.position) <= aggroRadius)
         {
             if(Vector3.Angle(transform.forward, (thief.transform.position - transform.position).normalized) <= aggroAngle)
             {
@@ -145,8 +182,20 @@ public class GuardAgent : Agent
         }
         else
         {
-            // Play tackling animation here
-            // also check if thief is already interacting/fighting and cancel its animations if so ig?
+            targetAgent.EndAgentAnimation();
+            Agent attacker = targetAgent.AgentBlackboard.GetVariable<Agent>("attackingAgent");
+            if (attacker != null)
+                attacker.EndAgentAnimation();
+            targetAgent.AgentBlackboard.SetVariable("isCaught", true);
+            // Start animated fight interaction between thief and guard
+            SetupAttack(this, targetAgent);
+            targetAgent.transform.Rotate(Vector3.up, 180f);
+            PlayTackleSequence(true);
+            targetAgent.PlayTackleSequence(false);
+            // Mark everyone as interacting and unable to interrupt attack
+            AgentBlackboard.SetVariable("isInteracting", true);
+            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
+            targetAgent.DeactivateAgent();
         }
     }
 
@@ -160,6 +209,13 @@ public class GuardAgent : Agent
         return hasFoughtThief;
     }
 
+    public override void EndAgentAnimation()
+    {
+        EndReportAnimation();
+        base.EndAgentAnimation();
+        PlayWakeupAnimation();
+    }
+
     public void EnableStunnedSuspicionFocus()
     {
         stunnedVisualInterest.gameObject.SetActive(true);
@@ -168,7 +224,6 @@ public class GuardAgent : Agent
     public void DisableStunnedSuspicionFocus()
     {
         stunnedVisualInterest.gameObject.SetActive(false);
-
     }
 
     [Button("Test head turn", EButtonEnableMode.Playmode)]

@@ -53,6 +53,8 @@ public abstract class Agent : MonoBehaviour
 
     private Coroutine walkingCoroutine;
 
+    private Coroutine attackCoroutine;
+
     [SerializeField]
     private List<string> blackboardDefaults;
 
@@ -163,7 +165,8 @@ public abstract class Agent : MonoBehaviour
     private IEnumerator MakeWalkingSound()
     {
         // Make the walking sound play as long as we're travelling to our destination
-        while(Vector3.Distance(transform.position, navAgent.destination) > 1f)
+        while(Vector3.Distance(transform.position, navAgent.destination) > 1f &&
+            !AgentBlackboard.GetVariable<bool>("isInteracting"))
         {
             walkingSound.PlaySound();
             yield return new WaitForSeconds(walkSoundInterval);
@@ -202,6 +205,11 @@ public abstract class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
+    public virtual bool CanAttackEnemy()
+    {
+        return !AgentBlackboard.GetVariable<bool>("isInteracting");
+    }
+
     public abstract void AttackAgent(Agent targetAgent);
 
     public abstract bool CanAttackBack(Agent attacker);
@@ -210,7 +218,22 @@ public abstract class Agent : MonoBehaviour
 
     public void PlayStruggleSequence(bool isWinner)
     {
-        StartCoroutine(EnumerateStruggleSequence(isWinner));
+        attackCoroutine = StartCoroutine(EnumerateStruggleSequence(isWinner));
+    }
+
+    public void PlayTackleSequence(bool isWinner)
+    {
+        attackCoroutine = StartCoroutine(EnumerateTackleSequence(isWinner));
+    }
+
+    public virtual void EndAgentAnimation()
+    {
+        LeanTween.cancel(AgentView.AgentRoot.gameObject);
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
     }
 
     protected void SetupAttack(Agent a, Agent b)
@@ -224,6 +247,7 @@ public abstract class Agent : MonoBehaviour
         a.navAgent.updateRotation = false;
         a.navAgent.updateUpAxis = false;
         a.navAgent.velocity = Vector3.zero;
+        a.AgentBlackboard.SetVariable("attackingAgent", b);
 
         b.transform.LookAt(a.transform, Vector3.up);
         b.navAgent.ResetPath();
@@ -231,6 +255,13 @@ public abstract class Agent : MonoBehaviour
         b.navAgent.updateRotation = false;
         b.navAgent.updateUpAxis = false;
         b.navAgent.velocity = Vector3.zero;
+        b.AgentBlackboard.SetVariable("attackingAgent", a);
+
+        Vector3 toA = (a.transform.position - b.transform.position);
+        Vector3 toB = (b.transform.position - a.transform.position);
+        Vector3 midPoint = a.transform.position + toB / 2f;
+        a.transform.position = midPoint + toA.normalized * 0.4f;
+        b.transform.position = midPoint + toB.normalized * 0.4f;
     }
 
     private IEnumerator EnumerateStruggleSequence(bool isWinner)
@@ -244,12 +275,14 @@ public abstract class Agent : MonoBehaviour
             AgentBlackboard.SetVariable("isStunned", true);
         else
             ActivateAgent();
+        attackCoroutine = null;
     }
 
     private void PlayStrugglingAnimation(bool beingAttacked)
     {
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? 15f : -15f, 0.3f);
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 0.6f).setFrom(beingAttacked ? 15f : -15f).setDelay(0.3f).setLoopPingPong(2);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, beingAttacked ? -15f : 15f, 0.6f)
+            .setFrom(beingAttacked ? 15f : -15f).setDelay(0.3f).setLoopPingPong(2);
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.3f).setFrom(beingAttacked ? 15f : -15f).setDelay(2.7f);
     }
 
@@ -260,9 +293,26 @@ public abstract class Agent : MonoBehaviour
             LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setDelay(0.4f);
     }
 
+    private IEnumerator EnumerateTackleSequence(bool isWinner)
+    {
+        PlayTackleAnimation(isWinner);
+        yield return new WaitForSeconds(1.6f);
+        AgentBlackboard.SetVariable("isInteracting", false);
+        if (!isWinner)
+            AgentBlackboard.SetVariable("isStunned", true);
+        else
+            ActivateAgent();
+        attackCoroutine = null;
+    }
+
+    private void PlayTackleAnimation(bool isWinner)
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 60f : -90f, 1.5f).setEaseInElastic();
+    }
+
     public void PlayWakeupAnimation()
     {
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 2f);
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 1f);
     }
 
     protected virtual void OnDrawGizmosSelected()

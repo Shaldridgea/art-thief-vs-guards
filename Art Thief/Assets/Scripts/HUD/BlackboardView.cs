@@ -48,7 +48,7 @@ public class BlackboardView : MonoBehaviour
 
             entries[i].SetActive(true);
             TextMeshProUGUI keyText = entries[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI valueText = entries[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI valueText = entries[i].transform.GetChild(2).GetComponent<TextMeshProUGUI>();
             keyText.text = d.Key;
             valueText.text = d.Value.ToString();
             ++i;

@@ -170,6 +170,11 @@ namespace XNodeEditor {
             Undo.RegisterCreatedObjectUndo(node, "Create Node");
             node.position = position;
             if (node.name == null || node.name.Trim() == "") node.name = NodeEditorUtilities.NodeDefaultName(type);
+
+            if (!string.IsNullOrEmpty(node.name))
+                if (node is BTGraphNode btNode)
+                    btNode.UpdateName(btNode.BehaviourType);
+
             if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(target))) AssetDatabase.AddObjectToAsset(node, target);
             if (NodeEditorPreferences.GetSettings().autoSave) AssetDatabase.SaveAssets();
             NodeEditorWindow.RepaintAll();

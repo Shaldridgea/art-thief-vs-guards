@@ -55,12 +55,13 @@ public class ThiefAgent : Agent
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
-            if (distanceToGuard < aggroRadius)
+            if (CanAttackEnemy())
             {
-                //Debug.Log(Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized));
-                if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
-                    aggression += 1f;
-
+                if (distanceToGuard < aggroRadius)
+                {
+                    if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
+                        aggression += 1f;
+                }
             }
             if (hasLos)
                 danger += 0.5f;
@@ -84,6 +85,15 @@ public class ThiefAgent : Agent
             storedDanger = Mathf.SmoothDamp(storedDanger, danger, ref dangerVelocity, 4f, 0.5f);
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
+    }
+
+    private void LateUpdate()
+    {
+        if (AgentBlackboard.GetVariable<bool>("isStunned"))
+        {
+            GameController.Instance.EndGame(Consts.Team.GUARD);
+            enabled = false;
+        }
     }
 
     private IEnumerator FollowPathOffMeshLink()
@@ -173,7 +183,7 @@ public class ThiefAgent : Agent
 
     public override bool CanAttackBack(Agent attacker)
     {
-        return !AgentBlackboard.GetVariable<bool>("isInteracting") && Vector3.Dot(attacker.transform.forward, transform.forward) > 0.2f;
+        return CanAttackEnemy() && Vector3.Dot(attacker.transform.forward, transform.forward) > 0.4f;
     }
 
     public override bool CanWinStruggle()

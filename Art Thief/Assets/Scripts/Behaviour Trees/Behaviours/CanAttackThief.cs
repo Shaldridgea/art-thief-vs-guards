@@ -14,7 +14,7 @@ public class CanAttackThief : Condition
     {
         Consts.NodeStatus status = Consts.NodeStatus.FAILURE;
 
-        if (ParentTree.Owner.CanAttackThief())
+        if (ParentTree.Owner.CanAttackEnemy())
             status = Consts.NodeStatus.SUCCESS;
 
         return status;

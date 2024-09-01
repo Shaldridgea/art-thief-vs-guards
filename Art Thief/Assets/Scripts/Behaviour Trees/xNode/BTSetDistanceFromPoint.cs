@@ -24,6 +24,6 @@ public class BTSetDistanceFromPoint : BTActionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { (int)source, distanceKey, pointKey };
+        return new NodeParameter[] { (int)source, pointKey, distanceKey };
     }
 }
