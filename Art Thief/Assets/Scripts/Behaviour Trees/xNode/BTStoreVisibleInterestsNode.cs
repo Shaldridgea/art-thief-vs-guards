@@ -27,4 +27,9 @@ public class BTStoreVisibleInterestsNode : BTActionNode
     {
         return new NodeParameter[] { interestTag, (int)source, listKey };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Interest tag: " + interestTag + ", List key: " + listKey;
+    }
 }

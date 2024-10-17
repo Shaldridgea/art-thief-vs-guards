@@ -1,14 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BehaviourNode
+public abstract class BehaviourNode : INodeGuid
 {
     public string Name { get; set; }
 
     protected BehaviourTree ParentTree { get; private set; }
 
     public Consts.NodeStatus Status { get; private set; }
+
+    private System.Guid guid;
 
     public BehaviourNode(BehaviourTree parentTree)
     {
@@ -100,9 +103,24 @@ public abstract class BehaviourNode
         return false;
     }
 
-    protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source) =>
-     source == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
+    protected Blackboard GetTargetBlackboard(Consts.BlackboardSource source)
+    {
+        return source == Consts.BlackboardSource.AGENT ?
+            ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
+    }
 
-    protected Blackboard GetTargetBlackboard(NodeParameter source) =>
-    ((Consts.BlackboardSource)(int)source) == Consts.BlackboardSource.AGENT ? ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
+    protected Blackboard GetTargetBlackboard(NodeParameter source)
+    {
+        return ((Consts.BlackboardSource)(int)source) == Consts.BlackboardSource.AGENT ?
+            ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
+    }
+
+    public virtual string GetLiveVisualsText()
+    {
+        return string.Empty;
+    }
+
+    public void SetGuid(Guid newGuid) { guid = newGuid; }
+
+    public Guid GetGuid() => guid;
 }

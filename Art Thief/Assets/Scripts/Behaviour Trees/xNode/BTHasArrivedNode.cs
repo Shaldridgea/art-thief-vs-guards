@@ -21,4 +21,9 @@ public class BTHasArrivedNode : BTConditionNode
     {
         return new NodeParameter[] { stoppingDistance };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Stopping distance: " + stoppingDistance;
+    }
 }

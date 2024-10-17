@@ -28,8 +28,6 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private SimulationHUD menuHUD;
 
-    public SimulationHUD MenuHUD => menuHUD;
-
     [SerializeField]
     private StartScreen startScreen;
 

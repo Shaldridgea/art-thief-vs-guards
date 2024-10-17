@@ -48,6 +48,24 @@ public class NodeParameter
         type = ParamType.Vector3;
     }
 
+    public override string ToString()
+    {
+        switch (type)
+        {
+            case ParamType.Int:
+                return intValue.ToString();
+            case ParamType.Float:
+                return floatValue.ToString();
+            case ParamType.Bool:
+                return boolValue.ToString();
+            case ParamType.String:
+                return stringValue;
+            case ParamType.Vector3:
+                return vector3Value.ToString();
+        }
+        return "NodeParameter";
+    }
+
     [NodeEnum]
     public ParamType type;
     [SerializeField]

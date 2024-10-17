@@ -35,4 +35,17 @@ public class BTCustomConditionNode : BTConditionNode
 
         return parameters;
     }
+
+    public override string GetNodeDetailsText()
+    {
+        string details = "Conditions: ";
+        for (int i = 0; i < checkConditions.Length; ++i)
+        {
+            details += checkConditions[i];
+            if (i != checkConditions.Length - 1)
+                details += ", ";
+        }
+        
+        return details;
+    }
 }

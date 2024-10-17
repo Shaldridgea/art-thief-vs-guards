@@ -16,6 +16,8 @@ public static class BehaviourTreeFactory
 
         BTGraphNode node = (BTGraphNode)nodes.Find(n => n.GetInputPort("parentNode").ConnectionCount == 0);
         currentTree.SetRoot(ProcessNode(node, currentTree, nodeStack, nodeMap));
+        currentTree.SetNodeMap(nodeMap);
+        currentTree.SetGraph(graph);
 
         if(nodeStack.Count != 0)
             Debug.Log("Stack wasn't processed correctly");
@@ -161,7 +163,7 @@ public static class BehaviourTreeFactory
                 newNode = new SetDistanceFromPoint(tree, dataNode.GetParameters());
             break;
 
-            case Consts.BehaviourType.CopyVariables:
+            case Consts.BehaviourType.CopyVariablesToSelf:
                 newNode = new CopyVariables(tree, dataNode.GetParameters());
             break;
 

@@ -43,4 +43,10 @@ public class Cooldown : Decorator
 
         return status;
     }
+
+    public override string GetLiveVisualsText()
+    {
+        float elapsedTime = Mathf.Clamp(Time.time - cooldownStart, 0f, cooldownTime);
+        return $"Timer: {elapsedTime:N2} sec(s)";
+    }
 }

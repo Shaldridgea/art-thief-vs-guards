@@ -26,4 +26,9 @@ public class BTSetRandomInterestNode : BTActionNode
     {
         return new NodeParameter[] { (int)source, sourceKey, destinationKey };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Source key: " + sourceKey + ", Destination key: " + destinationKey;
+    }
 }

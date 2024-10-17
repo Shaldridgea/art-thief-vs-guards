@@ -60,12 +60,12 @@ public class ThiefUtilityView : MonoBehaviour
 
                 // Set each motive name and score
                 motiveLayout.GetChild(j).GetComponent<TextMeshProUGUI>().text =
-                    $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard):N3}";
+                    $"{curve.MotiveSource.Motive}: {curve.GetValue(target.AgentBlackboard):N2}";
             }
 
             // Total action score text
             TextMeshProUGUI scoreText = entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-            scoreText.text = a.Score.ToString();
+            scoreText.text = a.Score.ToString("N3");
         }
     }
 

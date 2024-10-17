@@ -18,4 +18,9 @@ public class BTRandomChanceNode: BTDecoratorNode
     {
         return new NodeParameter[] { chanceValue };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Chance: " + chanceValue;
+    }
 }

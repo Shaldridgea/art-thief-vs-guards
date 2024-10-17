@@ -7,7 +7,8 @@ using NaughtyAttributes;
 [CreateNodeMenu("Action/Turn Body")]
 public class BTTurnBody : BTActionNode
 {
-    enum TurnType{
+    enum TurnType
+    {
         Angle,
         Point
     }
@@ -39,5 +40,11 @@ public class BTTurnBody : BTActionNode
     public override NodeParameter[] GetParameters()
     {
         return new NodeParameter[] { IsAngle, IsAngle ? addAngle : pointKey, time };
+    }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Turn to: " + turnType.ToString() + ", Time: " + time +
+            (IsAngle ? ", Angle: " + addAngle : ", Point key: " + pointKey);
     }
 }

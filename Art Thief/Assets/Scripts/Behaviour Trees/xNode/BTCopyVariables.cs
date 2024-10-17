@@ -15,12 +15,17 @@ public class BTCopyVariables : BTActionNode
 
     protected override void Init()
     {
-        type = Consts.BehaviourType.CopyVariables;
+        type = Consts.BehaviourType.CopyVariablesToSelf;
         base.Init();
     }
 
     public override NodeParameter[] GetParameters()
     {
         return new NodeParameter[] { (int)source, copyKey };
+    }
+
+    public override string GetNodeDetailsText()
+    {
+        return $"Source: {source}, Copy key: {copyKey}";
     }
 }

@@ -20,4 +20,9 @@ public class BTCallMethodNode : BTActionNode
     {
         return new NodeParameter[] { methodName };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Method name: " + methodName;
+    }
 }

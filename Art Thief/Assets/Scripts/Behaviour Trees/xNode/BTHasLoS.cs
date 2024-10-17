@@ -20,4 +20,9 @@ public class BTHasLoS : BTConditionNode
     {
         return new NodeParameter[] { targetKey };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Target key: " + targetKey;
+    }
 }

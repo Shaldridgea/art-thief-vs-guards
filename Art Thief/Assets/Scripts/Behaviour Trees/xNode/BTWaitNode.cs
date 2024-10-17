@@ -19,4 +19,9 @@ public class BTWaitNode : BTActionNode
     {
         return new NodeParameter[] { waitTime };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Wait time: " + waitTime;
+    }
 }

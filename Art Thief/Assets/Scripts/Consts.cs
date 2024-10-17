@@ -37,7 +37,7 @@ public static class Consts
         HasLineOfSight,
         CallMethod,
         SetDistanceFromPoint,
-        CopyVariables,
+        CopyVariablesToSelf,
         IsThiefHeard,
         CanAttackThief,
         AttackThief,

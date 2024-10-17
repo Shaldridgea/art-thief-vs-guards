@@ -33,4 +33,12 @@ public class BTSetPointFromPatrolNode : BTActionNode
     {
         return new NodeParameter[] { variableName, (int)pathType, (int)pointType, roomPointKey };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        string details;
+        details = "Path type: " + pathType.ToString() + ", Point type: " + pointType.ToString();
+        details += ", Variable key: " + variableName;
+        return details;
+    }
 }

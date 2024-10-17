@@ -5,7 +5,8 @@ using XNode;
 using NaughtyAttributes;
 
 [NodeWidth(250)]
-public abstract class BTGraphNode : Node {
+public abstract class BTGraphNode : Node, INodeGuid
+{
     [System.Serializable]
     protected class Empty { }
 
@@ -18,6 +19,8 @@ public abstract class BTGraphNode : Node {
     protected Consts.BehaviourType type;
 
     public Consts.BehaviourType BehaviourType => type;
+
+    private System.Guid guid;
 
     // Return the correct value of an output port when requested
     public override object GetValue(NodePort port) {
@@ -48,4 +51,15 @@ public abstract class BTGraphNode : Node {
         }
         return new string(wordList.ToArray());
     }
+
+    public string GetBehaviourTypeText() => $"Type: {type.ToString()}";
+
+    public virtual string GetNodeDetailsText()
+    {
+        return string.Empty;
+    }
+
+    public void SetGuid(System.Guid newGuid) { guid = newGuid; }
+
+    public System.Guid GetGuid() => guid;
 }

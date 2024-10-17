@@ -22,4 +22,9 @@ public class BTMoveToPointNode : BTActionNode {
     {
         return new NodeParameter[] { (int)source, variableName };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Point key: " + variableName;
+    }
 }

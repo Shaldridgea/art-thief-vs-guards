@@ -103,7 +103,7 @@ public class SimulationHUD : MonoBehaviour
         if(contextAgentTarget is GuardAgent guard)
         {
             treeView.SetActive(true);
-            treeView.GetComponentInChildren<BTRuntimeViewGraph>().SetTarget(guard);
+            treeView.GetComponentInChildren<BTRuntimeView>().SetTarget(guard);
         }
     }
 
@@ -128,6 +128,11 @@ public class SimulationHUD : MonoBehaviour
     private void HandleLockCameraToggle(bool toggle)
     {
         gameCameraControl.SetCameraMode(toggle ? CameraControl.CameraMode.Orbit : CameraControl.CameraMode.Free);
+    }
+
+    public void SetSimulationSpeed(float newSpeed)
+    {
+        simulationSpeedSlider.value = newSpeed;
     }
 
     private void Update()

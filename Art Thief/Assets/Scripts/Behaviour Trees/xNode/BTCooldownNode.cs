@@ -21,4 +21,9 @@ public class BTCooldownNode : BTDecoratorNode
     {
         return new NodeParameter[] { cooldownTime, startOnCooldown };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Cooldown: " + cooldownTime;
+    }
 }

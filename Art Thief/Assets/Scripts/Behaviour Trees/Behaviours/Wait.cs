@@ -28,4 +28,10 @@ public class Wait : BehaviourNode
 
         return status;
     }
+
+    public override string GetLiveVisualsText()
+    {
+        float elapsedTime = Mathf.Clamp(Time.time - waitStart, 0f, waitTime);
+        return $"Time: {elapsedTime:N2} sec(s)";
+    }
 }

@@ -42,4 +42,15 @@ public class BTRepeatNode : BTDecoratorNode
     {
         return new NodeParameter[] { (int)repeatCondition, (int)desiredResult, repeatTimes };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        string details;
+        details = "Repeat type: " + repeatCondition.ToString();
+        if (repeatCondition == Consts.RepeatCondition.UntilResult)
+            details += ", Target result: " + desiredResult;
+        else
+            details += ", Repeat times: " + repeatTimes;
+        return details;
+    }
 }

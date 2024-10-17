@@ -19,7 +19,7 @@ public class CopyVariables : BehaviourNode
     {
         Consts.NodeStatus status = Consts.NodeStatus.SUCCESS;
 
-        string[] copyKeys = board.GetVariable<string>(copyKey).Split(",");
+        string[] copyKeys = copyKey.Split(",");
 
         for (int i = 0; i < copyKeys.Length; ++i)
             ParentTree.Owner.AgentBlackboard.SetVariable(copyKeys[i], board.GetVariableGeneric(copyKeys[i]));

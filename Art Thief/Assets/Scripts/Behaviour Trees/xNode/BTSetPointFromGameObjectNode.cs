@@ -26,4 +26,9 @@ public class BTSetPointFromGameObjectNode : BTActionNode
     {
         return new NodeParameter[] { (int)source, objectKey, pointKey };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Object key: " + objectKey + ", Point key: " + pointKey;
+    }
 }

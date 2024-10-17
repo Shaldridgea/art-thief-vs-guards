@@ -27,4 +27,9 @@ public class BTSetVariableNode : BTActionNode {
     {
         return new NodeParameter[] { (int)source, variableKey, variableValue };
     }
+
+    public override string GetNodeDetailsText()
+    {
+        return "Variable key: " + variableKey + ", Value: " + variableValue.ToString();
+    }
 }

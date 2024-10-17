@@ -12,6 +12,10 @@ public class BehaviourTree
 
     public BehaviourNode RootNode => rootNode;
 
+    public Dictionary<BTGraphNode, BehaviourNode> NodeMap { get; private set; }
+
+    public BTGraph GraphSource { get; private set; }
+
     public delegate void NodeDelegate(BehaviourNode node);
 
     public event NodeDelegate NodeRanEvent;
@@ -31,7 +35,11 @@ public class BehaviourTree
     public void SetAgent(Agent newAgent) => Owner = (GuardAgent)newAgent;
 
     public void SetRoot(BehaviourNode newRoot) => rootNode = newRoot;
-    
+
+    public void SetNodeMap(Dictionary<BTGraphNode, BehaviourNode> map) => NodeMap = map;
+
+    public void SetGraph(BTGraph graphSource) => GraphSource = graphSource;
+
     public void Update()
     {
         if(monitoringList.Count > 0)
@@ -81,4 +89,6 @@ public class BehaviourTree
             current.OnExit();
         }
     }
+
+    public BehaviourNode PeekRunningStack() => runningStack.Count > 0 ? runningStack.Peek() : null;
 }

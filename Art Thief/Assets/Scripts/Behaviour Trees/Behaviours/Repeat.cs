@@ -77,4 +77,12 @@ public class Repeat : Decorator
         setRunningByChild = false;
         repeatCounter = 0;
     }
+
+    public override string GetLiveVisualsText()
+    {
+        if (repeatCondition == Consts.RepeatCondition.UntilResult)
+            return string.Empty;
+
+        return $"Repeat count: {repeatCounter}";
+    }
 }
