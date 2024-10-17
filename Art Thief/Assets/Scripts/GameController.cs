@@ -20,8 +20,6 @@ public class GameController : MonoBehaviour
         GlobalBlackboard = new Blackboard();
     }
 
-    public Transform ArtGoal { get; set; }
-
     [SerializeField]
     private CameraControl gameCamera;
 
@@ -30,8 +28,14 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private SimulationHUD menuHUD;
 
+    public SimulationHUD MenuHUD => menuHUD;
+
     [SerializeField]
     private StartScreen startScreen;
+
+    [SerializeField]
+    [Range(30, 120)]
+    private int framerateCap = 60;
 
     public Blackboard GlobalBlackboard { get; private set; }
 
@@ -40,7 +44,7 @@ public class GameController : MonoBehaviour
     {
         gameCamera.enabled = false;
         menuHUD.gameObject.SetActive(false);
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = framerateCap;
     }
 
     // Update is called once per frame

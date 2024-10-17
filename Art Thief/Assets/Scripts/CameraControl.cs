@@ -103,20 +103,31 @@ public class CameraControl : MonoBehaviour
     {
         // Turn camera using the mouse
         if (controllingCamera)
+        {
             orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
             Input.GetAxis("Mouse Y"),
             Input.GetAxis("Mouse X"), 0f);
+            
+            // Zoom the camera in or out
+            if (Input.mouseScrollDelta.y != 0f)
+            {
+                cameraDistance += (-Input.mouseScrollDelta.y * scrollSensitivity) * Time.unscaledDeltaTime;
+                cameraDistance = Mathf.Clamp(cameraDistance, 1f, 10f);
+            }
+        }
 
         orbitEuler.x = Mathf.Clamp(orbitEuler.x, -89f, 89f);
 
         Vector3 thiefOrigin = CameraTarget.AgentView.AgentHeadRoot.position;
         float rayDistance = cameraDistance;
-        // Make a raycast out from the Agent's head to find any collision with the environment,
-        // so the camera will be pushed closer by walls
+        // Make a raycast out from the Agent's head to find any collision
+        // with the environment, so the camera will be pushed closer by walls
         Vector3 desiredPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         if (Physics.Raycast(thiefOrigin, (desiredPoint - thiefOrigin).normalized,
             out RaycastHit info, cameraDistance, LayerMask.GetMask("Default", "Floor")))
-            rayDistance = info.distance-0.1f;
+        {
+            rayDistance = Mathf.Max(info.distance - 0.1f, 0.05f);
+        }
 
         // If the gotten ray distance is further than current camera position,
         // lerp the camera's distance and move it to the ray's distance smoothly
@@ -133,12 +144,5 @@ public class CameraControl : MonoBehaviour
         // Move camera around the spy and make the camera look at the spy
         cam.transform.position = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         cam.transform.LookAt(thiefOrigin);
-
-        // Zoom the camera in or out
-        if (Input.mouseScrollDelta.y != 0f)
-        {
-            cameraDistance += (-Input.mouseScrollDelta.y * scrollSensitivity) * Time.unscaledDeltaTime;
-            cameraDistance = Mathf.Clamp(cameraDistance, 1f, 10f);
-        }
     }
 }

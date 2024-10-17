@@ -6,12 +6,6 @@ using NaughtyAttributes;
 public class GuardAgent : Agent
 {
     [SerializeField]
-    private List<GameObject> breakroomMarkerList;
-
-    [SerializeField]
-    private List<GameObject> toiletMarkerList;
-
-    [SerializeField]
     private BTGraph behaviourTreeGraph;
 
     [SerializeField]
@@ -58,8 +52,8 @@ public class GuardAgent : Agent
     {
         base.Start();
 
-        AgentBlackboard.SetVariable("breakroomList", breakroomMarkerList);
-        AgentBlackboard.SetVariable("toiletList", toiletMarkerList);
+        GameController.Instance.GlobalBlackboard.SetVariable("breakroomList", Level.Instance.BreakroomMarkerList);
+        GameController.Instance.GlobalBlackboard.SetVariable("toiletList", Level.Instance.ToiletMarkerList);
 
         if (TryGetComponent(out SuspicionModule susModule))
             Suspicion = susModule;

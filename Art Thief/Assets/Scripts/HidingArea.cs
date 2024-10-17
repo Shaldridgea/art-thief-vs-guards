@@ -29,7 +29,7 @@ public class HidingArea : MonoBehaviour
         for(int i = 0; i < threats.Count; ++i)
         {
             GuardAgent guard = threats[i];
-            if(guard.GuardSenses.IsInLOS(transform.position))
+            if (guard.GuardSenses.IsInLOS(transform.position))
             {
                 IsSafe = false;
                 return;

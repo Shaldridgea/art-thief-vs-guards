@@ -307,7 +307,7 @@ public abstract class Agent : MonoBehaviour
 
     private void PlayTackleAnimation(bool isWinner)
     {
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 60f : -90f, 1.5f).setEaseInElastic();
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 70f : 90f, 1.5f).setEaseInElastic();
     }
 
     public void PlayWakeupAnimation()

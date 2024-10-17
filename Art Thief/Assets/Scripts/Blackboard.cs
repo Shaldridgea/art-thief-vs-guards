@@ -5,10 +5,6 @@ using UnityEngine;
 
 public class Blackboard
 {
-    private int setFrameCount = 0;
-
-    private HashSet<string> lockedVariables = new HashSet<string>();
-
     private Dictionary<string, object> variablesDict = new Dictionary<string, object>();
 
     private Dictionary<string, Type> typeDict = new Dictionary<string, Type>();
@@ -16,6 +12,7 @@ public class Blackboard
     public void SetVariable<T>(string variableName, T newValue)
     {
         variablesDict[variableName] = newValue;
+
         Type type = newValue.GetType();
         typeDict[variableName] = type;
     }

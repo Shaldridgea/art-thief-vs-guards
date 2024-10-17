@@ -117,12 +117,14 @@ public class ThiefAgent : Agent
 
             frameMovementSpeed = navAgent.speed * Time.deltaTime;
 
-            transform.position = Vector3.MoveTowards(
-                transform.position, goalPos, frameMovementSpeed);
+            transform.SetPositionAndRotation
+            (
+                Vector3.MoveTowards(transform.position, goalPos, frameMovementSpeed),
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation,
+                Quaternion.RotateTowards(transform.rotation,
                 Quaternion.LookRotation(goalPos.ZeroY() - transform.position.ZeroY(), Vector3.up),
-                navAgent.angularSpeed * Time.deltaTime);
+                navAgent.angularSpeed * Time.deltaTime)
+            );
 
             if (!reachedStartFirst && Vector3.Distance(transform.position.ZeroY(), goalPos.ZeroY()) <= frameMovementSpeed)
                 reachedStartFirst = true;
@@ -131,6 +133,7 @@ public class ThiefAgent : Agent
         }
         while (Vector3.Distance(transform.position.ZeroY(), endPos.ZeroY()) > frameMovementSpeed
         && navAgent.isOnOffMeshLink);
+
         navAgent.CompleteOffMeshLink();
         usingOffMeshLink = false;
     }
@@ -183,12 +186,30 @@ public class ThiefAgent : Agent
 
     public override bool CanAttackBack(Agent attacker)
     {
-        return CanAttackEnemy() && Vector3.Dot(attacker.transform.forward, transform.forward) > 0.4f;
+        return CanAttackEnemy() && Vector3.Dot(attacker.transform.forward, transform.forward) < -0.4f;
     }
 
     public override bool CanWinStruggle()
     {
         return true;
+    }
+
+    public Vector3 GetNavMeshSafePosition()
+    {
+        if (!navAgent.isOnNavMesh)
+        {
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit,
+                navAgent.height * 3f, navAgent.areaMask))
+            {
+                return hit.position;
+            }
+            else
+            {
+                return CurrentRoom.transform.position;
+            }
+        }
+        else
+            return transform.position;
     }
 
 #if UNITY_EDITOR

@@ -72,6 +72,16 @@ public class Level : MonoBehaviour
     public List<Transform> ThiefStartList => thiefStartTransforms;
 
     [SerializeField]
+    private List<GameObject> breakroomMarkerList;
+
+    public List<GameObject> BreakroomMarkerList => breakroomMarkerList;
+
+    [SerializeField]
+    private List<GameObject> toiletMarkerList;
+
+    public List<GameObject> ToiletMarkerList => toiletMarkerList;
+
+    [SerializeField]
     private Transform levelMiddleTransform;
 
     public Vector3 LevelMiddlePoint => levelMiddleTransform.position;

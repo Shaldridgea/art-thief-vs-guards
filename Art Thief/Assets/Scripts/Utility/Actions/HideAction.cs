@@ -7,8 +7,6 @@ public class HideAction : UtilityAction
 {
     private HidingArea targetArea;
 
-    private Vector3 targetPosition;
-
     private NavMeshPath targetPath;
 
     private bool turnedAround;
@@ -71,16 +69,10 @@ public class HideAction : UtilityAction
             area.CheckForSafety(senses.AwareGuards);
             if (area.IsSafe)
             {
-                Vector3 thiefPos = thief.transform.position;
-                if (!thief.NavAgent.isOnNavMesh)
-                    if (thief.NavAgent.FindClosestEdge(out NavMeshHit hit))
-                        thiefPos = hit.position;
-                
-                var newPath = Consts.GetNewPath(thiefPos, area.transform.position);
+                var newPath = Consts.GetNewPath(thief.GetNavMeshSafePosition(), area.transform.position);
                 if (IsPathSafe(thief, newPath, senses.AwareGuards))
                 {
                     targetArea = area;
-                    targetPosition = targetArea.transform.position;
                     targetPath = newPath;
                     break;
                 }
@@ -123,6 +115,12 @@ public class HideAction : UtilityAction
 
     private bool IsPathSafe(ThiefAgent thief, NavMeshPath path, List<GuardAgent> guardThreats)
     {
+        if(path == null)
+        {
+            Debug.LogError("IsPathSafe was passed a null path");
+            return false;
+        }
+
         // For every guard we're aware of, simulate the future positions of the guards and the thief
         // and check for whether there is a potential of being in the guard's line of sight
         // if this path is followed

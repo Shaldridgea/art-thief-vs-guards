@@ -16,7 +16,7 @@ public class FindExitAction : UtilityAction
         for(int i = 0; i < Level.Instance.LevelExits.Count; ++i)
         {
             NavMeshPath path = Consts.GetNewPath(
-                thief.transform.position,
+                thief.GetNavMeshSafePosition(),
                 Level.Instance.LevelExits[i].position);
 
             if (path == null)
