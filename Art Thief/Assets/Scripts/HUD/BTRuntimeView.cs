@@ -51,6 +51,11 @@ public class BTRuntimeView : MonoBehaviour
     private BTGridBasedGraph gridGraph;
 
     [SerializeField]
+    private NodeInspectTooltip inspectTooltip;
+
+    public NodeInspectTooltip InspectTooltip => inspectTooltip;
+
+    [SerializeField]
     private NodePoolLoader nodePoolLoader;
 
     private BehaviourTree tree;
@@ -89,6 +94,7 @@ public class BTRuntimeView : MonoBehaviour
 
         // Clean up previous nodes
         nodeGuidMap.Clear();
+        nodeGuidList.Clear();
         updatedNodesList.Clear();
         liveUpdateNodesList.Clear();
 

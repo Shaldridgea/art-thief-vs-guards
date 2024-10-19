@@ -43,7 +43,6 @@ public class ZoomScrollRect : ScrollRect
         Vector2 viewportSize = viewport.rect.size;
         Vector2 contentSize = content.rect.size;
         relativeSize = Mathf.Max(viewportSize.x, viewportSize.y) / Mathf.Max(contentSize.x, contentSize.y);
-        Debug.Log($"content size: {contentSize}, viewport size: {viewportSize}, relativesize: {relativeSize}");
     }
 
     public void SetZoom(float newZoomFactor)

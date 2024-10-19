@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class BTRuntimeViewNode : MonoBehaviour, INodeGuid
+public class BTRuntimeViewNode : MonoBehaviour, INodeGuid, IPointerEnterHandler, IPointerExitHandler
 {
+    [SerializeField]
+    private BTRuntimeView viewOwner;
+
     [SerializeField]
     private Image nodeImage;
 
@@ -16,20 +19,22 @@ public class BTRuntimeViewNode : MonoBehaviour, INodeGuid
     [SerializeField]
     private TextMeshProUGUI nodeTitle;
 
+    public TextMeshProUGUI NodeTitle => nodeTitle;
+
     [SerializeField]
     private TextMeshProUGUI typeText;
+
+    public TextMeshProUGUI TypeText => typeText;
 
     [SerializeField]
     private TextMeshProUGUI dataText;
 
+    public TextMeshProUGUI DataText => dataText;
+
     [SerializeField]
     private TextMeshProUGUI liveText;
 
-    [SerializeField]
-    private Button leftButton;
-
-    [SerializeField]
-    private Button rightButton;
+    public TextMeshProUGUI LiveText => liveText;
 
     [SerializeField]
     private List<Image> lineConnectors;
@@ -127,5 +132,16 @@ public class BTRuntimeViewNode : MonoBehaviour, INodeGuid
             Consts.NodeStatus.RUNNING => Color.yellow,
             _ => Color.white,
         };
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        viewOwner.InspectTooltip.gameObject.SetActive(true);
+        viewOwner.InspectTooltip.UpdateInspectTooltip(this);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        viewOwner.InspectTooltip.gameObject.SetActive(false);
     }
 }
