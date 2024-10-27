@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
+/// <summary>
+/// Trigger for controlling a single door
+/// </summary>
 public class DoorTrigger : MonoBehaviour
 {
     [SerializeField]
-    private DoorController controller;
+    private DoorwayController controller;
 
     [SerializeField]
     private string doorName;
@@ -23,16 +26,20 @@ public class DoorTrigger : MonoBehaviour
             if (other.CompareTag("Guard"))
                 return;
 
+        // If door is already in use register the agent as being there
+        // and then exit out, since the door is already open
         bool doorBeingUsed = controller.IsDoorBeingUsed(doorName);
         controller.AgentEnter(doorName);
         if (doorBeingUsed)
             return;
 
         controller.SwingDoor(doorName, swingAngle);
+
         Agent agent = other.GetComponent<Agent>();
         if (agent == null)
             return;
 
+        // Check if our agent is in chase (thief only) and play the corresponding door opening sound
         bool inChase = agent.AgentBlackboard.GetVariable<bool>("inChase");
         SoundInterest playSound;
         if (inChase)
@@ -50,6 +57,7 @@ public class DoorTrigger : MonoBehaviour
             if (other.CompareTag("Guard"))
                 return;
 
+        // Register the agent as leaving the door and don't continue if still used
         controller.AgentExit(doorName);
         if (controller.IsDoorBeingUsed(doorName))
             return;
@@ -63,8 +71,14 @@ public class DoorTrigger : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Place the supplied sound emitter at the location of this door and used a constraint to keep it there
+    /// </summary>
     private void PlaceDoorSound(SoundInterest doorSound)
     {
+        // The door sounds are per-agent and part of their hierarchy, so that every
+        // door doesn't need to have its own sound to take care of. Take the sound we're
+        // given and use a PositionConstraint to fix it to the position of this door
         PositionConstraint soundConstraint = doorSound.GetComponent<PositionConstraint>();
         if (soundConstraint.sourceCount == 0)
             soundConstraint.AddSource(new ConstraintSource());
@@ -74,6 +88,6 @@ public class DoorTrigger : MonoBehaviour
 
     private void Reset()
     {
-        controller = GetComponentInParent<DoorController>();
+        controller = GetComponentInParent<DoorwayController>();
     }
 }

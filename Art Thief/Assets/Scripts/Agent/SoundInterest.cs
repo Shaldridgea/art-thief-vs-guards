@@ -12,19 +12,13 @@ public class SoundInterest : SenseInterest
 
     public float TriggerRadius => trigger.radius;
 
-    [SerializeField]
-    private bool testing;
-
     public bool IsOngoing => trigger.enabled;
 
     private int sourceIndex;
 
-    // Start is called before the first frame update
     void Start()
     {
-        // Set our trigger to off by default
-        if(!testing)
-            trigger.enabled = false;
+        trigger.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other)

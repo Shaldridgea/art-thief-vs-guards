@@ -30,6 +30,7 @@ public abstract class Agent : MonoBehaviour
     protected float aggroAngle = 15f;
     public float AggroAngle => aggroAngle;
 
+    [Header("Audio")]
     [SerializeField]
     private SoundInterest walkingSound;
 
@@ -55,6 +56,7 @@ public abstract class Agent : MonoBehaviour
 
     private Coroutine attackCoroutine;
 
+    [Header("Agent Setup")]
     [SerializeField]
     private List<string> blackboardDefaults;
 
@@ -67,7 +69,6 @@ public abstract class Agent : MonoBehaviour
 
     public bool AgentActivated { get; protected set; }
 
-    // Start is called before the first frame update
     protected virtual void Start()
     {
         // Make a new blackboard for this agent
@@ -90,21 +91,8 @@ public abstract class Agent : MonoBehaviour
             if (bool.TryParse(right, out bool newBool))
                 AgentBlackboard.SetVariable(left, newBool);
             else
-            if (right.Contains("Vector3"))
-            {
-                int leftBracketIndex = right.IndexOf('(') + 1;
-                int rightBracketIndex = right.IndexOf(')');
-                string vectorValueString = right[leftBracketIndex..rightBracketIndex];
-                string[] vectorSplit = vectorValueString.Split(',');
-                float[] vectorComponents = new float[3];
-                for (int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
-                {
-                    if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
-                        vectorComponents[i] = vecComponent;
-                }
-                AgentBlackboard.SetVariable(left,
-                new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]));
-            }
+            if (Consts.ParseVector3(right, out Vector3 newVector))
+                AgentBlackboard.SetVariable(left, newVector);
             else
                 AgentBlackboard.SetVariable(left, right);
         }
@@ -118,14 +106,14 @@ public abstract class Agent : MonoBehaviour
     public void DeactivateAgent()
     {
         AgentActivated = false;
+        if(navAgent.hasPath)
+            navAgent.ResetPath();
     }
 
     /// <summary>
     /// Set an agent to move to a specified position
     /// </summary>
-    /// <param name="newPosition"></param>
-    /// <param name="updatePositionOnly"></param>
-    public void MoveAgent(Vector3 newPosition, bool updatePositionOnly = false)
+    public void MoveAgent(Vector3 newPosition)
     {
         navAgent.updatePosition = true;
         navAgent.updateRotation = true;
@@ -142,11 +130,9 @@ public abstract class Agent : MonoBehaviour
     }
 
     /// <summary>
-    /// Set an agent to move along a path
+    /// Set an agent to move along a NavMesh path
     /// </summary>
-    /// <param name="newPath"></param>
-    /// <param name="updatePositionOnly"></param>
-    public void MoveAgent(NavMeshPath newPath, bool updatePositionOnly = false)
+    public void MoveAgent(NavMeshPath newPath)
     {
         navAgent.updatePosition = true;
         navAgent.updateRotation = true;
@@ -178,7 +164,10 @@ public abstract class Agent : MonoBehaviour
 
     public void TurnHeadToPoint(Vector3 targetPoint, float time)
     {
-        float lookAngle = Vector3.SignedAngle((targetPoint - AgentView.AgentHeadRoot.position).normalized, AgentView.AgentRoot.forward, Vector3.up);
+        float lookAngle = Vector3.SignedAngle(
+            (targetPoint - AgentView.AgentHeadRoot.position).normalized,
+            AgentView.AgentRoot.forward,
+            Vector3.up);
         TurnHead(lookAngle, time);
     }
 
@@ -193,7 +182,10 @@ public abstract class Agent : MonoBehaviour
 
     public void TurnBodyToPoint(Vector3 targetPoint, float time)
     {
-        float lookAngle = Vector3.SignedAngle(AgentView.AgentRoot.forward, (targetPoint - AgentView.AgentRoot.position).normalized, Vector3.up);
+        float lookAngle = Vector3.SignedAngle(
+            AgentView.AgentRoot.forward,
+            (targetPoint - AgentView.AgentRoot.position).normalized,
+            Vector3.up);
         TurnBody(lookAngle, time);
     }
 
@@ -205,6 +197,7 @@ public abstract class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
+    #region ATTACKING
     public virtual bool CanAttackEnemy()
     {
         return !AgentBlackboard.GetVariable<bool>("isInteracting");
@@ -257,13 +250,17 @@ public abstract class Agent : MonoBehaviour
         b.navAgent.velocity = Vector3.zero;
         b.AgentBlackboard.SetVariable("attackingAgent", a);
 
+        // Push our agents together because they might be a
+        // bit far from each other when the animation starts
         Vector3 toA = (a.transform.position - b.transform.position);
         Vector3 toB = (b.transform.position - a.transform.position);
         Vector3 midPoint = a.transform.position + toB / 2f;
         a.transform.position = midPoint + toA.normalized * 0.4f;
         b.transform.position = midPoint + toB.normalized * 0.4f;
     }
+    #endregion
 
+    #region STRUGGLE ANIMATION
     private IEnumerator EnumerateStruggleSequence(bool isWinner)
     {
         PlayStrugglingAnimation(!isWinner);
@@ -293,6 +290,13 @@ public abstract class Agent : MonoBehaviour
             LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 0.5f).setDelay(0.4f);
     }
 
+    public void PlayWakeupAnimation()
+    {
+        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 1f);
+    }
+    #endregion
+
+    #region TACKLE ANIMATION
     private IEnumerator EnumerateTackleSequence(bool isWinner)
     {
         PlayTackleAnimation(isWinner);
@@ -309,10 +313,20 @@ public abstract class Agent : MonoBehaviour
     {
         LeanTween.rotateX(AgentView.AgentRoot.gameObject, isWinner ? 70f : 90f, 1.5f).setEaseInElastic();
     }
+    #endregion
 
-    public void PlayWakeupAnimation()
+    private void OnTriggerEnter(Collider other)
     {
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 1f);
+        if (other.CompareTag("Room"))
+            if (other.TryGetComponent(out Room room))
+                roomList.Add(room);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Room"))
+            if (other.TryGetComponent(out Room room))
+                roomList.Remove(room);
     }
 
     protected virtual void OnDrawGizmosSelected()
@@ -328,19 +342,5 @@ public abstract class Agent : MonoBehaviour
                 Gizmos.DrawLine(start, end);
             }
         }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Room"))
-            if(other.TryGetComponent(out Room room))
-                roomList.Add(room);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Room"))
-            if (other.TryGetComponent(out Room room))
-                roomList.Remove(room);
     }
 }

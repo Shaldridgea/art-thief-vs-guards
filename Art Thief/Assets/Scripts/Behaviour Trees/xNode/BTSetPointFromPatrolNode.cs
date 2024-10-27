@@ -11,7 +11,7 @@ public class BTSetPointFromPatrolNode : BTActionNode
     private Consts.PatrolPathType pathType;
 
     [SerializeField]
-    private Consts.PatrolPointType pointType;
+    private Consts.PatrolGetType pointType;
 
     [SerializeField]
     private string variableName;

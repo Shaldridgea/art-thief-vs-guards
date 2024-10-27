@@ -12,7 +12,7 @@ public class AttackAction : UtilityAction
 
     public override void EnterAction(ThiefAgent thief)
     {
-        // Find nearest guard we're looking at to attack
+        // Find nearest valid guard we're looking at to attack
         var guards = thief.ThiefSenses.AwareGuards;
         float beatDistance = float.MaxValue;
         foreach(var g in guards)
@@ -20,14 +20,19 @@ public class AttackAction : UtilityAction
             if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
                 continue;
 
-            float angleToGuard = Vector3.Angle(thief.transform.forward, (g.transform.position - thief.transform.position).normalized);
+            float angleToGuard = Vector3.Angle(thief.transform.forward,
+                    (g.transform.position - thief.transform.position).normalized);
+
             if (angleToGuard <= thief.AggroAngle)
             {
                 float distanceToGuard = Vector3.Distance(thief.transform.position, g.transform.position);
-                if(distanceToGuard <= beatDistance)
+                if (distanceToGuard <= thief.AggroRadius)
                 {
-                    beatDistance = distanceToGuard;
-                    targetGuard = g;
+                    if (distanceToGuard <= beatDistance)
+                    {
+                        beatDistance = distanceToGuard;
+                        targetGuard = g;
+                    }
                 }
             }
         }
@@ -47,7 +52,7 @@ public class AttackAction : UtilityAction
 
     public override void ExitAction(ThiefAgent thief)
     {
-        // Warp agents back to actual position as they drift when the animation starts
+        // Warp NavAgents back to actual position as they can drift when the animation starts
         thief.NavAgent.Warp(thief.transform.position);
 
         if (targetGuard != null)

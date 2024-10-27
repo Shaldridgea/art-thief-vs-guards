@@ -5,12 +5,15 @@ using UnityEngine;
 public class VisualInterest : SenseInterest
 {
     [SerializeField]
+    [Tooltip("Mask for lighting LOS checks to see whether we're illuminated by a light")]
     private LayerMask raycastMask;
 
     [SerializeField]
+    [Tooltip("Turn on to track whether we are moving about or not. Use this for interests that will be moving themselves")]
     private bool trackMovement;
 
     [SerializeField]
+    [Tooltip("Turn on to track our illumination in lights every frame or not. Use this for interests that move around a lot")]
     private bool trackDynamicLighting;
 
     public bool IsMoving { get; private set; }
@@ -29,8 +32,14 @@ public class VisualInterest : SenseInterest
         }
     }
 
+    /// <summary>
+    /// Lights that this interest is inside of
+    /// </summary>
     private List<Light> lightSources = new();
 
+    /// <summary>
+    /// Map of whether a light is able to illuminate this interest
+    /// </summary>
     private Dictionary<Light, bool> lightVisibleMap = new();
 
     private bool checkLightingNextUpdate;
@@ -40,8 +49,7 @@ public class VisualInterest : SenseInterest
         lightSources.Add(newSource);
         lightVisibleMap.Add(newSource, false);
 
-        if (!trackDynamicLighting)
-            checkLightingNextUpdate = true;
+        checkLightingNextUpdate = true;
     }
 
     public void ExitedLight(Light newSource)
@@ -51,8 +59,7 @@ public class VisualInterest : SenseInterest
         lightSources.Remove(newSource);
         lightVisibleMap.Remove(newSource);
 
-        if (!trackDynamicLighting)
-            checkLightingNextUpdate = true;
+        checkLightingNextUpdate = true;
     }
 
     private void FixedUpdate()
@@ -66,6 +73,9 @@ public class VisualInterest : SenseInterest
             else
                 IsMoving = false;
 
+        // Track dynamic lighting means we check if we're illuminated every frame no matter what.
+        // checkLightingNextUpdate is set every time we enter or exit a light collider
+        // and only does one check for being illuminated, since every frame doesn't matter for us
         if (trackDynamicLighting || checkLightingNextUpdate)
         {
             foreach (var l in lightSources)

@@ -32,6 +32,9 @@ public abstract class BTGraphNode : Node, INodeGuid
     /// </summary>
     public abstract bool IsLeaf { get; }
 
+    /// <summary>
+    /// Get the data parameters of this node
+    /// </summary>
     public abstract NodeParameter[] GetParameters();
 
     public void UpdateName<T>(T myType)
@@ -39,7 +42,10 @@ public abstract class BTGraphNode : Node, INodeGuid
         name = SpacedCapitalisation(myType.ToString());
     }
 
-    private string SpacedCapitalisation(string startString)
+    /// <summary>
+    /// Converts a string to have spaces before each capitalised letter
+    /// </summary>
+    public string SpacedCapitalisation(string startString)
     {
         List<char> wordList = new List<char>(startString.ToCharArray());
         int i = 0;
@@ -52,7 +58,7 @@ public abstract class BTGraphNode : Node, INodeGuid
         return new string(wordList.ToArray());
     }
 
-    public string GetBehaviourTypeText() => $"Type: {type.ToString()}";
+    public string GetBehaviourTypeText() => $"Type: {type}";
 
     public virtual string GetNodeDetailsText()
     {

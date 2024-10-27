@@ -8,10 +8,6 @@ public class BehaviourTree
 
     public Blackboard GlobalBlackboard { get; private set; }
 
-    protected BehaviourNode rootNode;
-
-    public BehaviourNode RootNode => rootNode;
-
     public Dictionary<BTGraphNode, BehaviourNode> NodeMap { get; private set; }
 
     public BTGraph GraphSource { get; private set; }
@@ -19,6 +15,8 @@ public class BehaviourTree
     public delegate void NodeDelegate(BehaviourNode node);
 
     public event NodeDelegate NodeRanEvent;
+
+    protected BehaviourNode rootNode;
 
     protected Stack<BehaviourNode> runningStack;
 
@@ -55,10 +53,10 @@ public class BehaviourTree
         {
             BehaviourNode currentRunning = runningStack.Peek();
 
-            Debug.Assert(currentRunning.Status == Consts.NodeStatus.RUNNING, "Top of running stack does not have a status of RUNNING");
+            Debug.Assert(currentRunning.Status == Consts.NodeStatus.RUNNING,
+                "Top of running stack does not have a status of RUNNING");
 
-            Consts.NodeStatus currentNewStatus = currentRunning.Tick();
-            if (currentNewStatus == Consts.NodeStatus.RUNNING)
+            if (currentRunning.Tick() == Consts.NodeStatus.RUNNING)
                 return;
         }
 
@@ -77,6 +75,9 @@ public class BehaviourTree
 
     public void DeregisterMonitoringNode(BehaviourNode oldNode) => monitoringList.Remove(oldNode);
 
+    /// <summary>
+    /// Interrupt our tree and terminate running stack until the interrupting node is currently running
+    /// </summary>
     public void Interrupt(BehaviourNode interruptSource)
     {
         while(runningStack.Count > 0)

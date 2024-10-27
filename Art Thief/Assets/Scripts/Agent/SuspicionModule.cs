@@ -8,6 +8,12 @@ public class SuspicionModule : MonoBehaviour
     [Tooltip("How long in seconds for a suspicious thing to be spotted")]
     private float reactionTimerMax;
 
+    [SerializeField]
+    private float awarenessMinDistance = 5f;
+
+    [SerializeField]
+    private float awarenessMaxDistance = 20f;
+
     private float reactionTimer;
 
     private Dictionary<SenseInterest, (bool Visible, float Awareness)> visualSuspectMap = new();
@@ -22,7 +28,6 @@ public class SuspicionModule : MonoBehaviour
 
     private bool IsChasing => owner.AgentBlackboard.GetVariable<string>("guardMode") == "chase";
 
-    // Start is called before the first frame update
     void Start()
     {
         reactionTimer = -1f;
@@ -30,9 +35,9 @@ public class SuspicionModule : MonoBehaviour
             owner = myAgent;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // Check reaction when our timer hits zero, but not after
         bool checkReaction = false;
         if (reactionTimer == 0f)
         {
@@ -51,37 +56,48 @@ public class SuspicionModule : MonoBehaviour
             var suspectValues = visualSuspectMap[key];
             float compareAware = suspectValues.Awareness;
 
-            // Awareness delta is how fast the guard becomes aware/suspicious of something
-            // 1 is the baseline of taking 1 second to become aware
-            // 2 would take 2 seconds, 0.5 would be half a second etc.
-            float awarenessDelta = 0.5f;
-            // Add more time to awareness if we're in peripheral vision
-            if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
-                awarenessDelta += 1f;
+            // Calculate our new awareness to increase by if interest is visible
+            if (suspectValues.Visible)
+            {
+                // Awareness delta is how fast the guard becomes aware/suspicious of something
+                // 1 is the baseline of taking 1 second to become aware
+                // 2 would take 2 seconds, 0.5 would be half a second etc.
+                float awarenessDelta = 0.5f;
+                // Add more time to awareness if interest is in peripheral vision
+                if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
+                    awarenessDelta += 1f;
 
-            // Change awareness factor based on distance
-            awarenessDelta *= Mathf.Lerp(0.25f, 1.5f,
-                Mathf.InverseLerp(5f, 20f,
-                Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
+                // Mutiply awareness factor based on distance
+                awarenessDelta *= Mathf.Lerp(0.25f, 1.5f,
+                    Mathf.InverseLerp(awarenessMinDistance, awarenessMaxDistance,
+                    Vector3.Distance(transform.position.ZeroY(), key.transform.position.ZeroY())));
 
-            VisualInterest visual = (key as VisualInterest);
+                VisualInterest visual = (key as VisualInterest);
 
-            // Reduce the reaction time if the visual interest is moving
-            if (visual.IsMoving)
-                awarenessDelta *= 0.5f;
+                // Reduce the reaction time if the visual interest is moving
+                if (visual.IsMoving)
+                    awarenessDelta *= 0.5f;
 
-            // Change awareness factor to take 3 times as long if interest is in the dark
-            if (!visual.IsLitUp)
-                awarenessDelta *= 3f;
+                // Multiply awareness factor to take 3 times as long if interest is in the dark
+                if (!visual.IsLitUp)
+                    awarenessDelta *= 3f;
 
-            suspectValues.Awareness =
-                Mathf.Clamp(suspectValues.Awareness +
-                (Time.deltaTime / (suspectValues.Visible ? awarenessDelta : -1f)), 0f, 2f);
+                // Clamp our awareness so we don't react too fast or too slow
+                awarenessDelta = Mathf.Clamp(awarenessDelta, 0.3f, 3f);
+
+                // Increase our awareness of this interest over time
+                suspectValues.Awareness =
+                    Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime / awarenessDelta), 0f, 2f);
+            }
+            else // Reduce awareness over a second if interest isn't visible
+                suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime / -1f), 0f, 2f);
 
             visualSuspectMap[key] = suspectValues;
 
             if(suspectValues.Awareness >= 1f)
             {
+                // If our awareness is over 1 and was previously under 1
+                // then this is our new current suspicion, start reacting
                 if (compareAware < 1f)
                 {
                     SetSuspicion(key);
@@ -89,22 +105,27 @@ public class SuspicionModule : MonoBehaviour
                     break;
                 }
             }
+        }
 
-            if (currentSuspicion == key)
+        if (currentSuspicion != null && currentSuspicion is VisualInterest)
+        {
+            // Confirm our suspicion as soon as it hits 2
+            if (visualSuspectMap[currentSuspicion].Awareness >= 2f)
             {
-                if (suspectValues.Awareness >= 2f)
-                {
-                    owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
-                    shouldResetInterest = true;
-                }
-                else if (checkReaction)
-                {
-                    owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
-                    shouldResetInterest = true;
-                }
+                owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
+                shouldResetInterest = true;
+            }
+            else if (checkReaction)
+            {
+                // If our awareness hasn't reached 2 when the
+                // timer stops, our suspicion is unconfirmed
+                owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
+                shouldResetInterest = true;
             }
         }
 
+        // Sound interests can never be truly confirmed, as the guard is more interested
+        // in what caused the sound, so when reaction runs out we're unconfirmed
         if (checkReaction)
             if (currentSuspicion is SoundInterest)
             {
@@ -128,6 +149,9 @@ public class SuspicionModule : MonoBehaviour
             ignoreList.Add(newInterest);
     }
     
+    /// <summary>
+    /// Cull visual suspects that aren't relevant or in use, and reset our current suspicion
+    /// </summary>
     private void CullSuspects()
     {
         if (currentSuspicion is VisualInterest)
@@ -135,6 +159,7 @@ public class SuspicionModule : MonoBehaviour
             for (int i = visualSuspectList.Count - 1; i >= 0; --i)
             {
                 var key = visualSuspectList[i];
+                // Cull interest if it's not visible and we're not aware of it
                 if (!visualSuspectMap[key].Visible && visualSuspectMap[key].Awareness == 0f)
                 {
                     visualSuspectList.RemoveAt(i);
@@ -154,8 +179,10 @@ public class SuspicionModule : MonoBehaviour
         if (ignoreList.Contains(newInterest))
             return false;
 
-        if (currentSuspicion == null || currentSuspicion.Priority <= newInterest.Priority)
+        // If we have no suspicion right now or this new suspicion is higher/equal priority
+        if (currentSuspicion == null || newInterest.Priority >= currentSuspicion.Priority)
         {
+            // Immediately set our suspicion if its a sound interest
             if (suspicionType == Consts.SuspicionType.Sound)
             {
                 SetSuspicion(newInterest);
@@ -163,6 +190,7 @@ public class SuspicionModule : MonoBehaviour
             }
             else
             {
+                // Add/update a visual interest as being visible
                 if (visualSuspectMap.TryGetValue(newInterest, out var value))
                 {
                     value.Visible = true;
@@ -190,6 +218,9 @@ public class SuspicionModule : MonoBehaviour
         visualSuspectMap[lostInterest] = value;
     }
 
+    /// <summary>
+    /// Get whether the last heard sound was made by the thief and is still playing
+    /// </summary>
     public bool IsThiefHeard()
     {
         SoundInterest sound = owner.AgentBlackboard.GetVariable<SoundInterest>("lastHeardSound");

@@ -4,6 +4,9 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Grid layout for Behaviour Tree graphs at runtime, based on Unity's GridLayoutGroup
+/// </summary>
 public class BTGridBasedGraph : MonoBehaviour
 {
     [SerializeField]
@@ -38,6 +41,9 @@ public class BTGridBasedGraph : MonoBehaviour
         Debug.Log(gridRect);
     }
     
+    /// <summary>
+    /// Process every node in the current view and calculate its position in the graph
+    /// </summary>
     private void ProcessNodes(BTRuntimeView viewOwner, ref Rect gridRect)
     {
         Dictionary<Vector2, Guid> posGuidMap = new();
@@ -47,7 +53,9 @@ public class BTGridBasedGraph : MonoBehaviour
             Guid nodeGuid = viewOwner.AllNodesList[i];
             BTGraphNode sourceNode = viewOwner.GetDataNode(nodeGuid);
 
-            Vector2 gridPos = new(Mathf.Ceil(sourceNode.position.x / snapSize.x), Mathf.Ceil(sourceNode.position.y / snapSize.y));
+            Vector2 gridPos = new(
+                Mathf.Ceil(sourceNode.position.x / snapSize.x),
+                Mathf.Ceil(sourceNode.position.y / snapSize.y));
 
             // Set the outer extents of our grid if the node position changes it
             if (gridRect.xMin == float.MaxValue)
@@ -91,7 +99,7 @@ public class BTGridBasedGraph : MonoBehaviour
     }
 
     /// <summary>
-    /// Evaluates the nodes in the grid and pushes them towards the middle to save unused space
+    /// Evaluate the nodes in the grid and push them towards the middle to save unused space
     /// </summary>
     /// <returns>The updated smaller Rect grid</returns>
     private Rect OptimiseGrid(BTRuntimeView viewOwner, Rect gridRect)
@@ -137,7 +145,7 @@ public class BTGridBasedGraph : MonoBehaviour
         int verticalSort(BTRuntimeViewNode x, BTRuntimeViewNode y) => x.GridPosition.y.CompareTo(y.GridPosition.y);
         int horizontalSort(BTRuntimeViewNode x, BTRuntimeViewNode y) => x.GridPosition.x.CompareTo(y.GridPosition.x);
 
-        // Sort our lists to go from closest to furthest from middle
+        // Sort our node lists to go from closest to furthest from middle
         topNodes.Sort(verticalSort);
         topNodes.Reverse();
         bottomNodes.Sort(verticalSort);
@@ -225,6 +233,9 @@ public class BTGridBasedGraph : MonoBehaviour
         return gridRect;
     }
 
+    /// <summary>
+    /// Set the actual UI node's position in the graph according to the grid, and update their visuals
+    /// </summary>
     private void UpdateGraphVisuals(BTRuntimeView viewOwner, Rect gridRect)
     {
         gridRect.size += Vector2.one;
@@ -239,9 +250,8 @@ public class BTGridBasedGraph : MonoBehaviour
             Vector2 adjustedGridPosition = (posDiff - gridRect.size / 2f) * cellSize;
             // Set our position in UI space, adjusting for spacing,
             // keeping in mind that UI elements expand out from the middle
-            (viewNode.transform as RectTransform).anchoredPosition = (adjustedGridPosition
-                + posDiff * spacing
-                - (gridRect.size * spacing / 2f))
+            (viewNode.transform as RectTransform).anchoredPosition =
+                (adjustedGridPosition + posDiff * spacing - (gridRect.size * spacing / 2f))
                 * new Vector2(1f, -1f); // Flip our y coords because Unity UI is y-up
 
             viewOwner.UpdateNodeView(viewNode);

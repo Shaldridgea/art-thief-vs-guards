@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Pooling class for GameObjects that have the passed component type
+/// </summary>
 public class GameObjectPool<T>
 {
     private List<T> returnList;
@@ -22,6 +25,7 @@ public class GameObjectPool<T>
         {
             GameObject newObject = GameObject.Instantiate(templateObject);
             newObject.SetActive(false);
+            newObject.transform.SetAsLastSibling();
             returnList.Add(newObject.GetComponent<T>());
             objectList.Add(newObject);
         }
@@ -59,6 +63,9 @@ public class GameObjectPool<T>
         return returnTarget;
     }
 
+    /// <summary>
+    /// Reset the internal counter for getting from the pool, starting from the top again
+    /// </summary>
     public void ResetCounter()
     {
         getIndex = 0;

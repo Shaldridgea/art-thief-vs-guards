@@ -9,7 +9,7 @@ public class ParameterBox : MonoBehaviour, IPointerEnterHandler
     private StartScreen startScreen;
 
     [SerializeField]
-    private StartScreen.CameraFocus boxFocus;
+    private StartScreen.OptionFocus boxFocus;
 
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {

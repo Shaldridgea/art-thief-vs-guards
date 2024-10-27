@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Container for a Dictionary of string-object pairs to generically store values by name
+/// </summary>
 public class Blackboard
 {
     private Dictionary<string, object> variablesDict = new Dictionary<string, object>();

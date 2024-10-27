@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6c68a82400ec70b4ba04be4a9c1b0dbe
+guid: 85f22da2398eca847bad6567da600287
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -12,8 +12,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: RK_chrome
-    second: {fileID: 2100000, guid: e48adcb0fc7cccc4db4835fc741b67df, type: 2}
+      name: Metal
+    second: {fileID: 2100000, guid: b2128c76940556b4e999ca1d3e5d0e28, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -45,13 +45,13 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.1
+    globalScale: 0.22
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importVisibility: 0
-    importBlendShapes: 1
+    importBlendShapes: 0
     importCameras: 0
     importLights: 0
     nodeNameCollisionStrategy: 1
@@ -77,6 +77,7 @@ ModelImporter:
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -98,7 +99,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.1
+    globalScale: 0.22
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

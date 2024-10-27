@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles senses for seeing and hearing, sensing visual/audio interests
+/// </summary>
 public abstract class SensoryModule : MonoBehaviour
 {
     [SerializeField]
@@ -22,8 +25,6 @@ public abstract class SensoryModule : MonoBehaviour
     private Dictionary<SenseInterest, int> entryCountMap = new();
 
     private Dictionary<GameObject, bool> centralVisionMap = new();
-
-    private float losCheckTimer;
 
     public delegate void SenseDelegate(SenseInterest interest);
 
@@ -47,6 +48,8 @@ public abstract class SensoryModule : MonoBehaviour
 
     protected float losTimer;
 
+    private float losCheckTimer;
+
     protected virtual void Start()
     {
         owner = GetComponent<Agent>();
@@ -60,9 +63,11 @@ public abstract class SensoryModule : MonoBehaviour
     public bool IsSoundHeard(SenseInterest sound)
     {
         // We model sound being muffled by first checking if we'd be
-        // beyond the sound radius were it 30% smaller
-        // and if we are, check if there's an object obstructing the sound
-        float distanceToSound = Vector3.Distance(sound.transform.position.ZeroY(), owner.AgentView.AgentHeadRoot.position.ZeroY());
+        // beyond the sound radius were it 30% smaller, and if we are,
+        // check if there's an object obstructing the sound
+        float distanceToSound = Vector3.Distance(sound.transform.position.ZeroY(),
+            owner.AgentView.AgentHeadRoot.position.ZeroY());
+
         if (distanceToSound > (sound as SoundInterest).TriggerRadius * 0.7f)
         {
             if (Physics.Linecast(sound.transform.position, owner.AgentView.AgentHeadRoot.position,
@@ -78,12 +83,21 @@ public abstract class SensoryModule : MonoBehaviour
         SoundHeard?.Invoke(sound);
     }
 
+    /// <summary>
+    /// Makes a line of sight check from the agent's eye point to the target position.
+    /// Does not take into account whether the agent is facing the target
+    /// </summary>
     public bool IsInLOS(Vector3 checkPosition)
     {
         return !Physics.Linecast(checkPosition,
             owner.AgentView.AgentEyeRoot.position, losMask, QueryTriggerInteraction.Collide);
     }
 
+    /// <summary>
+    /// Checks whether the target position is within the agent's viewing angle
+    /// as well as doing a line of sight check from the eye point
+    /// </summary>
+    /// <param name="agentForward">Optional override for the agent's facing direction for the check</param>
     public bool IsSeen(Vector3 checkPosition, Vector3 agentForward = default)
     {
         if (agentForward == default)
@@ -99,6 +113,9 @@ public abstract class SensoryModule : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Whether an interest is detected to be in the centre of our vision rather than peripheral
+    /// </summary>
     public bool IsInCentralVision(GameObject interest) => centralVisionMap.TryGetValue(interest, out bool value) ? value : false;
 
     public virtual void NotifyVisualFound(SenseInterest visual)
@@ -111,11 +128,16 @@ public abstract class SensoryModule : MonoBehaviour
         VisualLost?.Invoke(visual);
     }
 
+    /// <summary>
+    /// Handles checking whether an object that has entered a vision cone is a VisualInterest and keeping track
+    /// </summary>
+    /// <param name="origin">Vision cone that detected the object</param>
     private void HandleVisionEnter(VisionCone origin, GameObject other)
     {
         if (other.TryGetComponent(out VisualInterest visualInterest))
             if (!inConeObjects.Contains(visualInterest))
             {
+                // Initialise data about this object if it wasn't in cones already
                 inConeObjects.Add(visualInterest);
                 visibilityMap[visualInterest] = false;
                 centralVisionMap[other] = origin.IsCentralVision;
@@ -129,6 +151,10 @@ public abstract class SensoryModule : MonoBehaviour
             }
     }
 
+    /// <summary>
+    /// Handles checking whether an object that has exited a vision cone is a VisualInterest and keeping track
+    /// </summary>
+    /// <param name="origin">Vision cone that detected the object</param>
     private void HandleVisionExit(VisionCone origin, GameObject other)
     {
         if (other.TryGetComponent(out VisualInterest visualInterest))
@@ -154,13 +180,14 @@ public abstract class SensoryModule : MonoBehaviour
         if (!owner.AgentActivated)
             return;
 
+        // Make checks for every visual interest within our vision cones
+        // for whether they're visible via line of sight
         if (losCheckTimer <= 0f)
         {
             for (int i = 0; i < inConeObjects.Count; ++i)
             {
                 SenseInterest target = inConeObjects[i];
-                bool isSeen = !Physics.Linecast(owner.AgentView.AgentEyeRoot.position, target.transform.position,
-                    losMask.value, QueryTriggerInteraction.Collide);
+                bool isSeen = IsInLOS(target.transform.position);
 
                 if (!visibilityMap[target] && isSeen)
                     NotifyVisualFound(target);
@@ -176,6 +203,9 @@ public abstract class SensoryModule : MonoBehaviour
             losCheckTimer -= Time.fixedDeltaTime;
     }
 
+    /// <summary>
+    /// Find nearby interest objects that have the supplied tag
+    /// </summary>
     protected List<GameObject> FindNearbyInterests(string interestTag)
     {
         Collider[] nearbyInterests =

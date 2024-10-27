@@ -29,10 +29,8 @@ public class Repeat : Decorator
         {
             if (Status == Consts.NodeStatus.RUNNING)
             {
-                // If we're running then it's either because our child node is running
-                // and doing something that we were waiting on,
-                // OR because our child node didn't give the result we wanted, so we're
-                // still checking till it does
+                // If we're running then it's either because our child node was running
+                // OR because our child node didn't give the SUCCESS/FAILURE result we wanted
                 if (childNode.Status != Consts.NodeStatus.RUNNING && setRunningByChild)
                     status = childNode.Status;
                 else
@@ -65,6 +63,7 @@ public class Repeat : Decorator
 
                 if (status == Consts.NodeStatus.RUNNING)
                     break;
+
                 ++repeatCounter;
             }
         }

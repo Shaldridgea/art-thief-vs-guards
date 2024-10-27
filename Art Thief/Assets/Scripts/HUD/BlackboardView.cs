@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Runtime view of agent's Blackboard data
+/// </summary>
 public class BlackboardView : MonoBehaviour
 {
     [SerializeField]
@@ -37,6 +40,7 @@ public class BlackboardView : MonoBehaviour
         var allData = board.GetData();
 
         int i = 0;
+        // Update all our blackboard UI entries
         foreach(var d in allData)
         {
             // Create new UI boxes for entries if there's less than we need

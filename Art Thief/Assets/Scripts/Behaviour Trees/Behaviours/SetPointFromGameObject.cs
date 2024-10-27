@@ -22,10 +22,10 @@ public class SetPointFromGameObject : BehaviourNode
     {
         Consts.NodeStatus status = Consts.NodeStatus.FAILURE;
 
-        GameObject targetGobject = board.GetVariable<GameObject>(objectKey);
-        if(targetGobject != null)
+        GameObject targetObject = board.GetVariable<GameObject>(objectKey);
+        if(targetObject != null)
         {
-            board.SetVariable(pointKey, targetGobject.transform.position);
+            board.SetVariable(pointKey, targetObject.transform.position);
             status = Consts.NodeStatus.SUCCESS;
         }
 

@@ -73,7 +73,7 @@ public class BTRuntimeViewNode : MonoBehaviour, INodeGuid, IPointerEnterHandler,
             liveText.text = logicNode.GetLiveVisualsText();
     }
 
-    public void SetLineConnectorVisuals(int lineIndex, BTRuntimeViewNode connectToNode, Vector2 gridCellSize, Vector2 gridSpacing)
+    public void SetLineConnectorVisuals(int lineIndex, BTRuntimeViewNode connectToNode, BTGridBasedGraph gridGraph)
     {
         Image lineImage;
         if (lineIndex < lineConnectors.Count)
@@ -85,18 +85,21 @@ public class BTRuntimeViewNode : MonoBehaviour, INodeGuid, IPointerEnterHandler,
         }
 
         // Do grid math to find our start and end positions for the line
-        Vector2 startPoint = GridPosition * gridCellSize;
-        Vector2 endPoint = connectToNode.GridPosition * gridCellSize;
-        startPoint += new Vector2(gridCellSize.x / 2f, 0f);
-        endPoint -= new Vector2(gridCellSize.x / 2f, 0f);
-        endPoint.x += gridSpacing.x * Mathf.Abs(connectToNode.GridPosition.x - GridPosition.x);
+        Vector2 cellSize = gridGraph.CellSize;
+        Vector2 spacing = gridGraph.Spacing;
+
+        Vector2 startPoint = GridPosition * cellSize;
+        Vector2 endPoint = connectToNode.GridPosition * cellSize;
+        startPoint += new Vector2(cellSize.x / 2f, 0f);
+        endPoint -= new Vector2(cellSize.x / 2f, 0f);
+        endPoint.x += spacing.x * Mathf.Abs(connectToNode.GridPosition.x - GridPosition.x);
 
         // Maths for spacing between vertical nodes
         float gridHeightDiff = Mathf.Abs(connectToNode.GridPosition.y - GridPosition.y);
         if (endPoint.y > startPoint.y)
-            endPoint.y += gridSpacing.y * gridHeightDiff;
+            endPoint.y += spacing.y * gridHeightDiff;
         else
-            endPoint.y -= gridSpacing.y * gridHeightDiff;
+            endPoint.y -= spacing.y * gridHeightDiff;
 
         if (!lineImage.gameObject.activeSelf)
             lineImage.gameObject.SetActive(true);

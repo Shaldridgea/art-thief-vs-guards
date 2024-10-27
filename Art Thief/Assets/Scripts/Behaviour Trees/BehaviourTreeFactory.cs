@@ -5,8 +5,6 @@ using XNode;
 
 public static class BehaviourTreeFactory
 {
-    private static int processedNodes = 0;
-
     public static BehaviourTree MakeTree(BTGraph graph, Agent owner)
     {
         Stack<BehaviourNode> nodeStack = new Stack<BehaviourNode>();
@@ -14,24 +12,23 @@ public static class BehaviourTreeFactory
         var nodes = graph.nodes;
         Dictionary<BTGraphNode, BehaviourNode> nodeMap = new Dictionary<BTGraphNode, BehaviourNode>();
 
-        BTGraphNode node = (BTGraphNode)nodes.Find(n => n.GetInputPort("parentNode").ConnectionCount == 0);
-        currentTree.SetRoot(ProcessNode(node, currentTree, nodeStack, nodeMap));
+        // Find the root node, which is the only node with no input connections
+        BTGraphNode rootNode = (BTGraphNode)nodes.Find(n => n.GetInputPort("parentNode").ConnectionCount == 0);
+        currentTree.SetRoot(ProcessNode(rootNode, currentTree, nodeStack, nodeMap));
         currentTree.SetNodeMap(nodeMap);
         currentTree.SetGraph(graph);
 
         if(nodeStack.Count != 0)
             Debug.Log("Stack wasn't processed correctly");
-        Debug.Log("Processed nodes: " + processedNodes);
         Debug.Log("Nodes length: " + nodes.Count);
-        processedNodes = 0;
         return currentTree;
     }
 
     private static BehaviourNode ProcessNode(BTGraphNode nextNode, BehaviourTree tree, Stack<BehaviourNode> stack,
     Dictionary<BTGraphNode, BehaviourNode> map, NodePort outputSource = null)
     {
-        // Check if we already have a BehaviourNode instance that
-        // maps to this graph node, otherwise make a new one
+        // Check if this source node already has its
+        // BehaviourNode cached, otherwise make a new one
         BehaviourNode thisNode;
         bool alreadyCached = false;
         if (map.TryGetValue(nextNode, out BehaviourNode cachedNode))
@@ -43,14 +40,15 @@ public static class BehaviourTreeFactory
         {
             thisNode = CreateBehaviourInstance(nextNode, tree);
             map.Add(nextNode, thisNode);
-            ++processedNodes;
         }
 
         Debug.Assert(thisNode != null, $"BehaviourTreeFactory node instance wasn't found: {nextNode.BehaviourType}");
 
+        // Add children nodes to their parents
         if (stack.Count > 0)
             stack.Peek().AddChild(thisNode, outputSource.fieldName);
 
+        // Recurse through output connections
         if (!nextNode.IsLeaf && !alreadyCached)
         {
             stack.Push(thisNode);
@@ -68,122 +66,37 @@ public static class BehaviourTreeFactory
 
     private static BehaviourNode CreateBehaviourInstance(BTGraphNode dataNode, BehaviourTree tree)
     {
-        BehaviourNode newNode = null;
-        switch (dataNode.BehaviourType)
+        return dataNode.BehaviourType switch
         {
-            case Consts.BehaviourType.Sequence:
-                newNode = new Sequence(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Selector:
-                newNode = new Selector(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Repeat:
-                newNode = new Repeat(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Invert:
-                newNode = new Invert(tree);
-            break;
-
-            case Consts.BehaviourType.ForceSuccess:
-                newNode = new ForceSuccess(tree);
-            break;
-
-            case Consts.BehaviourType.RandomChance:
-                newNode = new RandomChance(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Monitor:
-                newNode = new Monitor(tree);
-            break;
-
-            case Consts.BehaviourType.SetVariable:
-                newNode = new SetVariable(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Wait:
-                newNode = new Wait(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Condition:
-                newNode = new Condition(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.HasArrived:
-                newNode = new HasArrived(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.MoveToPoint:
-                newNode = new MoveToPoint(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.SetPointFromPatrol:
-                newNode = new SetPointFromPatrol(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.Cooldown:
-                newNode = new Cooldown(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.StoreVisibleInterests:
-                newNode = new StoreVisibleInterests(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.SetRandomInterest:
-                newNode = new SetRandomInterest(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.SetPointFromGameObject:
-                newNode = new SetPointFromGameObject(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.StopMoving:
-                newNode = new StopMoving(tree);
-            break;
-
-            case Consts.BehaviourType.TurnHead:
-                newNode = new TurnHead(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.IsTurningHead:
-                newNode = new IsTurningHead(tree);
-            break;
-
-            case Consts.BehaviourType.HasLineOfSight:
-                newNode = new HasLoS(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.CallMethod:
-                newNode = new CallMethod(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.SetDistanceFromPoint:
-                newNode = new SetDistanceFromPoint(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.CopyVariablesToSelf:
-                newNode = new CopyVariables(tree, dataNode.GetParameters());
-            break;
-
-            case Consts.BehaviourType.IsThiefHeard:
-                newNode = new IsThiefHeard(tree);
-            break;
-
-            case Consts.BehaviourType.CanAttackThief:
-                newNode = new CanAttackThief(tree);
-            break;
-
-            case Consts.BehaviourType.AttackThief:
-                newNode = new AttackThief(tree);
-            break;
-
-            case Consts.BehaviourType.TurnBody:
-                newNode = new TurnBody(tree, dataNode.GetParameters());
-            break;
-        }
-        newNode.Name = dataNode.name;
-        return newNode;
+            Consts.BehaviourType.Sequence => new Sequence(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Selector => new Selector(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Repeat => new Repeat(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Invert => new Invert(tree),
+            Consts.BehaviourType.ForceSuccess => new ForceSuccess(tree),
+            Consts.BehaviourType.RandomChance => new RandomChance(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Monitor => new Monitor(tree),
+            Consts.BehaviourType.SetVariable => new SetVariable(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Wait => new Wait(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Condition => new Condition(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.HasArrived => new HasArrived(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.MoveToPoint => new MoveToPoint(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.SetPointFromPatrol => new SetPointFromPatrol(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.Cooldown => new Cooldown(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.StoreVisibleInterests => new StoreVisibleInterests(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.SetRandomInterest => new SetRandomInterest(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.SetPointFromGameObject => new SetPointFromGameObject(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.StopMoving => new StopMoving(tree),
+            Consts.BehaviourType.TurnHead => new TurnHead(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.IsTurningHead => new IsTurningHead(tree),
+            Consts.BehaviourType.HasLineOfSight => new HasLoS(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.CallMethod => new CallMethod(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.SetDistanceFromPoint => new SetDistanceFromPoint(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.CopyVariablesToSelf => new CopyVariables(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.IsThiefHeard => new IsThiefHeard(tree),
+            Consts.BehaviourType.CanAttackThief => new CanAttackThief(tree),
+            Consts.BehaviourType.AttackThief => new AttackThief(tree),
+            Consts.BehaviourType.TurnBody => new TurnBody(tree, dataNode.GetParameters()),
+            _ => null,
+        };
     }
 }

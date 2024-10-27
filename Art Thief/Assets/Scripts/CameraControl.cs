@@ -24,6 +24,9 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     private float turnSensitivity = 10f;
 
+    [SerializeField]
+    private float maxCameraDistanceFromMiddle = 70f;
+
     public Agent CameraTarget { get; set; }
 
     private Camera cam;
@@ -36,13 +39,12 @@ public class CameraControl : MonoBehaviour
 
     private bool controllingCamera;
 
-    // Start is called before the first frame update
     void Start()
     {
         CameraTarget = Level.Instance.Thief;
         cam = Camera.main;
         orbitEuler = new Vector3(-45f, 0f, 0f);
-        cameraVector = new Vector3(0f,0f,cameraDistance);
+        cameraVector = new Vector3(0f, 0f, cameraDistance);
     }
 
     private void OnEnable()
@@ -50,10 +52,9 @@ public class CameraControl : MonoBehaviour
         freeEuler = transform.rotation.eulerAngles;
     }
 
-    // Update is called once per frame
     void LateUpdate()
     {
-        // Toggle the cursor locking
+        // Control the camera while holding down right click
         if (Input.GetMouseButtonDown(1) && !controllingCamera)
         {
             Cursor.visible = false;
@@ -83,13 +84,24 @@ public class CameraControl : MonoBehaviour
 
     private void UpdateFreeCam()
     {
+        // Moving camera around
         Vector3 movementVector = new Vector3(
             Input.GetAxisRaw("FreeCam_X"), Input.GetAxisRaw("FreeCam_Y"), Input.GetAxisRaw("FreeCam_Z")).normalized;
 
         float camSpeed = speed * (Input.GetKey(KeyCode.LeftShift) ? 2f : 1f);
-        if(controllingCamera)
+        if (controllingCamera)
+        {
             cam.transform.position += camSpeed * Time.unscaledDeltaTime * cam.transform.TransformVector(movementVector);
 
+            // Clamp how far away we can be from the level as to not fly too far away and get lost
+            Vector3 vectorFromMiddle = cam.transform.position - Level.Instance.LevelMiddlePoint;
+
+            if (vectorFromMiddle.magnitude > maxCameraDistanceFromMiddle)
+                cam.transform.position = Level.Instance.LevelMiddlePoint +
+                    Vector3.ClampMagnitude(vectorFromMiddle, maxCameraDistanceFromMiddle);
+        }
+
+        // Turning camera
         if (controllingCamera)
         {
             Vector3 turnVector =
@@ -101,7 +113,7 @@ public class CameraControl : MonoBehaviour
 
     private void UpdateOrbitingCam()
     {
-        // Turn camera using the mouse
+        // Rotate camera using the mouse
         if (controllingCamera)
         {
             orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
@@ -121,9 +133,10 @@ public class CameraControl : MonoBehaviour
         Vector3 thiefOrigin = CameraTarget.AgentView.AgentHeadRoot.position;
         float rayDistance = cameraDistance;
         // Make a raycast out from the Agent's head to find any collision
-        // with the environment, so the camera will be pushed closer by walls
-        Vector3 desiredPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
-        if (Physics.Raycast(thiefOrigin, (desiredPoint - thiefOrigin).normalized,
+        // with the environment, so the camera will be pushed away from walls
+        Vector3 orbitPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
+
+        if (Physics.Raycast(thiefOrigin, (orbitPoint - thiefOrigin).normalized,
             out RaycastHit info, cameraDistance, LayerMask.GetMask("Default", "Floor")))
         {
             rayDistance = Mathf.Max(info.distance - 0.1f, 0.05f);
@@ -138,11 +151,13 @@ public class CameraControl : MonoBehaviour
             else
                 cameraVector.z = Mathf.MoveTowards(cameraVector.z, rayDistance, 0.05f * Time.unscaledDeltaTime);
         }
-        else // If our distance is closer to the agent we instantly change it
+        else // If our distance is closer to the agent we instantly change it so as to not clip through walls
             cameraVector.z = rayDistance;
 
         // Move camera around the spy and make the camera look at the spy
         cam.transform.position = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         cam.transform.LookAt(thiefOrigin);
+        // Cache our camera's angle in the free cam's angles so it's the same when the camera mode changes
+        freeEuler = cam.transform.eulerAngles;
     }
 }

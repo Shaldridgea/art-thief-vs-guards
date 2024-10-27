@@ -15,7 +15,6 @@ public class HidingArea : MonoBehaviour
 
     public bool IsSafe { get; private set; }
 
-    // Start is called before the first frame update
     void Start()
     {
         IsSafe = areaType == Consts.HidingAreaType.Safe;
@@ -26,7 +25,9 @@ public class HidingArea : MonoBehaviour
         if(areaType == Consts.HidingAreaType.Safe)
             return;
 
-        for(int i = 0; i < threats.Count; ++i)
+        // Mark ourselves as unsafe if we're seen
+        // by any guard we're aware of
+        for (int i = 0; i < threats.Count; ++i)
         {
             GuardAgent guard = threats[i];
             if (guard.GuardSenses.IsInLOS(transform.position))

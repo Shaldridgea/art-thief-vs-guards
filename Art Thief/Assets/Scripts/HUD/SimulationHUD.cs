@@ -26,6 +26,9 @@ public class SimulationHUD : MonoBehaviour
     private Button changeCameraRightButton;
 
     [SerializeField]
+    private TextMeshProUGUI cameraTargetNameText;
+
+    [SerializeField]
     private Toggle lockCameraToggle;
 
     [SerializeField]
@@ -60,15 +63,17 @@ public class SimulationHUD : MonoBehaviour
 
     private int cameraTargetIndex;
 
-    // Start is called before the first frame update
     void Start()
     {
+        // Setup listener callbacks for all the UI
         simulationSpeedSlider.onValueChanged.AddListener(HandleSpeedSliderChange);
         monitorBoardButton.onClick.AddListener(HandleMonitorBlackboard);
         monitorAgentButton.onClick.AddListener(HandleMonitorAgent);
         changeCameraLeftButton.onClick.AddListener(HandleChangeCameraLeft);
         changeCameraRightButton.onClick.AddListener(HandleChangeCameraRight);
         lockCameraToggle.onValueChanged.AddListener(HandleLockCameraToggle);
+
+        // Add agents to list to scroll through
         cameraTargetList = new(5);
         cameraTargetList.Add(Level.Instance.Thief);
         cameraTargetList.AddRange(Level.Instance.GuardList);
@@ -113,7 +118,8 @@ public class SimulationHUD : MonoBehaviour
         if (cameraTargetIndex < 0)
             cameraTargetIndex = cameraTargetList.Count - 1;
 
-        GameController.Instance.GameCamera.CameraTarget = cameraTargetList[cameraTargetIndex];
+        GameController.Instance.CameraController.CameraTarget = cameraTargetList[cameraTargetIndex];
+        cameraTargetNameText.text = GameController.Instance.CameraController.CameraTarget.name;
     }
 
     private void HandleChangeCameraRight()
@@ -122,7 +128,8 @@ public class SimulationHUD : MonoBehaviour
         if (cameraTargetIndex >= cameraTargetList.Count)
             cameraTargetIndex = 0;
 
-        GameController.Instance.GameCamera.CameraTarget = cameraTargetList[cameraTargetIndex];
+        GameController.Instance.CameraController.CameraTarget = cameraTargetList[cameraTargetIndex];
+        cameraTargetNameText.text = GameController.Instance.CameraController.CameraTarget.name;
     }
 
     private void HandleLockCameraToggle(bool toggle)
@@ -130,19 +137,13 @@ public class SimulationHUD : MonoBehaviour
         gameCameraControl.SetCameraMode(toggle ? CameraControl.CameraMode.Orbit : CameraControl.CameraMode.Free);
     }
 
-    public void SetSimulationSpeed(float newSpeed)
-    {
-        simulationSpeedSlider.value = newSpeed;
-    }
-
     private void Update()
     {
-        // Right click context menu for bringing up visual aids
-        if(Input.GetMouseButtonUp(0) && !contextMenu.gameObject.activeSelf)
+        // Left click context menu for bringing up visual aids
+        if(Input.GetMouseButtonUp(0) && !contextMenu.activeSelf)
         {
-            // Raycast for any agents we can right click on
-            if(Physics.Raycast(
-                Camera.main.ScreenPointToRay(Input.mousePosition),
+            // Raycast for any agents we can left click on
+            if(Physics.Raycast(GameController.Instance.GameCamera.ScreenPointToRay(Input.mousePosition),
                 out RaycastHit hitInfo, 300f, agentLayerMask.value))
             {
                 contextMenu.SetActive(true);
@@ -169,7 +170,7 @@ public class SimulationHUD : MonoBehaviour
             }
         }
         else
-        if (Input.GetMouseButtonUp(0) && contextMenu.gameObject.activeSelf)
+        if (Input.GetMouseButtonUp(0) && contextMenu.activeSelf)
             contextMenu.SetActive(false);
 
         if (Input.GetKeyDown(KeyCode.Space))

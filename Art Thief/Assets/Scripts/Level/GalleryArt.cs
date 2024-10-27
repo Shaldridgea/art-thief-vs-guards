@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class GalleryArt : MonoBehaviour
 {
@@ -13,15 +14,17 @@ public class GalleryArt : MonoBehaviour
     private int targetMaterialIndex;
 
     [SerializeField]
-    private Material woodReplaceMaterial;
+    private bool shouldTakeObject;
 
     [SerializeField]
-    private bool shouldTakeObject;
+    [HideIf("shouldTakeObject")]
+    private Material woodReplaceMaterial;
 
     public bool ShouldTakeObject => shouldTakeObject;
 
     public void RemoveArtImage()
     {
+        // Replace our targeted painting image with its wood texture
         var materials = targetMesh.materials;
         materials[targetMaterialIndex] = woodReplaceMaterial;
         targetMesh.materials = materials;

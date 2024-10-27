@@ -41,11 +41,6 @@ public class Level : MonoBehaviour
 
     public ThiefAgent Thief => thief;
 
-    [SerializeField]
-    private List<GameObject> artList;
-
-    public List<GameObject> ArtList => artList;
-
     public List<BoxCollider> MedievalArtList { get; private set; } = new(30);
 
     public List<BoxCollider> AbstractArtList { get; private set; } = new(15);
@@ -74,24 +69,21 @@ public class Level : MonoBehaviour
     [SerializeField]
     private List<GameObject> breakroomMarkerList;
 
-    public List<GameObject> BreakroomMarkerList => breakroomMarkerList;
-
     [SerializeField]
     private List<GameObject> toiletMarkerList;
-
-    public List<GameObject> ToiletMarkerList => toiletMarkerList;
 
     [SerializeField]
     private Transform levelMiddleTransform;
 
     public Vector3 LevelMiddlePoint => levelMiddleTransform.position;
 
-    // Start is called before the first frame update
     void Start()
     {
         GetArtByRooms(medievalArtRooms, MedievalArtList);
         GetArtByRooms(abstractArtRooms, AbstractArtList);
         GetArtByRooms(sculptureRooms, SculptureArtList);
+        GameController.Instance.GlobalBlackboard.SetVariable("breakroomList", breakroomMarkerList);
+        GameController.Instance.GlobalBlackboard.SetVariable("toiletList", toiletMarkerList);
     }
 
     private void GetArtByRooms(List<BoxCollider> roomsList, List<BoxCollider> targetArtList)
@@ -106,7 +98,7 @@ public class Level : MonoBehaviour
             {
                 if (o.CompareTag("Art"))
                 {
-                    targetArtList.Add(o.gameObject.GetComponent<BoxCollider>());
+                    targetArtList.Add(o as BoxCollider);
                 }
             }
         }

@@ -21,9 +21,14 @@ public class GameController : MonoBehaviour
     }
 
     [SerializeField]
-    private CameraControl gameCamera;
+    private CameraControl cameraController;
 
-    public CameraControl GameCamera => gameCamera;
+    public CameraControl CameraController => cameraController;
+
+    [SerializeField]
+    private Camera gameCamera;
+
+    public Camera GameCamera => gameCamera;
 
     [SerializeField]
     private SimulationHUD menuHUD;
@@ -37,15 +42,13 @@ public class GameController : MonoBehaviour
 
     public Blackboard GlobalBlackboard { get; private set; }
 
-    // Start is called before the first frame update
     private void Start()
     {
-        gameCamera.enabled = false;
+        cameraController.enabled = false;
         menuHUD.gameObject.SetActive(false);
         Application.targetFrameRate = framerateCap;
     }
 
-    // Update is called once per frame
     void Update()
     {
         // Reload the whole scene
@@ -67,8 +70,8 @@ public class GameController : MonoBehaviour
             GuardAgent guard = Level.Instance.GuardList[i];
             guard.ActivateAgent();
         }
-        gameCamera.transform.LookAt(Level.Instance.Thief.transform);
-        gameCamera.enabled = true;
+        cameraController.transform.LookAt(Level.Instance.Thief.transform);
+        cameraController.enabled = true;
         menuHUD.gameObject.SetActive(true);
     }
 

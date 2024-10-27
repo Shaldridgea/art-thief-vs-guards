@@ -119,6 +119,7 @@ public class BTRuntimeView : MonoBehaviour
 
         gridGraph.CreateGraph(this);
 
+        // Focus on current running node when starting
         mostRecentRunningNode = tree.PeekRunningStack();
         zoomScrollRect.SetZoom(0.35f);
         FocusScrollRectView(mostRecentRunningNode.GetGuid());
@@ -130,7 +131,6 @@ public class BTRuntimeView : MonoBehaviour
 
     public BTRuntimeViewNode GetViewNode(Guid g) => nodeGuidMap[g].GetViewNode();
 
-    // Update is called once per frame
     void LateUpdate()
     {
         if (!resetUpdatedNodes && updatedNodesList.Count > 0)
@@ -174,7 +174,7 @@ public class BTRuntimeView : MonoBehaviour
 
         // Clamp the content position to the 0-1 bounds
         Vector2 normPos = zoomScrollRect.normalizedPosition;
-        normPos = new Vector2(Mathf.Clamp(normPos.x, 0f, 1f), Mathf.Clamp(normPos.y, 0f, 1f));
+        normPos = new Vector2(Mathf.Clamp01(normPos.x), Mathf.Clamp01(normPos.y));
         zoomScrollRect.normalizedPosition = normPos;
     }
 
@@ -186,6 +186,7 @@ public class BTRuntimeView : MonoBehaviour
 
         var logicNode = nodeGuidMap[viewNode.GetGuid()].GetLogicNode();
 
+        // Initialise node views and if returns true it has a live update
         if (viewNode.InitNodeInfoVisuals(dataNode, logicNode))
             liveUpdateNodesList.Add(viewNode.GetGuid());
 
@@ -210,7 +211,7 @@ public class BTRuntimeView : MonoBehaviour
             BTGraphNode nextNode = n.Connection.node as BTGraphNode;
 
             var nextViewNode = nodeGuidMap[nextNode.GetGuid()].GetViewNode();
-            viewNode.SetLineConnectorVisuals(j, nextViewNode, gridGraph.CellSize, gridGraph.Spacing);
+            viewNode.SetLineConnectorVisuals(j, nextViewNode, gridGraph);
             ++j;
         }
         viewNode.ResetLineConnectors(j);

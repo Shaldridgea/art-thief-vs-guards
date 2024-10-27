@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Utility AI behaviour controller
+/// </summary>
 public class UtilityBehaviour : MonoBehaviour
 {
     [SerializeField]
@@ -21,25 +24,17 @@ public class UtilityBehaviour : MonoBehaviour
 
     private UtilityAction currentAction;
 
-    private bool toggleGUI;
-
-    // Start is called before the first frame update
     void Start()
     {
-        // Create our actions and give the actions their relvant motives
+        // Create our actions using our associated action data
         for (int i = 0; i < actionData.Count; ++i)
             actionList.Add(Consts.GetUtilityAction(actionData[i]));
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!agent.AgentActivated)
             return;
-
-        // Toggle visualisation of our values
-        if (Input.GetKeyDown(KeyCode.G))
-            toggleGUI = !toggleGUI;
 
         // Run our evaluation timer
         updateTimer -= Time.deltaTime;
@@ -72,20 +67,23 @@ public class UtilityBehaviour : MonoBehaviour
             }
         }
 
-        // If the action we want to perform is different from the one we were doing before
+        // If the action we want to perform is different from the one
+        // we were doing before, call our Exit function on the old action,
+        // and run Enter function on the new action
         if (favouredAction != currentAction)
         {
-            // Stop our current action and set our new one to do
             currentAction?.ExitAction(agent);
             currentAction = favouredAction;
             currentAction.EnterAction(agent);
         }
     }
 
+#if UNITY_EDITOR
     public UtilityAction.DebugDrawCallback GetDebugDrawCallback(){
         if (currentAction != null)
             return currentAction.OnSceneGUI;
 
         return null;
     }
+#endif
 }

@@ -12,7 +12,6 @@ public class NodePoolLoader : MonoBehaviour
 
     GameObjectPool<BTRuntimeViewNode> nodePool;
 
-    // Start is called before the first frame update
     void Start()
     {
         nodePool = new(nodeTemplate.gameObject, poolSize);

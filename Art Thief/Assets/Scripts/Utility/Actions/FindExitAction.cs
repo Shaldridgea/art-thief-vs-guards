@@ -13,6 +13,7 @@ public class FindExitAction : UtilityAction
     {
         float checkDist = float.MaxValue;
         targetPath = null;
+        // Find the exit with the shortest path from us
         for(int i = 0; i < Level.Instance.LevelExits.Count; ++i)
         {
             NavMeshPath path = Consts.GetNewPath(
@@ -37,6 +38,7 @@ public class FindExitAction : UtilityAction
             thief.MoveAgent(targetPath);
         else
         {
+            // Thief wins simulation if they reach the exit
             if (thief.NavAgent.remainingDistance < 1f)
                 GameController.Instance.EndGame(Consts.Team.THIEF);
         }

@@ -22,6 +22,7 @@ public class FindArtAction : UtilityAction
         if (!thief.NavAgent.hasPath)
             thief.MoveAgent(thief.AgentBlackboard.GetVariable<Vector3>("artPosition"));
 
+        // Set boolean for whether we're near enough to the art to steal it
         thief.AgentBlackboard.SetVariable("nearToArt",
             Vector3.Distance(thief.transform.position.ZeroY(), thief.ArtGoal.transform.position.ZeroY()) <= 1f ? 1f : 0f);
     }
@@ -29,6 +30,7 @@ public class FindArtAction : UtilityAction
     public override void ExitAction(ThiefAgent thief)
     {
         thief.NavAgent.ResetPath();
+        thief.AgentBlackboard.SetVariable("nearToArt", false);
     }
 
     public override void OnSceneGUI()

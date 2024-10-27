@@ -19,6 +19,8 @@ public class Condition : BehaviourNode
 
         board = GetTargetBlackboard(parameters[0]);
 
+        // Each condition has a left, middle (operator), and right token
+        // e.g. myVariable == true
         leftTokens = new string[parameters.Length-1];
         operatorTokens = new string[parameters.Length-1];
         rightTokens = new string[parameters.Length-1];
@@ -39,6 +41,7 @@ public class Condition : BehaviourNode
 
     public override Consts.NodeStatus Update()
     {
+        // Parse tokens for the values and matching operator method delegate to call
         NodeParameter[] leftValues = new NodeParameter[leftTokens.Length];
         ConditionCheckDelegate[] operatorDelegates = new ConditionCheckDelegate[operatorTokens.Length];
         NodeParameter[] rightValues = new NodeParameter[rightTokens.Length];
@@ -48,7 +51,9 @@ public class Condition : BehaviourNode
             rightValues[i] = ParseStringToValue(rightTokens[i]);
             operatorDelegates[i] = GetMatchingDelegate(rightValues[i].type, operatorTokens[i]);
         }
+
         Consts.NodeStatus conditionStatus = Consts.NodeStatus.SUCCESS;
+        // Call each operator method for each condition and check that they're all true
         for (int i = 0; i < leftTokens.Length; ++i)
         {
             if (!operatorDelegates[i](leftValues[i], rightValues[i]))
@@ -80,20 +85,8 @@ public class Condition : BehaviourNode
         if (bool.TryParse(newString, out bool newBool))
             return newBool;
 
-        if(newString.Contains("Vector3"))
-        {
-            int leftBracketIndex = newString.IndexOf('(') + 1;
-            int rightBracketIndex = newString.IndexOf(')');
-            string vectorValueString = newString[leftBracketIndex..rightBracketIndex];
-            string[] vectorSplit = vectorValueString.Split(',');
-            float[] vectorComponents = new float[3];
-            for(int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
-            {
-                if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
-                    vectorComponents[i] = vecComponent;
-            }
-            return new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]);
-        }
+        if (Consts.ParseVector3(newString, out Vector3 newVector))
+            return newVector;
 
         // If our value is not any of the above then
         // we check if it's actually a string or if it's
@@ -102,9 +95,12 @@ public class Condition : BehaviourNode
             return newString.Trim('"');
 
         System.Type type = board.GetVariableType(newString);
+        // If we got null back then this key isn't in
+        // the blackboard and we just return the string
         if (type == null)
             return newString;
 
+        // Get the value from the board key
         if (type == typeof(int))
             return workingBoard.GetVariable<int>(newString);
         else if (type == typeof(float))

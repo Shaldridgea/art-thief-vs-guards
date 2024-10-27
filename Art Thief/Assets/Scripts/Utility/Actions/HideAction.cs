@@ -9,7 +9,7 @@ public class HideAction : UtilityAction
 
     private NavMeshPath targetPath;
 
-    private bool turnedAround;
+    private bool reachedSpot;
 
     public const float CHECK_RADIUS = 15f;
 
@@ -21,14 +21,14 @@ public class HideAction : UtilityAction
 
     public override void EnterAction(ThiefAgent thief)
     {
+        // Find nearby hiding areas
         Collider[] overlaps = Physics.OverlapSphere(thief.transform.position, CHECK_RADIUS,
             LayerMask.GetMask("Hide"),
             QueryTriggerInteraction.Collide);
-        ThiefSensoryModule senses = thief.ThiefSenses;
 
         List<(HidingArea area, float distance)> areaList = new List<(HidingArea area, float distance)>();
 
-        // Get a list of tuples of our found areas and the distances to them
+        // Create a list of tuples of our found areas and the distances to them
         foreach (Collider c in overlaps)
             if (c.TryGetComponent(out HidingArea area))
                 areaList.Add(( area, Vector3.Distance(thief.transform.position, area.transform.position) ));
@@ -38,6 +38,9 @@ public class HideAction : UtilityAction
         {
             float xDist = x.distance;
             float yDist = y.distance;
+            // If a hiding area is safe, reduce its stored
+            // distance to weight it more favourably,
+            // and sort it higher in the list if it's in our current room
             if (x.area.AreaType == Consts.HidingAreaType.Safe)
             {
                 xDist /= 3f;
@@ -51,18 +54,22 @@ public class HideAction : UtilityAction
                     return 1;
             }
             
-            if (x.distance < y.distance)
+            // Return sort for which area is closer
+            if (xDist < yDist)
                 return -1;
-            else if (x.distance > y.distance)
+            else if (xDist > yDist)
                 return 1;
             else
                 return 0;
         });
 
+        ThiefSensoryModule senses = thief.ThiefSenses;
+
         bool beingChased = thief.AgentBlackboard.GetVariable<bool>("inChase");
         // Check if any of these areas are safe to go to, preferring closest first
         foreach (var (area, distance) in areaList)
         {
+            // If we're being chased then we don't care about conditional/unsafe hiding spots
             if (area.AreaType == Consts.HidingAreaType.Conditional && beingChased)
                 continue;
 
@@ -79,7 +86,7 @@ public class HideAction : UtilityAction
             }
         }
 
-        // If we couldn't find a valid hiding spot
+        // If we couldn't find a valid hiding spot, increase danger
         if (targetArea == null)
             thief.AgentBlackboard.SetVariable("danger", thief.AgentBlackboard.GetVariable<float>("danger")+0.5f);
     }
@@ -89,18 +96,20 @@ public class HideAction : UtilityAction
         if (targetArea != null && !thief.NavAgent.hasPath)
         {
             thief.MoveAgent(targetPath);
+            // Mark ourself as hiding so we stay in our hiding spot when we reach it
             thief.AgentBlackboard.SetVariable("hiding", 1f);
         }
 
-        if (thief.NavAgent.hasPath && !turnedAround)
+        if (thief.NavAgent.hasPath && !reachedSpot)
             if (thief.NavAgent.remainingDistance <= 1f)
             {
                 thief.TurnBody(180f, 1.5f);
                 fearWaitStart = Time.time;
-                turnedAround = true;
+                reachedSpot = true;
             }
 
-        if(turnedAround)
+        // Wait for a bit to be cautious before thinking about leaving our hiding spot
+        if(reachedSpot)
             if(Time.time >= fearWaitStart + FEAR_WAIT_LENGTH)
                 thief.AgentBlackboard.SetVariable("hiding", 0f);
     }
@@ -110,7 +119,7 @@ public class HideAction : UtilityAction
         targetArea = null;
         thief.AgentBlackboard.SetVariable("hiding", 0f);
         thief.NavAgent.ResetPath();
-        turnedAround = false;
+        reachedSpot = false;
     }
 
     private bool IsPathSafe(ThiefAgent thief, NavMeshPath path, List<GuardAgent> guardThreats)
@@ -128,19 +137,20 @@ public class HideAction : UtilityAction
         {
             GuardAgent guard = guardThreats[i];
 
+            // Ignore stunned guards who aren't a threat to us
             if (guard.AgentBlackboard.GetVariable<bool>("isStunned"))
                 continue;
 
             // Store our initial guard position before simulation
             Vector3 guardPosition = guard.transform.position;
-            // Simulate in steps of 2 seconds, for 8 seconds into the future
+            // Simulate in steps of 2 seconds, for 6 seconds into the future
             for(int d = 2; d <= 6; d += 2)
             {
                 // Get the simulated position of where the guard will be in however many seconds on its path
                 bool terminated = guard.NavAgent.SamplePathPosition(guard.NavAgent.areaMask,
                     Consts.GetPathDistance(guard.NavAgent.path), out var hit);
 
-                // Get the simulated position of the thief however many seconds into the future
+                // Get the simulated position along the supplied path however many seconds into the future
                 Vector3 thiefPosition = GetPositionAlongPath(path, thief.NavAgent.speed * d);
 
                 // Get the direction the guard will be looking in
@@ -154,6 +164,7 @@ public class HideAction : UtilityAction
                 if (guard.GuardSenses.IsSeen(thiefPosition, guardDirection))
                     return false;
 
+                // Store current simulated position for next loop
                 guardPosition = hit.position;
 
                 // If terminated that means we reached the end of the current path
@@ -165,6 +176,9 @@ public class HideAction : UtilityAction
         return true;
     }
 
+    /// <summary>
+    /// Gets the position along a supplied NavMesh path by a specific distance
+    /// </summary>
     private Vector3 GetPositionAlongPath(NavMeshPath path, float sampleDistance)
     {
         Vector3[] corners = path.corners;

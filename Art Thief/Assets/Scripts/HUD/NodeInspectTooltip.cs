@@ -37,8 +37,12 @@ public class NodeInspectTooltip : MonoBehaviour
 
     private Vector2 viewportEdge;
 
+    private BTRuntimeViewNode targetCopyNode;
+
     public void UpdateInspectTooltip(BTRuntimeViewNode copyNode)
     {
+        targetCopyNode = copyNode;
+
         if (tooltipRectTransform == null)
         {
             tooltipRectTransform = transform as RectTransform;
@@ -91,5 +95,8 @@ public class NodeInspectTooltip : MonoBehaviour
             tooltipRectTransform.pivot = new Vector2(horizontalPivot, verticalPivot);
             tooltipRectTransform.anchoredPosition = point;
         }
+
+        if (liveText.gameObject.activeSelf)
+            liveText.text = targetCopyNode.LiveText.text;
     }
 }

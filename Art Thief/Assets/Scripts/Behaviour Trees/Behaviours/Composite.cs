@@ -30,12 +30,6 @@ public abstract class Composite : BehaviourNode
         ChildNodes.Add(node);
     }
 
-    public override bool TryGetChildNodes(out List<BehaviourNode> children)
-    {
-        children = ChildNodes;
-        return true;
-    }
-
     public override void OnEnter()
     {
         base.OnEnter();

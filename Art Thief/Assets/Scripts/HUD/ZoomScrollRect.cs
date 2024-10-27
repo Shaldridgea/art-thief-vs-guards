@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Extended version of ScrollRect class that enables zooming in and out of content with the scroll wheel
+/// </summary>
 public class ZoomScrollRect : ScrollRect
 {
     private float relativeSize = 1f;
@@ -56,6 +59,7 @@ public class ZoomScrollRect : ScrollRect
         CalculateRelativeZoomSize();
 
         Vector3 contentScale = content.localScale;
+        // Calculate scale for our new zoom factor
         Vector3 newScale = Vector3.one * Mathf.Lerp(relativeSize, MAX_ZOOM, zoomFactor);
         content.localScale = newScale;
 

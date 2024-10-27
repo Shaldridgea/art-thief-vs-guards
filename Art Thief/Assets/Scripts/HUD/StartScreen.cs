@@ -2,15 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.AI;
 
+/// <summary>
+/// Start screen UI for setting up parameters for the simulation
+/// </summary>
 public class StartScreen : MonoBehaviour
 {
-    public enum CameraFocus
+    public enum OptionFocus
     {
         Steal,
-        Start,
+        ThiefStart,
         Guard
     }
 
@@ -25,6 +29,12 @@ public class StartScreen : MonoBehaviour
     private Button confirmButton;
 
     [SerializeField]
+    private Button infoButton;
+
+    [SerializeField]
+    private GameObject infoScreen;
+
+    [SerializeField]
     private TMP_Dropdown artCategoryDropdown;
 
     [SerializeField]
@@ -36,11 +46,11 @@ public class StartScreen : MonoBehaviour
     [SerializeField]
     private Camera levelViewCamera;
 
-    private CameraFocus currentFocus;
+    private OptionFocus currentFocus;
 
     private int currentGuardCount;
 
-    private int guardCountMax = 6;
+    private int guardCountMax = 4;
 
     private List<BoxCollider> artFocusList;
 
@@ -48,22 +58,22 @@ public class StartScreen : MonoBehaviour
 
     private float artCameraDistance = 2.5f;
 
-    private Transform thiefStartFocus;
+    private Transform thiefStartCameraTransform;
 
-    // Start is called before the first frame update
     void Start()
     {
         leftButton.onClick.AddListener(LeftButtonPressed);
         rightButton.onClick.AddListener(RightButtonPressed);
         confirmButton.onClick.AddListener(ConfirmButton);
+        infoButton.onClick.AddListener(InfoButtonPressed);
 
         artCategoryDropdown.onValueChanged.AddListener(ArtCategoryChanged);
-        startTargetDropdown.onValueChanged.AddListener(StartTargetChanged);
+        startTargetDropdown.onValueChanged.AddListener(ThiefStartTargetChanged);
         guardCountInput.onValueChanged.AddListener(GuardCountChanged);
 
         artFocusList = Level.Instance.MedievalArtList;
-        thiefStartFocus = Level.Instance.ThiefStartList[0];
-        if (NavMesh.SamplePosition(thiefStartFocus.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        thiefStartCameraTransform = Level.Instance.ThiefStartList[0];
+        if (NavMesh.SamplePosition(thiefStartCameraTransform.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
             Level.Instance.Thief.NavAgent.Warp(hit.position);
 
         guardCountMax = Level.Instance.GuardList.Count;
@@ -73,7 +83,10 @@ public class StartScreen : MonoBehaviour
         UpdateLevelCameraView();
     }
 
-    public void ChangeCameraFocus(CameraFocus newFocus)
+    /// <summary>
+    /// Change the start screen camera's focus based on what parameter is being changed
+    /// </summary>
+    public void ChangeCameraFocus(OptionFocus newFocus)
     {
         currentFocus = newFocus;
         UpdateLevelCameraView();
@@ -81,19 +94,20 @@ public class StartScreen : MonoBehaviour
 
     private void LeftButtonPressed()
     {
+        // Scroll backwards through the current focused option
         switch (currentFocus)
         {
-            case CameraFocus.Steal:
+            case OptionFocus.Steal:
                 artFocusIndex = artFocusIndex == 0 ? artFocusList.Count - 1 : artFocusIndex - 1;
             break;
 
-            case CameraFocus.Start:
+            case OptionFocus.ThiefStart:
                 startTargetDropdown.value =
                     startTargetDropdown.value == 0 ? startTargetDropdown.options.Count - 1 : startTargetDropdown.value - 1;
-                thiefStartFocus = Level.Instance.ThiefStartList[startTargetDropdown.value];
+                thiefStartCameraTransform = Level.Instance.ThiefStartList[startTargetDropdown.value];
             break;
 
-            case CameraFocus.Guard:
+            case OptionFocus.Guard:
                 currentGuardCount = currentGuardCount == 0 ? guardCountMax : currentGuardCount - 1;
                 guardCountInput.text = currentGuardCount.ToString();
             break;
@@ -103,18 +117,19 @@ public class StartScreen : MonoBehaviour
 
     private void RightButtonPressed()
     {
+        // Scroll forwards through the current focused option
         switch (currentFocus)
         {
-            case CameraFocus.Steal:
+            case OptionFocus.Steal:
                 artFocusIndex = (artFocusIndex + 1) % artFocusList.Count;
             break;
 
-            case CameraFocus.Start:
+            case OptionFocus.ThiefStart:
                 startTargetDropdown.value = (startTargetDropdown.value + 1) % startTargetDropdown.options.Count;
-                thiefStartFocus = Level.Instance.ThiefStartList[startTargetDropdown.value];
+                thiefStartCameraTransform = Level.Instance.ThiefStartList[startTargetDropdown.value];
                 break;
 
-            case CameraFocus.Guard:
+            case OptionFocus.Guard:
                 currentGuardCount = (currentGuardCount + 1) % (guardCountMax+1);
                 guardCountInput.text = currentGuardCount.ToString();
             break;
@@ -129,9 +144,18 @@ public class StartScreen : MonoBehaviour
         levelViewCamera.enabled = false;
     }
 
+    private void InfoButtonPressed()
+    {
+        // Toggle info screen
+        infoScreen.SetActive(!infoScreen.activeSelf);
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
     private void ArtCategoryChanged(int index)
     {
-        currentFocus = CameraFocus.Steal;
+        // Update which kind of art we're stealing and how far away
+        // at minimum the camera should be to look at those
+        currentFocus = OptionFocus.Steal;
         switch (artCategoryDropdown.options[index].text.ToLower())
         {
             case "medieval":
@@ -153,10 +177,10 @@ public class StartScreen : MonoBehaviour
         UpdateLevelCameraView();
     }
 
-    private void StartTargetChanged(int index)
+    private void ThiefStartTargetChanged(int index)
     {
-        thiefStartFocus = Level.Instance.ThiefStartList[index];
-        currentFocus = CameraFocus.Start;
+        thiefStartCameraTransform = Level.Instance.ThiefStartList[index];
+        currentFocus = OptionFocus.ThiefStart;
         UpdateLevelCameraView();
     }
 
@@ -170,7 +194,7 @@ public class StartScreen : MonoBehaviour
                 guardCountInput.SetTextWithoutNotify(result.ToString());
             }
             currentGuardCount = result;
-            currentFocus = CameraFocus.Guard;
+            currentFocus = OptionFocus.Guard;
             UpdateLevelCameraView();
         }
     }
@@ -180,34 +204,36 @@ public class StartScreen : MonoBehaviour
         levelViewCamera.orthographic = false;
         switch (currentFocus)
         {
-            case CameraFocus.Steal:
+            case OptionFocus.Steal:
                 Transform artFocusTransform = artFocusList[artFocusIndex].transform;
                 BoxCollider artFocusBox = artFocusList[artFocusIndex];
 
-                // Push our camera far enough away to adequately frame the art
+                // Push our camera far enough away to adequately frame the art.
                 // Get the largest world bound size of the collider as the unit length
                 // to move away as all our art pieces are rotated and scaled with no consistency
                 levelViewCamera.transform.position = artFocusTransform.position +
                     artFocusTransform.forward *
                     Mathf.Clamp(
                         Mathf.Max(
-                         artFocusBox.bounds.size.x,
+                        artFocusBox.bounds.size.x,
                         artFocusBox.bounds.size.y,
                         artFocusBox.bounds.size.z), artCameraDistance, 5f);
 
                 levelViewCamera.transform.LookAt(artFocusTransform);
                 break;
 
-            case CameraFocus.Start:
-                levelViewCamera.transform.position = thiefStartFocus.position;
-                levelViewCamera.transform.rotation = thiefStartFocus.rotation;
-                if(NavMesh.SamplePosition(thiefStartFocus.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+            case OptionFocus.ThiefStart:
+                levelViewCamera.transform.position = thiefStartCameraTransform.position;
+                levelViewCamera.transform.rotation = thiefStartCameraTransform.rotation;
+                if(NavMesh.SamplePosition(thiefStartCameraTransform.position, out NavMeshHit hit, 5f,
+                    Level.Instance.Thief.NavAgent.areaMask))
                 {
                     Level.Instance.Thief.NavAgent.Warp(hit.position);
                 }
                 break;
 
-            case CameraFocus.Guard:
+            case OptionFocus.Guard:
+                // Place our camera above and look down to give a view of the entire level
                 levelViewCamera.transform.position = Level.Instance.LevelMiddlePoint + Vector3.up * 40f;
                 levelViewCamera.transform.LookAt(Level.Instance.LevelMiddlePoint);
                 levelViewCamera.transform.Rotate(Vector3.forward, 270f);

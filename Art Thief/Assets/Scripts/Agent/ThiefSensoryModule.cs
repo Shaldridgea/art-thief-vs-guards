@@ -8,8 +8,6 @@ public class ThiefSensoryModule : SensoryModule
     [Tooltip("How long after we last knew where a guard was do we lose track of them")]
     private float loseGuardTime;
 
-    private ThiefAgent thief;
-
     [SerializeField]
     private List<GuardAgent> awareGuards;
 
@@ -17,11 +15,9 @@ public class ThiefSensoryModule : SensoryModule
 
     private Dictionary<GuardAgent, float> loseGuardTimerMap = new();
 
-    // Start is called before the first frame update
     override protected void Start()
     {
         base.Start();
-        thief = (ThiefAgent)owner;
     }
 
     private void Update()

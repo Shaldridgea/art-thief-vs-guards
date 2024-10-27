@@ -76,7 +76,7 @@ public static class Consts
         Room
     }
 
-    public enum PatrolPointType
+    public enum PatrolGetType
     {
         Follow,
         Random
@@ -148,11 +148,26 @@ public static class Consts
         return distance;
     }
 
-    public enum AgentSource
+    public static bool ParseVector3(string vectorString, out Vector3 parsedVector)
     {
-        Guard,
-        Thief
-    }
+        if (!vectorString.Contains("Vector3") || !vectorString.Contains("(") ||
+                !vectorString.Contains(")") || !vectorString.Contains(","))
+        {
+            parsedVector = Vector3.zero;
+            return false;
+        }
 
-    public const string CHASE_KEY = "thiefChase";
+        int leftBracketIndex = vectorString.IndexOf('(') + 1;
+        int rightBracketIndex = vectorString.IndexOf(')');
+        string vectorValueString = vectorString[leftBracketIndex..rightBracketIndex];
+        string[] vectorSplit = vectorValueString.Split(',');
+        float[] vectorComponents = new float[3];
+        for (int i = 0; i < Mathf.Min(vectorSplit.Length, 3); ++i)
+        {
+            if (float.TryParse(vectorSplit[i].Trim(), out float vecComponent))
+                vectorComponents[i] = vecComponent;
+        }
+        parsedVector = new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]);
+        return true;
+    }
 }

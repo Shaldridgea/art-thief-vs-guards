@@ -5,8 +5,6 @@ using UnityEngine;
 
 public abstract class BehaviourNode : INodeGuid
 {
-    public string Name { get; set; }
-
     protected BehaviourTree ParentTree { get; private set; }
 
     public Consts.NodeStatus Status { get; private set; }
@@ -51,16 +49,11 @@ public abstract class BehaviourNode : INodeGuid
 
     public virtual void AddChild(BehaviourNode addNode, string portName = "") { }
 
-    public virtual bool TryGetChildNodes(out List<BehaviourNode> children)
-    { 
-        children = null;
-        return false;
-    }
-
     /// <summary>
     /// Helper function to handle changing board targets in variable statements by using an accessor operator
     /// </summary>
-    protected bool HandleStatementAccessor(string statement, Blackboard sourceBoard, out Blackboard newTargetBoard, out string modifiedStatement)
+    protected bool HandleStatementAccessor(string statement, Blackboard sourceBoard,
+        out Blackboard newTargetBoard, out string modifiedStatement)
     {
         newTargetBoard = null;
         modifiedStatement = null;
@@ -82,8 +75,9 @@ public abstract class BehaviourNode : INodeGuid
             {
                 newTargetBoard = ParentTree.GlobalBlackboard;
                 return true;
-            } // Check if our source board has the GameObject and associated Agent we expect it to have stored
+            }
             
+            // Check if our source board has the GameObject and associated Agent we expect it to have stored
             if (sourceBoard.GetData().ContainsKey(left))
             {
                 if (sourceBoard.GetVariableType(left).Name.Contains("GameObject"))
@@ -115,6 +109,9 @@ public abstract class BehaviourNode : INodeGuid
             ParentTree.Owner.AgentBlackboard : ParentTree.GlobalBlackboard;
     }
 
+    /// <summary>
+    /// Get a string of any live changes to the node's variables. Can be empty if it has no live changes
+    /// </summary>
     public virtual string GetLiveVisualsText()
     {
         return string.Empty;

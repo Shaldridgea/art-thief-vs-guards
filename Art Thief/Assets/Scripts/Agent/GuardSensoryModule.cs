@@ -8,7 +8,7 @@ public class GuardSensoryModule : SensoryModule
     public override void NotifySound(SenseInterest sound)
     {
         base.NotifySound(sound);
-        // Ignore un-suspicious sounds (usually friendly sounds)
+
         if (!sound.IsSuspicious)
             return;
 
@@ -20,7 +20,7 @@ public class GuardSensoryModule : SensoryModule
     public override void NotifyVisualFound(SenseInterest visual)
     {
         base.NotifyVisualFound(visual);
-        // Exit if this interest belongs to a guard and it's not flagged as suspicious
+
         if (!visual.IsSuspicious)
             return;
 
@@ -30,7 +30,7 @@ public class GuardSensoryModule : SensoryModule
     public override void NotifyVisualLost(SenseInterest visual)
     {
         base.NotifyVisualLost(visual);
-        // Exit if this interest belongs to a guard and it's not flagged as suspicious
+
         if (!visual.IsSuspicious)
             return;
 

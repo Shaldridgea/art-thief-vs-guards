@@ -9,6 +9,7 @@ public class ThiefAgent : Agent
 {
     [SerializeField]
     private float dangerDistanceMin = 9f;
+
     [SerializeField]
     private float dangerDistanceMax = 20f;
 
@@ -19,11 +20,20 @@ public class ThiefAgent : Agent
 
     public Transform ArtGoal { get; set; }
 
+    [SerializeField]
+    private GameObject stealingProgressContainer;
+
+    public GameObject StealingProgressContainer => stealingProgressContainer;
+
+    [SerializeField]
+    private UnityEngine.UI.Image stealingProgressImage;
+
+    public UnityEngine.UI.Image StealingProgressImage => stealingProgressImage;
+
     private bool usingOffMeshLink;
 
     private float dangerVelocity;
     
-    // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
@@ -40,6 +50,7 @@ public class ThiefAgent : Agent
             usingOffMeshLink = true;
         }
 
+        // Motive calculation for Danger and Aggression
         float danger = 0f;
         float aggression = 0f;
         var guards = ThiefSenses.AwareGuards;
@@ -47,14 +58,18 @@ public class ThiefAgent : Agent
         bool beingChased = false;
         foreach(var g in guards)
         {
+            // Ignore guards who aren't a threat to us
             if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
                 continue;
 
             ++guardThreats;
-            bool hasLos = g.GuardSenses.IsSeen(transform.position);
+            bool seenByGuard = g.GuardSenses.IsSeen(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
+            // Add more danger to closer a guard is to us
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
+            // Add aggression if we're able to attack currently and
+            // there's a guard close enough who we're looking at
             if (CanAttackEnemy())
             {
                 if (distanceToGuard < aggroRadius)
@@ -63,16 +78,24 @@ public class ThiefAgent : Agent
                         aggression += 1f;
                 }
             }
-            if (hasLos)
+            // Add more danger if we're currently seen by a guard
+            if (seenByGuard)
                 danger += 0.5f;
+
+            // Flag whether we're being chased by any guard
             if (g.AgentBlackboard.GetVariable<string>("guardMode") == "chase")
                 beingChased = true;
         }
+        // Average our danger by the number of guards and add a bit extra
+        // to reflect the danger of multiple guards being nearby
         danger /= Mathf.Max(guardThreats, 1);
         danger += guardThreats * 0.1f;
+
+        // Reflect being chased in our blackboard and increase our danger significantly if so
         AgentBlackboard.SetVariable("inChase", beingChased);
         if (beingChased)
             danger += 1f;
+
         float storedDanger = AgentBlackboard.GetVariable<float>("danger");
         // Immediately reflect calculated danger in blackboard if it's higher,
         // otherwise bring it down slowly if it's lower
@@ -83,12 +106,14 @@ public class ThiefAgent : Agent
         }
         else
             storedDanger = Mathf.SmoothDamp(storedDanger, danger, ref dangerVelocity, 4f, 0.5f);
+
         AgentBlackboard.SetVariable("danger", storedDanger);
         AgentBlackboard.SetVariable("aggro", aggression);
     }
 
     private void LateUpdate()
     {
+        // Guards win the simulation if thief is stunned
         if (AgentBlackboard.GetVariable<bool>("isStunned"))
         {
             GameController.Instance.EndGame(Consts.Team.GUARD);
@@ -96,6 +121,9 @@ public class ThiefAgent : Agent
         }
     }
 
+    /// <summary>
+    /// Manually move and rotate through the points of an OffMeshLink
+    /// </summary>
     private IEnumerator FollowPathOffMeshLink()
     {
         bool reachedStartFirst = false;
@@ -111,8 +139,10 @@ public class ThiefAgent : Agent
 
         navAgent.velocity = Vector3.zero;
 
+        // Move and rotate the agent through an OffMeshLink
         do
         {
+            // Set our goal position based on if we went to the start yet
             Vector3 goalPos = reachedStartFirst ? endPos : startPos;
 
             frameMovementSpeed = navAgent.speed * Time.deltaTime;
@@ -126,13 +156,15 @@ public class ThiefAgent : Agent
                 navAgent.angularSpeed * Time.deltaTime)
             );
 
+            // Go to the start of the link if we weren't close enough first
             if (!reachedStartFirst && Vector3.Distance(transform.position.ZeroY(), goalPos.ZeroY()) <= frameMovementSpeed)
                 reachedStartFirst = true;
 
+            // Yield to run every frame
             yield return null;
         }
         while (Vector3.Distance(transform.position.ZeroY(), endPos.ZeroY()) > frameMovementSpeed
-        && navAgent.isOnOffMeshLink);
+                && navAgent.isOnOffMeshLink);
 
         navAgent.CompleteOffMeshLink();
         usingOffMeshLink = false;
@@ -145,6 +177,8 @@ public class ThiefAgent : Agent
 
         if (ArtGoal.TryGetComponent(out GalleryArt art))
         {
+            // Art is either a painting or a statue. We take the mesh
+            // of a statue with us, otherwise we replace the painting texture
             if (art.ShouldTakeObject)
             {
                 art.TargetMesh.transform.SetParent(artHolderTransform, false);
@@ -153,6 +187,7 @@ public class ThiefAgent : Agent
             else
                 art.RemoveArtImage();
 
+            // The stolen art should be marked as suspicious to alert guards
             if (ArtGoal.TryGetComponent(out VisualInterest visual))
                 visual.SetSuspicious(true);
         }
@@ -164,6 +199,9 @@ public class ThiefAgent : Agent
     {
         if(targetAgent.CanAttackBack(this))
         {
+            // Decide who the winner of a struggle is.
+            // We're the winner if the enemy can't win,
+            // otherwise it's a 50/50
             bool winnerIsMe = false;
             if(CanWinStruggle())
             {
@@ -177,7 +215,7 @@ public class ThiefAgent : Agent
             SetupAttack(this, targetAgent);
             PlayStruggleSequence(winnerIsMe);
             targetAgent.PlayStruggleSequence(!winnerIsMe);
-            // Mark everyone as interacting and unable to interrupt attack
+            // Mark everyone as interacting and disable agent logic to not interrupt attack
             targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
             AgentBlackboard.SetVariable("isInteracting", true);
             DeactivateAgent();
@@ -186,6 +224,8 @@ public class ThiefAgent : Agent
 
     public override bool CanAttackBack(Agent attacker)
     {
+        // Thief can only attack back if they're allowed to attack at all
+        // and if they're facing towards their attacker enough
         return CanAttackEnemy() && Vector3.Dot(attacker.transform.forward, transform.forward) < -0.4f;
     }
 
@@ -194,21 +234,26 @@ public class ThiefAgent : Agent
         return true;
     }
 
+    /// <summary>
+    /// Gets the position of the agent or the closest equivalent
+    /// that is always a valid position on the NavMesh for pathfinding
+    /// </summary>
     public Vector3 GetNavMeshSafePosition()
     {
         if (!navAgent.isOnNavMesh)
         {
+            // Sample position will find the nearest position on the nav mesh from where we are
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit,
                 navAgent.height * 3f, navAgent.areaMask))
             {
                 return hit.position;
             }
-            else
+            else // If SamplePosition somehow doesn't find a position we use the centre of the room as a failsafe
             {
                 return CurrentRoom.transform.position;
             }
         }
-        else
+        else // If we're on the nav mesh anyway we just return our normal position
             return transform.position;
     }
 

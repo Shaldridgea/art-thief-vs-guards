@@ -25,6 +25,7 @@ public class EvadeAction : UtilityAction
         if (targetDoorway != null && !thief.NavAgent.hasPath)
             thief.MoveAgent(targetPoint);
 
+        // Find the next exit to run to if we've reached our current one in another room
         if (!thief.NavAgent.pathPending && thief.NavAgent.remainingDistance < thief.NavAgent.radius)
         {
             FindSafeExit(thief);
@@ -34,12 +35,17 @@ public class EvadeAction : UtilityAction
 
     public override void ExitAction(ThiefAgent thief)
     {
+        targetDoorway = null;
         recentRooms.Clear();
         thief.NavAgent.ResetPath();
     }
 
+    /// <summary>
+    /// Calculates the safest exit out of the current room to try and avoid guards
+    /// </summary>
     private void FindSafeExit(ThiefAgent thief)
     {
+        targetDoorway = null;
         Room room = thief.CurrentRoom;
         if (room == null)
             return;
@@ -62,20 +68,20 @@ public class EvadeAction : UtilityAction
         if (currentRoom.Doorways.Count == 1)
             recentRooms.Clear();
 
-        List<DoorwayArea> leastRisk = new(room.Doorways.Count);
+        List<DoorwayArea> exitList = new(room.Doorways.Count);
         List<DoorwayArea> validCandidates = new();
         // Calculate risk of every doorway in the room, make a list of them,
         // and make a list of doorways that don't go to recent rooms or a dead end
         foreach (var d in room.Doorways)
         {
             d.CalculateRisk(thief, thief.ThiefSenses.AwareGuards);
-            leastRisk.Add(d);
+            exitList.Add(d);
             if (IsValidDoorway(d))
                 validCandidates.Add(d);
         }
 
         // Sort our doorways by least risk to most risk
-        leastRisk.Sort(delegate(DoorwayArea x, DoorwayArea y)
+        exitList.Sort(delegate(DoorwayArea x, DoorwayArea y)
         {
             if (x.Risk < y.Risk)
                 return -1;
@@ -94,20 +100,25 @@ public class EvadeAction : UtilityAction
         else
         {
             // Remove doorways that aren't valid exits
-            for (int i = leastRisk.Count - 1; i >= 0; --i)
+            for (int i = exitList.Count - 1; i >= 0; --i)
             {
-                if (!validCandidates.Contains(leastRisk[i]))
-                    leastRisk.RemoveAt(i);
+                if (!validCandidates.Contains(exitList[i]))
+                    exitList.RemoveAt(i);
             }
         }
 
-        if (leastRisk.Count > 0)
-            targetDoorway = leastRisk[0];
+        // Choose our least risky doorway
+        if (exitList.Count > 0)
+            targetDoorway = exitList[0];
 
+        // Set to go to the point of the doorway that's in the next room
         if (targetDoorway != null)
             targetPoint = targetDoorway.GetFurthestPoint(thief.transform.position);
     }
 
+    /// <summary>
+    /// Checks whether a door is valid, that being it doesn't go to a room passed through recently, and isn't a dead end
+    /// </summary>
     private bool IsValidDoorway(DoorwayArea doorway)
     {
         foreach (var r in doorway.ConnectedRooms)

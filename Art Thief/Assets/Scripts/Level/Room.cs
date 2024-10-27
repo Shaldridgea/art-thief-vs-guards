@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEditor;
 using NaughtyAttributes;
 
+/// <summary>
+/// Data container for each room that describes size, hiding spots, doorways, and patrol path.
+/// Informs DoorwayArea's of what rooms they're connected to
+/// </summary>
 public class Room : MonoBehaviour
 {
     [SerializeField]
