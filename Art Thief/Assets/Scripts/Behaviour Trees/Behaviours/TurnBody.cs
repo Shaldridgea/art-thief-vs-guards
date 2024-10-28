@@ -32,7 +32,7 @@ public class TurnBody : BehaviourNode
         else
         {
             Vector3 toPoint = ParentTree.Owner.AgentBlackboard.GetVariable<Vector3>(pointKey);
-            ParentTree.Owner.TurnHeadToPoint(toPoint, animLength);
+            ParentTree.Owner.TurnBodyToPoint(toPoint, animLength);
         }
 
         return status;

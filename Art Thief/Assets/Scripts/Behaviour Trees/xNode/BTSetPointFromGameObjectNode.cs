@@ -16,6 +16,12 @@ public class BTSetPointFromGameObjectNode : BTActionNode
     [SerializeField]
     private string pointKey;
 
+    [SerializeField]
+    private Vector3 offset;
+
+    [SerializeField]
+    private Consts.OffsetType offsetSpace;
+
     protected override void Init()
     {
         type = Consts.BehaviourType.SetPointFromGameObject;
@@ -24,7 +30,7 @@ public class BTSetPointFromGameObjectNode : BTActionNode
 
     public override NodeParameter[] GetParameters()
     {
-        return new NodeParameter[] { (int)source, objectKey, pointKey };
+        return new NodeParameter[] { (int)source, objectKey, pointKey, offset, (int)offsetSpace };
     }
 
     public override string GetNodeDetailsText()

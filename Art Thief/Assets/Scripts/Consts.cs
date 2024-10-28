@@ -82,6 +82,12 @@ public static class Consts
         Random
     }
 
+    public enum OffsetType
+    {
+        WORLD,
+        LOCAL
+    }
+
     public enum HidingAreaType
     {
         Safe,

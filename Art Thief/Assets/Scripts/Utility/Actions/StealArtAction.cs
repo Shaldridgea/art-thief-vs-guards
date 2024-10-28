@@ -11,6 +11,7 @@ public class StealArtAction : UtilityAction
     public override void EnterAction(ThiefAgent thief)
     {
         thief.StealingProgressContainer.SetActive(true);
+        GameEventLog.Log("Thief started stealing art");
     }
 
     public override void PerformAction(ThiefAgent thief)
@@ -23,16 +24,14 @@ public class StealArtAction : UtilityAction
         thief.StealingProgressImage.fillAmount = stealProgress;
 
         if (stealProgress >= 1f)
+        {
             thief.TakeArt();
+            GameEventLog.Log("Thief stole the art!");
+        }
     }
 
     public override void ExitAction(ThiefAgent thief)
     {
         thief.StealingProgressContainer.SetActive(false);
-    }
-
-    public override void OnSceneGUI()
-    {
-        return;
     }
 }

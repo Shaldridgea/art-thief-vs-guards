@@ -48,6 +48,7 @@ public class AttackAction : UtilityAction
 
         thief.AttackAgent(targetGuard);
         animationStarted = true;
+        GameEventLog.Log($"Thief started attacking {targetGuard.name}!");
     }
 
     public override void ExitAction(ThiefAgent thief)
@@ -60,10 +61,5 @@ public class AttackAction : UtilityAction
 
         animationStarted = false;
         targetGuard = null;
-    }
-
-    public override void OnSceneGUI()
-    {
-        return;
     }
 }

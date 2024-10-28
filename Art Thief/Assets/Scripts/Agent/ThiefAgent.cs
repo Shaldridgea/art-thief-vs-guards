@@ -50,6 +50,10 @@ public class ThiefAgent : Agent
             usingOffMeshLink = true;
         }
 
+        // Set true or false as a float for whether we're near enough to the art to steal it
+        AgentBlackboard.SetVariable("nearToArt",
+            Vector3.Distance(transform.position.ZeroY(), ArtGoal.transform.position.ZeroY()) <= 1f ? 1f : 0f);
+
         // Motive calculation for Danger and Aggression
         float danger = 0f;
         float aggression = 0f;

@@ -30,6 +30,7 @@ public class FindExitAction : UtilityAction
                 targetPath = path;
             }
         }
+        GameEventLog.Log("Thief started heading to the exit");
     }
 
     public override void PerformAction(ThiefAgent thief)
@@ -47,10 +48,5 @@ public class FindExitAction : UtilityAction
     public override void ExitAction(ThiefAgent thief)
     {
         thief.NavAgent.ResetPath();
-    }
-
-    public override void OnSceneGUI()
-    {
-        return;
     }
 }

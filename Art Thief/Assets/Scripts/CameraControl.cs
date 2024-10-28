@@ -105,7 +105,7 @@ public class CameraControl : MonoBehaviour
         if (controllingCamera)
         {
             Vector3 turnVector =
-            new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * turnSensitivity * Time.unscaledDeltaTime;
+            new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f) * turnSensitivity;
             freeEuler = new Vector3(Mathf.Clamp(freeEuler.x + turnVector.x, -90f, 90f), freeEuler.y + turnVector.y);
             cam.transform.rotation = Quaternion.Euler(freeEuler);
         }
@@ -116,9 +116,7 @@ public class CameraControl : MonoBehaviour
         // Rotate camera using the mouse
         if (controllingCamera)
         {
-            orbitEuler += Time.unscaledDeltaTime * turnSensitivity * new Vector3(
-            Input.GetAxis("Mouse Y"),
-            Input.GetAxis("Mouse X"), 0f);
+            orbitEuler += turnSensitivity * new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f);
             
             // Zoom the camera in or out
             if (Input.mouseScrollDelta.y != 0f)

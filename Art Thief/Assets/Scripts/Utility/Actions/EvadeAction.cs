@@ -18,12 +18,16 @@ public class EvadeAction : UtilityAction
     public override void EnterAction(ThiefAgent thief)
     {
         FindSafeExit(thief);
+        GameEventLog.Log("Thief started evading");
     }
 
     public override void PerformAction(ThiefAgent thief)
     {
         if (targetDoorway != null && !thief.NavAgent.hasPath)
+        {
             thief.MoveAgent(targetPoint);
+            GameEventLog.Log("Thief running to next room exit");
+        }
 
         // Find the next exit to run to if we've reached our current one in another room
         if (!thief.NavAgent.pathPending && thief.NavAgent.remainingDistance < thief.NavAgent.radius)

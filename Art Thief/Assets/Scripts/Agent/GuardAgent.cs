@@ -147,6 +147,7 @@ public class GuardAgent : Agent
         LeanTween.value(walkieTalkieTransform.gameObject,
             (float value) => walkieTalkieTransform.localPosition = walkieTalkiePath.point(value), 1f, 0f, 1.5f).setDelay(2.5f);
         LeanTween.rotateLocal(walkieTalkieTransform.gameObject, walkieStartAngles, 1.2f).setDelay(2.5f);
+        GameEventLog.Log($"{name} is reporting in about the thief!");
     }
 
     public void EndReportAnimation()
@@ -212,9 +213,8 @@ public class GuardAgent : Agent
         }
         else // If thief can't attack back then we tackle them
         {
-            // End any animations that may already be playing on thief
-            // and end animation on any guard that may have been attacking the thief already
-            targetAgent.EndAgentAnimation();
+            // If a guard was already attacking the thief,
+            // end the animations on that guard
             Agent attacker = targetAgent.AgentBlackboard.GetVariable<Agent>("attackingAgent");
             if (attacker != null)
                 attacker.EndAgentAnimation();
@@ -231,6 +231,7 @@ public class GuardAgent : Agent
             targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
             targetAgent.DeactivateAgent();
         }
+        GameEventLog.Log($"{name} started attacking the thief!");
     }
 
     public override bool CanAttackBack(Agent attacker)

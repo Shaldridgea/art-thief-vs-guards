@@ -43,13 +43,13 @@ public class HideAction : UtilityAction
             // and sort it higher in the list if it's in our current room
             if (x.area.AreaType == Consts.HidingAreaType.Safe)
             {
-                xDist /= 3f;
+                xDist /= 2f;
                 if (thief.CurrentRoom.HidingSpots.Contains(x.area))
                     return -1;
             }
             if (y.area.AreaType == Consts.HidingAreaType.Safe)
             {
-                yDist /= 3f;
+                yDist /= 2f;
                 if (thief.CurrentRoom.HidingSpots.Contains(y.area))
                     return 1;
             }
@@ -93,11 +93,12 @@ public class HideAction : UtilityAction
 
     public override void PerformAction(ThiefAgent thief)
     {
-        if (targetArea != null && !thief.NavAgent.hasPath)
+        if (targetArea != null && !thief.NavAgent.hasPath && !reachedSpot)
         {
             thief.MoveAgent(targetPath);
             // Mark ourself as hiding so we stay in our hiding spot when we reach it
             thief.AgentBlackboard.SetVariable("hiding", 1f);
+            GameEventLog.Log("Thief started hiding");
         }
 
         if (thief.NavAgent.hasPath && !reachedSpot)
@@ -106,6 +107,7 @@ public class HideAction : UtilityAction
                 thief.TurnBody(180f, 1.5f);
                 fearWaitStart = Time.time;
                 reachedSpot = true;
+                GameEventLog.Log("Thief reached hiding spot");
             }
 
         // Wait for a bit to be cautious before thinking about leaving our hiding spot
@@ -197,10 +199,5 @@ public class HideAction : UtilityAction
             }
         }
         return corners[^1];
-    }
-
-    public override void OnSceneGUI()
-    {
-        return;
     }
 }

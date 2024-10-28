@@ -11,11 +11,17 @@ public class SetPointFromGameObject : BehaviourNode
 
     private string pointKey;
 
+    private Vector3 offsetVector;
+
+    private Consts.OffsetType offsetType;
+
     public SetPointFromGameObject(BehaviourTree parentTree, NodeParameter[] parameters) : base(parentTree)
     {
         board = GetTargetBlackboard(parameters[0]);
         objectKey = parameters[1];
         pointKey = parameters[2];
+        offsetVector = parameters[3];
+        offsetType = (Consts.OffsetType)(int)parameters[4];
     }
 
     public override Consts.NodeStatus Update()
@@ -25,7 +31,17 @@ public class SetPointFromGameObject : BehaviourNode
         GameObject targetObject = board.GetVariable<GameObject>(objectKey);
         if(targetObject != null)
         {
-            board.SetVariable(pointKey, targetObject.transform.position);
+            Vector3 targetPoint = targetObject.transform.position;
+
+            if(offsetVector != Vector3.zero)
+            {
+                if (offsetType == Consts.OffsetType.LOCAL)
+                    offsetVector = targetObject.transform.InverseTransformVector(offsetVector);
+
+                targetPoint += offsetVector;
+            }
+
+            board.SetVariable(pointKey, targetPoint);
             status = Consts.NodeStatus.SUCCESS;
         }
 

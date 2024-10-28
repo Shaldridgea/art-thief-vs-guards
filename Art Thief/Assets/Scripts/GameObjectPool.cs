@@ -63,6 +63,24 @@ public class GameObjectPool<T>
         return returnTarget;
     }
 
+    public void ReturnToPool(GameObject returnedObject)
+    {
+        int index = objectList.FindIndex(0, (f) => f == returnedObject);
+        if (index < 0)
+            return;
+
+        objectList.RemoveAt(index);
+        T returnComponent = returnList[index];
+        returnList.RemoveAt(index);
+
+        if (getIndex >= objectList.Count)
+            getIndex = objectList.Count - 1;
+
+        objectList.Insert(getIndex, returnedObject);
+        returnList.Insert(getIndex, returnComponent);
+        returnedObject.SetActive(false);
+    }
+
     /// <summary>
     /// Reset the internal counter for getting from the pool, starting from the top again
     /// </summary>

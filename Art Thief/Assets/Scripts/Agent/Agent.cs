@@ -171,6 +171,9 @@ public abstract class Agent : MonoBehaviour
         TurnHead(lookAngle, time);
     }
 
+    /// <summary>
+    /// Rotate head to the supplied angle over time
+    /// </summary>
     public void TurnHead(float turnAngle, float time)
     {
         LeanTween.cancel(AgentView.AgentHeadRoot.gameObject);
@@ -189,6 +192,9 @@ public abstract class Agent : MonoBehaviour
         TurnBody(lookAngle, time);
     }
 
+    /// <summary>
+    /// Rotate body by adding the supplied angle over time
+    /// </summary>
     public void TurnBody(float turnAngle, float time)
     {
         LeanTween.cancel(AgentView.AgentRoot.gameObject);
@@ -227,10 +233,15 @@ public abstract class Agent : MonoBehaviour
             StopCoroutine(attackCoroutine);
             attackCoroutine = null;
         }
+        TurnHead(0f, 0f);
     }
 
     protected void SetupAttack(Agent a, Agent b)
     {
+        // End any current animations on the agents first
+        a.EndAgentAnimation();
+        b.EndAgentAnimation();
+
         // Immediately stop the thief and guard from moving, make them look at each other
         // and stop the NavAgent components from moving
         // or rotating the agents during their animated interaction
@@ -269,7 +280,10 @@ public abstract class Agent : MonoBehaviour
         yield return new WaitForSeconds(1f);
         AgentBlackboard.SetVariable("isInteracting", false);
         if (!isWinner)
+        {
             AgentBlackboard.SetVariable("isStunned", true);
+            GameEventLog.Log($"{name} lost the struggle!");
+        }
         else
             ActivateAgent();
         attackCoroutine = null;
@@ -292,7 +306,8 @@ public abstract class Agent : MonoBehaviour
 
     public void PlayWakeupAnimation()
     {
-        LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 1f);
+        if(AgentView.AgentRoot.eulerAngles.x != 0f)
+            LeanTween.rotateX(AgentView.AgentRoot.gameObject, 0f, 1f);
     }
     #endregion
 
@@ -303,7 +318,10 @@ public abstract class Agent : MonoBehaviour
         yield return new WaitForSeconds(1.6f);
         AgentBlackboard.SetVariable("isInteracting", false);
         if (!isWinner)
+        {
             AgentBlackboard.SetVariable("isStunned", true);
+            GameEventLog.Log($"{name} was tackled to the floor!");
+        }
         else
             ActivateAgent();
         attackCoroutine = null;

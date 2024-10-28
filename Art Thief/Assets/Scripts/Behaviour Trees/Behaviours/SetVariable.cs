@@ -33,6 +33,8 @@ public class SetVariable : BehaviourNode
             targetBoard = newBoard;
         }
 
+        // If the value we're setting is a string then we might
+        // be using a key for another variable to set from
         if (value.type == NodeParameter.ParamType.String)
         {
             string valueString = value;

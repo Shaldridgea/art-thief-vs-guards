@@ -114,6 +114,7 @@ public class SuspicionModule : MonoBehaviour
             {
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
                 shouldResetInterest = true;
+                GameEventLog.Log($"{name} saw something suspicious!");
             }
             else if (checkReaction)
             {
@@ -121,6 +122,7 @@ public class SuspicionModule : MonoBehaviour
                 // timer stops, our suspicion is unconfirmed
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
                 shouldResetInterest = true;
+                GameEventLog.Log($"{name} thinks they saw something...");
             }
         }
 
@@ -131,6 +133,7 @@ public class SuspicionModule : MonoBehaviour
             {
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
                 shouldResetInterest = true;
+                GameEventLog.Log($"{name} thinks they heard something...");
             }
 
         if (shouldResetInterest)
@@ -202,6 +205,7 @@ public class SuspicionModule : MonoBehaviour
                     visualSuspectList.Add(newInterest);
                 }
             }
+            GameEventLog.Log($"{name} noticed something...");
             return true;
         }
 
