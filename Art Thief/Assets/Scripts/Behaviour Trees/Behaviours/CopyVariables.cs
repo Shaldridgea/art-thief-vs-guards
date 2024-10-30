@@ -23,7 +23,7 @@ public class CopyVariables : BehaviourNode
 
         // Copy variable values from the target board to our own board with the same key
         for (int i = 0; i < copyKeys.Length; ++i)
-            ParentTree.Owner.AgentBlackboard.SetVariable(copyKeys[i], board.GetVariableGeneric(copyKeys[i]));
+            ParentTree.Owner.AgentBlackboard.SetVariable(copyKeys[i], board.GetVariable<object>(copyKeys[i]));
 
         return status;
     }

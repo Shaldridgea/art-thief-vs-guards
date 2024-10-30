@@ -29,11 +29,13 @@ public class SetPointFromGameObject : BehaviourNode
         Consts.NodeStatus status = Consts.NodeStatus.FAILURE;
 
         GameObject targetObject = board.GetVariable<GameObject>(objectKey);
+
         if(targetObject != null)
         {
             Vector3 targetPoint = targetObject.transform.position;
 
-            if(offsetVector != Vector3.zero)
+            // Add our offset in the correct transform space if we have one
+            if (offsetVector != Vector3.zero)
             {
                 if (offsetType == Consts.OffsetType.LOCAL)
                     offsetVector = targetObject.transform.InverseTransformVector(offsetVector);

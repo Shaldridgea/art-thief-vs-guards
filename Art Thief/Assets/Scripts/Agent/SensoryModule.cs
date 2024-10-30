@@ -50,8 +50,12 @@ public abstract class SensoryModule : MonoBehaviour
 
     private float losCheckTimer;
 
+    private LayerMask interestMask;
+
     protected virtual void Start()
     {
+        interestMask = LayerMask.GetMask("Interest", "Thief", "Guard");
+
         owner = GetComponent<Agent>();
         foreach (VisionCone v in visionCones)
         {
@@ -212,23 +216,54 @@ public abstract class SensoryModule : MonoBehaviour
         Physics.OverlapSphere(
         transform.position,
         INTEREST_RADIUS,
-        LayerMask.GetMask("Interest", "Thief", "Guard"),
+        interestMask,
         QueryTriggerInteraction.Collide);
 
         List<GameObject> desiredInterests = new();
         foreach(Collider c in nearbyInterests)
         {
-            if (c.CompareTag(interestTag) && c.gameObject != owner.gameObject)
-                desiredInterests.Add(c.gameObject);
+            // Only try to add things that have the right tag applied
+            if (c.CompareTag(interestTag))
+            {
+                bool shouldAdd = true;
+                GameObject addObject = c.gameObject;
+
+                // Don't add ourselves to our interests
+                // and don't add duplicates
+                if (addObject == owner.gameObject || desiredInterests.Contains(addObject))
+                    shouldAdd = false;
+                else if(addObject.TryGetComponent<SenseInterest>(out var interest))
+                {
+                    if(interest.Owner != null)
+                        addObject = interest.Owner;
+
+                    // If we found an actual sense interest, don't add
+                    // if it belongs to us and don't add a duplicate
+                    if (addObject == owner.gameObject || desiredInterests.Contains(addObject))
+                        shouldAdd = false;
+                }
+
+                if(shouldAdd)
+                    desiredInterests.Add(addObject);
+            }
         }
         return desiredInterests;
     }
 
-    public bool StoreNearbyInterests(string interestTag, Blackboard targetBoard, string listKey)
+    public bool StoreVisibleInterests(string interestTag, Blackboard targetBoard, string listKey)
     {
         var interests = FindNearbyInterests(interestTag);
         if(interests.Count > 0)
         {
+            // Remove interests that we can't see
+            for(int i = interests.Count - 1; i >= 0; --i)
+            {
+                if(!IsInLOS(interests[i].transform.position))
+                {
+                    interests.RemoveAt(i);
+                }
+            }
+
             var existingList = targetBoard.GetVariable<List<GameObject>>(listKey);
             if (existingList == null)
                 targetBoard.SetVariable(listKey, interests);

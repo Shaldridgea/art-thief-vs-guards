@@ -76,13 +76,14 @@ public abstract class BehaviourNode : INodeGuid
                 newTargetBoard = ParentTree.GlobalBlackboard;
                 return true;
             }
-            
+
             // Check if our source board has the GameObject and associated Agent we expect it to have stored
-            if (sourceBoard.GetData().ContainsKey(left))
+            object retrievedValue = sourceBoard.GetVariable<object>(left);
+            if (retrievedValue != default)
             {
-                if (sourceBoard.GetVariableType(left).Name.Contains("GameObject"))
+                if (retrievedValue.GetType() == typeof(GameObject))
                 {
-                    GameObject target = sourceBoard.GetVariable<GameObject>(left);
+                    GameObject target = retrievedValue as GameObject;
                     if (target != null)
                     {
                         if (target.TryGetComponent(out Agent targetAgent))

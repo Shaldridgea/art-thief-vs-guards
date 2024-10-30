@@ -96,6 +96,7 @@ public abstract class Agent : MonoBehaviour
             else
                 AgentBlackboard.SetVariable(left, right);
         }
+        AgentBlackboard.SetVariable("owner", gameObject);
     }
 
     public virtual void ActivateAgent()

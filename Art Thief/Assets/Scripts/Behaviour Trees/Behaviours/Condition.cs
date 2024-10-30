@@ -94,12 +94,13 @@ public class Condition : BehaviourNode
         if (newString.StartsWith('"') && newString.EndsWith('"'))
             return newString.Trim('"');
 
-        System.Type type = board.GetVariableType(newString);
-        // If we got null back then this key isn't in
+        object retrievedValue = board.GetVariable<object>(newString);
+        // If we got default back then this key isn't in
         // the blackboard and we just return the string
-        if (type == null)
+        if (retrievedValue == default)
             return newString;
 
+        var type = retrievedValue.GetType();
         // Get the value from the board key
         if (type == typeof(int))
             return workingBoard.GetVariable<int>(newString);

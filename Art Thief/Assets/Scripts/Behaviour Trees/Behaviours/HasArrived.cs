@@ -16,6 +16,16 @@ public class HasArrived : Condition
     {
         // Return whether we have arrived at the navigation destination
         NavMeshAgent agent = ParentTree.Owner.NavAgent;
-        return (!agent.pathPending && agent.remainingDistance < agent.radius + stoppingDistance) ? Consts.NodeStatus.SUCCESS : Consts.NodeStatus.FAILURE;
+
+        if (agent.pathPending)
+            return Consts.NodeStatus.FAILURE;
+
+        if (!agent.hasPath)
+            return Consts.NodeStatus.FAILURE;
+
+        if (agent.remainingDistance < agent.radius + stoppingDistance)
+            return Consts.NodeStatus.SUCCESS;
+
+        return Consts.NodeStatus.FAILURE;
     }
 }

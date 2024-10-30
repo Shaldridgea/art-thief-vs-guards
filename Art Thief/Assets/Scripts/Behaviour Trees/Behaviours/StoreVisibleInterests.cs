@@ -22,7 +22,7 @@ public class StoreVisibleInterests : BehaviourNode
     {
         Consts.NodeStatus status = Consts.NodeStatus.FAILURE;
 
-        if (ParentTree.Owner.Senses.StoreNearbyInterests(interestTag, board, listKey))
+        if (ParentTree.Owner.Senses.StoreVisibleInterests(interestTag, board, listKey))
             status = Consts.NodeStatus.SUCCESS;
 
         return status;

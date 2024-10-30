@@ -23,7 +23,6 @@ public class SetVariable : BehaviourNode
     public override Consts.NodeStatus Update()
     {
         string variableName = keyStatement;
-        NodeParameter value = valueStatement;
         Blackboard targetBoard = board;
 
         // If we're setting on a different agent by accessor e.g. storedAgent.newVariable
@@ -33,47 +32,41 @@ public class SetVariable : BehaviourNode
             targetBoard = newBoard;
         }
 
+        bool isDirectValue = true;
         // If the value we're setting is a string then we might
         // be using a key for another variable to set from
-        if (value.type == NodeParameter.ParamType.String)
+        if (valueStatement.type == NodeParameter.ParamType.String)
         {
-            string valueString = value;
+            string valueString = valueStatement;
             if (HandleStatementAccessor(valueString, board, out Blackboard tempBoard, out string newValueName))
             {
-                object tempValue = tempBoard.GetVariable<object>(newValueName);
-                System.Type type = tempBoard.GetVariableType(newValueName);
-                if (type == typeof(int))
-                    value = (int)tempValue;
-                else if (type == typeof(float))
-                    value = (float)tempValue;
-                else if (type == typeof(bool))
-                    value = (bool)tempValue;
-                else if (type == typeof(string))
-                    value = (string)tempValue;
-                else if (type == typeof(Vector3))
-                    value = (Vector3)tempValue;
-                else
-                    value = newValueName;
+                isDirectValue = false;
+
+                object value = tempBoard.GetVariable<object>(newValueName);
+                targetBoard.SetVariable(variableName, value);
             }
         }
-
-        switch (value.type)
+        
+        if(isDirectValue)
         {
-            case NodeParameter.ParamType.Int:
-                targetBoard.SetVariable<int>(variableName, value);
-            break;
-            case NodeParameter.ParamType.Float:
-                targetBoard.SetVariable<float>(variableName, value);
-            break;
-            case NodeParameter.ParamType.Bool:
-                targetBoard.SetVariable<bool>(variableName, value);
-            break;
-            case NodeParameter.ParamType.String:
-                targetBoard.SetVariable<string>(variableName, value);
-            break;
-            case NodeParameter.ParamType.Vector3:
-                targetBoard.SetVariable<Vector3>(variableName, value);
-            break;
+            switch (valueStatement.type)
+            {
+                case NodeParameter.ParamType.Int:
+                    targetBoard.SetVariable<int>(variableName, valueStatement);
+                    break;
+                case NodeParameter.ParamType.Float:
+                    targetBoard.SetVariable<float>(variableName, valueStatement);
+                    break;
+                case NodeParameter.ParamType.Bool:
+                    targetBoard.SetVariable<bool>(variableName, valueStatement);
+                    break;
+                case NodeParameter.ParamType.String:
+                    targetBoard.SetVariable<string>(variableName, valueStatement);
+                    break;
+                case NodeParameter.ParamType.Vector3:
+                    targetBoard.SetVariable<Vector3>(variableName, valueStatement);
+                    break;
+            }
         }
         return Consts.NodeStatus.SUCCESS;
     }
