@@ -141,12 +141,12 @@ public class GuardAgent : Agent
     public void PlayReportAnimation()
     {
         LeanTween.value(walkieTalkieTransform.gameObject,
-            (float value) => walkieTalkieTransform.localPosition = walkieTalkiePath.point(value), 0f, 1f, 1.5f);
-        LeanTween.rotateLocal(walkieTalkieTransform.gameObject, walkieGoalLocalAngles, 1.2f).setDelay(0.3f);
+            (float value) => walkieTalkieTransform.localPosition = walkieTalkiePath.point(value), 0f, 1f, 1f);
+        LeanTween.rotateLocal(walkieTalkieTransform.gameObject, walkieGoalLocalAngles, 0.7f).setDelay(0.3f);
 
         LeanTween.value(walkieTalkieTransform.gameObject,
-            (float value) => walkieTalkieTransform.localPosition = walkieTalkiePath.point(value), 1f, 0f, 1.5f).setDelay(2.5f);
-        LeanTween.rotateLocal(walkieTalkieTransform.gameObject, walkieStartAngles, 1.2f).setDelay(2.5f);
+            (float value) => walkieTalkieTransform.localPosition = walkieTalkiePath.point(value), 1f, 0f, 1f).setDelay(2f);
+        LeanTween.rotateLocal(walkieTalkieTransform.gameObject, walkieStartAngles, 0.7f).setDelay(2f);
         GameEventLog.Log($"{name} is reporting in about the thief!");
     }
 

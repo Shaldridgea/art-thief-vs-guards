@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Tracks the suspicions and awareness of guards, using visual and auditory sense information
+/// </summary>
 public class SuspicionModule : MonoBehaviour
 {
     [SerializeField]
@@ -13,6 +16,16 @@ public class SuspicionModule : MonoBehaviour
 
     [SerializeField]
     private float awarenessMaxDistance = 20f;
+
+    [Header("Awareness UI")]
+    [SerializeField]
+    private GameObject guardMarkerCanvas;
+
+    [SerializeField]
+    private GameObject exclamationIcon;
+
+    [SerializeField]
+    private GameObject questionIcon;
 
     private float reactionTimer;
 
@@ -37,6 +50,9 @@ public class SuspicionModule : MonoBehaviour
 
     void Update()
     {
+        if (!owner.AgentActivated)
+            return;
+
         // Check reaction when our timer hits zero, but not after
         bool checkReaction = false;
         if (reactionTimer == 0f)
@@ -51,6 +67,7 @@ public class SuspicionModule : MonoBehaviour
             return;
 
         bool shouldResetInterest = false;
+        int awarenessCount = 0;
         foreach(var key in visualSuspectList)
         {
             var suspectValues = visualSuspectMap[key];
@@ -62,7 +79,7 @@ public class SuspicionModule : MonoBehaviour
                 // Awareness delta is how fast the guard becomes aware/suspicious of something
                 // 1 is the baseline of taking 1 second to become aware
                 // 2 would take 2 seconds, 0.5 would be half a second etc.
-                float awarenessDelta = 0.5f;
+                float awarenessDelta = 0.75f;
                 // Add more time to awareness if interest is in peripheral vision
                 if (!owner.GuardSenses.IsInCentralVision(key.gameObject))
                     awarenessDelta += 1f;
@@ -76,7 +93,7 @@ public class SuspicionModule : MonoBehaviour
 
                 // Reduce the reaction time if the visual interest is moving
                 if (visual.IsMoving)
-                    awarenessDelta *= 0.5f;
+                    awarenessDelta *= 0.6f;
 
                 // Multiply awareness factor to take 3 times as long if interest is in the dark
                 if (!visual.IsLitUp)
@@ -90,22 +107,33 @@ public class SuspicionModule : MonoBehaviour
                     Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime / awarenessDelta), 0f, 2f);
             }
             else // Reduce awareness over a second if interest isn't visible
-                suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness + (Time.deltaTime / -1f), 0f, 2f);
+                suspectValues.Awareness = Mathf.Clamp(suspectValues.Awareness - Time.deltaTime, 0f, 2f);
 
             visualSuspectMap[key] = suspectValues;
 
-            if(suspectValues.Awareness >= 1f)
+            if (suspectValues.Awareness > 0f)
             {
-                // If our awareness is over 1 and was previously under 1
-                // then this is our new current suspicion, start reacting
-                if (compareAware < 1f)
+                ++awarenessCount;
+                ShowAwarenessMarker(questionIcon);
+
+                if (suspectValues.Awareness >= 1f)
                 {
-                    SetSuspicion(key);
-                    reactionTimer = reactionTimerMax;
-                    break;
+                    // If our awareness is over 1 and was previously under 1
+                    // then this is our new current suspicion, start reacting
+                    if (compareAware < 1f)
+                    {
+                        SetSuspicion(key);
+                        reactionTimer = reactionTimerMax;
+                        break;
+                    }
                 }
             }
+            else if (compareAware > 0f)
+                --awarenessCount;
         }
+
+        if(awarenessCount < 0)
+            HideAwarenessMarker();
 
         if (currentSuspicion != null && currentSuspicion is VisualInterest)
         {
@@ -115,6 +143,7 @@ public class SuspicionModule : MonoBehaviour
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "confirmed");
                 shouldResetInterest = true;
                 GameEventLog.Log($"{name} saw something suspicious!");
+                ShowAwarenessMarker(exclamationIcon);
             }
             else if (checkReaction)
             {
@@ -123,6 +152,8 @@ public class SuspicionModule : MonoBehaviour
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
                 shouldResetInterest = true;
                 GameEventLog.Log($"{name} thinks they saw something...");
+                ShowAwarenessMarker(questionIcon);
+                HideAwarenessMarker();
             }
         }
 
@@ -134,6 +165,7 @@ public class SuspicionModule : MonoBehaviour
                 owner.AgentBlackboard.SetVariable("suspicionStatus", "unconfirmed");
                 shouldResetInterest = true;
                 GameEventLog.Log($"{name} thinks they heard something...");
+                HideAwarenessMarker();
             }
 
         if (shouldResetInterest)
@@ -172,6 +204,8 @@ public class SuspicionModule : MonoBehaviour
         }
 
         currentSuspicion = null;
+
+        HideAwarenessMarker();
     }
 
     public bool OnSuspicionSensed(SenseInterest newInterest, Consts.SuspicionType suspicionType)
@@ -185,6 +219,9 @@ public class SuspicionModule : MonoBehaviour
         // If we have no suspicion right now or this new suspicion is higher/equal priority
         if (currentSuspicion == null || newInterest.Priority >= currentSuspicion.Priority)
         {
+            guardMarkerCanvas.SetActive(true);
+            ShowAwarenessMarker(questionIcon);
+
             // Immediately set our suspicion if its a sound interest
             if (suspicionType == Consts.SuspicionType.Sound)
             {
@@ -235,6 +272,22 @@ public class SuspicionModule : MonoBehaviour
             return sound.IsOngoing;
 
         return false;
+    }
+
+    private void ShowAwarenessMarker(GameObject marker)
+    {
+        LeanTween.cancel(guardMarkerCanvas);
+        marker.SetActive(true);
+        if (marker == exclamationIcon)
+            questionIcon.SetActive(false);
+        else
+            exclamationIcon.SetActive(false);
+    }
+
+    private void HideAwarenessMarker()
+    {
+        LeanTween.cancel(guardMarkerCanvas);
+        LeanTween.delayedCall(guardMarkerCanvas, 5f, () => guardMarkerCanvas.SetActive(false));
     }
 
     public Dictionary<SenseInterest, (bool Visible, float Awareness)> GetSuspectData() => visualSuspectMap;

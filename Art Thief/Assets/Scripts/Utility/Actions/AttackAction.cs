@@ -8,6 +8,8 @@ public class AttackAction : UtilityAction
 
     private bool animationStarted;
 
+    private bool reachedGuard;
+
     public AttackAction(ActionData newData) : base(newData) { }
 
     public override void EnterAction(ThiefAgent thief)
@@ -46,6 +48,15 @@ public class AttackAction : UtilityAction
         if (animationStarted)
             return;
 
+        if(!reachedGuard)
+        {
+            if (!thief.NavAgent.hasPath)
+                thief.MoveAgent(targetGuard.transform.position);
+
+            if (Vector3.Distance(thief.transform.position, targetGuard.transform.position) <= thief.NavAgent.radius * 2.5f)
+                reachedGuard = true;
+        }
+
         thief.AttackAgent(targetGuard);
         animationStarted = true;
         GameEventLog.Log($"Thief started attacking {targetGuard.name}!");
@@ -59,6 +70,9 @@ public class AttackAction : UtilityAction
         if (targetGuard != null)
             targetGuard.NavAgent.Warp(targetGuard.transform.position);
 
+        thief.NavAgent.ResetPath();
+
+        reachedGuard = false;
         animationStarted = false;
         targetGuard = null;
     }

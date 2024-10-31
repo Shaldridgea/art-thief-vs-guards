@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// HUD for controlling simulation while in play
+/// </summary>
 public class SimulationHUD : MonoBehaviour
 {
     [SerializeField]
@@ -114,9 +117,10 @@ public class SimulationHUD : MonoBehaviour
 
     private void HandleChangeCameraLeft()
     {
-        --cameraTargetIndex;
-        if (cameraTargetIndex < 0)
-            cameraTargetIndex = cameraTargetList.Count - 1;
+        cameraTargetIndex = (cameraTargetIndex - 1) % cameraTargetList.Count - 1;
+
+        while (!cameraTargetList[cameraTargetIndex].gameObject.activeSelf)
+            cameraTargetIndex = (cameraTargetIndex - 1) % cameraTargetList.Count - 1;
 
         GameController.Instance.CameraController.CameraTarget = cameraTargetList[cameraTargetIndex];
         cameraTargetNameText.text = GameController.Instance.CameraController.CameraTarget.name;
@@ -124,9 +128,10 @@ public class SimulationHUD : MonoBehaviour
 
     private void HandleChangeCameraRight()
     {
-        ++cameraTargetIndex;
-        if (cameraTargetIndex >= cameraTargetList.Count)
-            cameraTargetIndex = 0;
+        cameraTargetIndex = (cameraTargetIndex + 1) % cameraTargetList.Count;
+
+        while (!cameraTargetList[cameraTargetIndex].gameObject.activeSelf)
+            cameraTargetIndex = (cameraTargetIndex + 1) % cameraTargetList.Count;
 
         GameController.Instance.CameraController.CameraTarget = cameraTargetList[cameraTargetIndex];
         cameraTargetNameText.text = GameController.Instance.CameraController.CameraTarget.name;

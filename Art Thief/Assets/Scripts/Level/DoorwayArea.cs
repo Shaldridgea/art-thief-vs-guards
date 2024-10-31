@@ -64,10 +64,8 @@ public class DoorwayArea : MonoBehaviour
             Risk += Mathf.InverseLerp(GUARD_MAX_RISK_DISTANCE, GUARD_MIN_RISK_DISTANCE,
                 Vector3.Distance(nearPoint, guard.transform.position));
 
-            float guardLookAngle = Vector3.Angle(guard.transform.forward, (nearPoint - guard.transform.position).normalized);
-
-            // Increase our risk significantly if a guard is looking at this doorway
-            if (guardLookAngle <= 50f)
+            // Increase our risk significantly if a guard can see this doorway
+            if (guard.Senses.IsSeen(nearPoint))
                 Risk += 0.7f;
 
             float guardToDoorwayAngle = Vector3.Angle(

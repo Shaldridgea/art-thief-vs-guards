@@ -56,7 +56,7 @@ public class ThiefAgent : Agent
 
         // Motive calculation for Danger and Aggression
         float danger = 0f;
-        float aggression = 0f;
+        float aggression = AgentBlackboard.GetVariable<float>("aggro");
         var guards = ThiefSenses.AwareGuards;
         int guardThreats = 0;
         bool beingChased = false;
@@ -69,25 +69,40 @@ public class ThiefAgent : Agent
             ++guardThreats;
             bool seenByGuard = g.GuardSenses.IsSeen(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
-            // Add more danger to closer a guard is to us
+            bool isGuardChasing = g.AgentBlackboard.GetVariable<string>("guardMode") == "chase";
+            // Add more danger the closer a guard is to us
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
             // Add aggression if we're able to attack currently and
-            // there's a guard close enough who we're looking at
+            // there's a guard close enough who we can see
+            bool wantToAttack = false;
             if (CanAttackEnemy())
             {
-                if (distanceToGuard < aggroRadius)
+                if (distanceToGuard <= aggroRadius)
                 {
                     if (Vector3.Angle(transform.forward, (g.transform.position - transform.position).normalized) <= aggroAngle)
-                        aggression += 1f;
+                    {
+                        if (senses.IsInLOS(g.transform.position))
+                        {
+                            wantToAttack = true;
+
+                            if (isGuardChasing)
+                                aggression += 1.2f * Time.deltaTime;
+                            else
+                                aggression += 0.6f * Time.deltaTime;
+                        }
+                    }
                 }
             }
+            if (!wantToAttack)
+                aggression = 0f;
+
             // Add more danger if we're currently seen by a guard
             if (seenByGuard)
                 danger += 0.5f;
 
             // Flag whether we're being chased by any guard
-            if (g.AgentBlackboard.GetVariable<string>("guardMode") == "chase")
+            if (isGuardChasing)
                 beingChased = true;
         }
         // Average our danger by the number of guards and add a bit extra
@@ -269,6 +284,8 @@ public class ThiefAgent : Agent
         Gizmos.DrawWireSphere(transform.position, HideAction.CHECK_RADIUS);
         Handles.DrawWireDisc(transform.position + new Vector3(0f, 0.5f), Vector3.up, dangerDistanceMin);
         Handles.DrawWireDisc(transform.position + new Vector3(0f, 0.5f), Vector3.up, dangerDistanceMax);
+        Handles.color = Color.red;
+        Handles.DrawWireDisc(transform.position + new Vector3(0f, 0.5f), Vector3.up, aggroRadius);
 
         if (!EditorApplication.isPlaying)
             return;
