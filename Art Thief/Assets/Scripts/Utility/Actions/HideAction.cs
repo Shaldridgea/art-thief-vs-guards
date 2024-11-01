@@ -38,20 +38,24 @@ public class HideAction : UtilityAction
         {
             float xDist = x.distance;
             float yDist = y.distance;
+            var hidingSpots = thief.CurrentRoom.HidingSpots;
             // If a hiding area is safe, reduce its stored
             // distance to weight it more favourably,
             // and sort it higher in the list if it's in our current room
             if (x.area.AreaType == Consts.HidingAreaType.Safe)
             {
                 xDist /= 2f;
-                if (thief.CurrentRoom.HidingSpots.Contains(x.area))
-                    return -1;
+                if (hidingSpots != null && hidingSpots.Count > 0)
+                    if (hidingSpots.Contains(x.area))
+                        return -1;
             }
+
             if (y.area.AreaType == Consts.HidingAreaType.Safe)
             {
                 yDist /= 2f;
-                if (thief.CurrentRoom.HidingSpots.Contains(y.area))
-                    return 1;
+                if (hidingSpots != null && hidingSpots.Count > 0)
+                    if (hidingSpots.Contains(y.area))
+                        return 1;
             }
             
             // Return sort for which area is closer
