@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Utility action that handles the thief agent stealing a piece of art over time
+/// </summary>
 public class StealArtAction : UtilityAction
 {
     const float STEALING_SPEED = 10f;

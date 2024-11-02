@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>
+/// Utility action that handles the thief agent hiding in the best suitable spot it can find to avoid detection
+/// </summary>
 public class HideAction : UtilityAction
 {
     private HidingArea targetArea;

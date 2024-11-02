@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Utility action that handles the thief agent attacking nearby guards
+/// </summary>
 public class AttackAction : UtilityAction
 {
     private GuardAgent targetGuard;

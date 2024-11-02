@@ -440,7 +440,7 @@ PlayerSettings:
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
   m_TemplateCustomTags:
-    BACKGROUND: '#000'
+    BACKGROUND: rgb(248,228,198)
     OPTIMIZE_FOR_PIXEL_ART: 
     SCALE_TO_FIT: 
   mobileMTRendering:
@@ -707,7 +707,7 @@ PlayerSettings:
   webGLTemplate: PROJECT:BetterMinimal
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
-  webGLCompressionFormat: 1
+  webGLCompressionFormat: 2
   webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0

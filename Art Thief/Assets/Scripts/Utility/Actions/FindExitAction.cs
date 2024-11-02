@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>
+/// Utility action that handles the thief agent pathing to the nearest level exit
+/// </summary>
 public class FindExitAction : UtilityAction
 {
     private NavMeshPath targetPath;

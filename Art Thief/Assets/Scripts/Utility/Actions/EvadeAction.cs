@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// Utility action that handles the thief agent evading capture and running from room to room
+/// </summary>
 public class EvadeAction : UtilityAction
 {
     private DoorwayArea targetDoorway;
