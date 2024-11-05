@@ -41,7 +41,8 @@ public static class Consts
         IsThiefHeard,
         CanAttackThief,
         AttackThief,
-        TurnBody
+        TurnBody,
+        LockVariable
     }
 
     public enum RepeatCondition

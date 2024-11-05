@@ -64,7 +64,8 @@ public abstract class Agent : MonoBehaviour
 
     private List<Room> roomList = new();
 
-    // Get the room at the end of the list if it's not empty
+    // We add the most recently entered room to the end of our list,
+    // so our current room can always be gotten with the last entry
     public Room CurrentRoom => roomList.Count == 0 ? null : roomList[^1];
 
     public bool AgentActivated { get; protected set; }
@@ -74,14 +75,15 @@ public abstract class Agent : MonoBehaviour
         // Make a new blackboard for this agent
         AgentBlackboard = new Blackboard();
 
-        // Set our default blackboard values by parsing the strings for their keys and values
+        // Every default value is a string where we
+        // have the key name and then its value,
+        // separated by a comma
         foreach (string s in blackboardDefaults)
         {
             string[] splitResult = s.Split(',', 2);
             string left = splitResult[0].Trim();
             string right = splitResult[1].Trim();
 
-            // Parse normally for our primitives
             if (int.TryParse(right, out int newInt))
                 AgentBlackboard.SetVariable(left, newInt);
             else
@@ -94,8 +96,11 @@ public abstract class Agent : MonoBehaviour
             if (Consts.ParseVector3(right, out Vector3 newVector))
                 AgentBlackboard.SetVariable(left, newVector);
             else
-                AgentBlackboard.SetVariable(left, right);
+                AgentBlackboard.SetVariable(left, right); // Fallback sets the value as a string
         }
+
+        // Add our GameObject to our blackboard so we
+        // can be addressed by variable accessors
         AgentBlackboard.SetVariable("owner", gameObject);
     }
 
@@ -151,7 +156,6 @@ public abstract class Agent : MonoBehaviour
 
     private IEnumerator MakeWalkingSound()
     {
-        // Make the walking sound play as long as we're travelling to our destination
         while(Vector3.Distance(transform.position, navAgent.destination) > 1f &&
             !AgentBlackboard.GetVariable<bool>("isInteracting"))
         {
@@ -163,6 +167,10 @@ public abstract class Agent : MonoBehaviour
         yield break;
     }
 
+    /// <summary>
+    /// Rotate the agent's head model to look towards the supplied point over time.
+    /// Head angle will be clamped to not rotate too far
+    /// </summary>
     public void TurnHeadToPoint(Vector3 targetPoint, float time)
     {
         float lookAngle = Vector3.SignedAngle(
@@ -173,7 +181,7 @@ public abstract class Agent : MonoBehaviour
     }
 
     /// <summary>
-    /// Rotate head to the supplied angle over time
+    /// Rotate head to the supplied angle over time. Head angle will be clamped to not rotate too far
     /// </summary>
     public void TurnHead(float turnAngle, float time)
     {
@@ -184,6 +192,9 @@ public abstract class Agent : MonoBehaviour
         LeanTween.rotateLocal(AgentView.AgentHeadRoot.gameObject, new Vector3(0f, 0f, turnAngle), time);
     }
 
+    /// <summary>
+    /// Rotate the whole agent to look towards the supplied point over time
+    /// </summary>
     public void TurnBodyToPoint(Vector3 targetPoint, float time)
     {
         float lookAngle = Vector3.SignedAngle(
@@ -194,7 +205,7 @@ public abstract class Agent : MonoBehaviour
     }
 
     /// <summary>
-    /// Rotate body by adding the supplied angle over time
+    /// Rotate the whole agent by adding the supplied angle over time
     /// </summary>
     public void TurnBody(float turnAngle, float time)
     {
@@ -205,15 +216,28 @@ public abstract class Agent : MonoBehaviour
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
     #region ATTACKING
+    /// <summary>
+    /// Whether this agent is allowed to attack another agent
+    /// </summary>
+    /// <returns></returns>
     public virtual bool CanAttackEnemy()
     {
         return !AgentBlackboard.GetVariable<bool>("isInteracting");
     }
 
+    /// <summary>
+    /// Run logic for attacking the supplied agent
+    /// </summary>
     public abstract void AttackAgent(Agent targetAgent);
 
+    /// <summary>
+    /// Whether this agent is allowed to fight back against the supplied agent who is attacking them
+    /// </summary>
     public abstract bool CanAttackBack(Agent attacker);
 
+    /// <summary>
+    /// Whether this agent can win a struggle with another agent
+    /// </summary>
     public abstract bool CanWinStruggle();
 
     public void PlayStruggleSequence(bool isWinner)
@@ -226,6 +250,9 @@ public abstract class Agent : MonoBehaviour
         attackCoroutine = StartCoroutine(EnumerateTackleSequence(isWinner));
     }
 
+    /// <summary>
+    /// Ends and resets any currently running animations on this agent
+    /// </summary>
     public virtual void EndAgentAnimation()
     {
         LeanTween.cancel(AgentView.AgentRoot.gameObject);
@@ -237,6 +264,10 @@ public abstract class Agent : MonoBehaviour
         TurnHead(0f, 0f);
     }
 
+    /// <summary>
+    /// Set up two agents for the start of an attack animation.
+    /// Ends movement, animations etc. and makes them look at each other
+    /// </summary>
     protected void SetupAttack(Agent a, Agent b)
     {
         // End any current animations on the agents first

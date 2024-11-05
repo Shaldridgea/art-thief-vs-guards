@@ -96,6 +96,7 @@ public static class BehaviourTreeFactory
             Consts.BehaviourType.CanAttackThief => new CanAttackThief(tree),
             Consts.BehaviourType.AttackThief => new AttackThief(tree),
             Consts.BehaviourType.TurnBody => new TurnBody(tree, dataNode.GetParameters()),
+            Consts.BehaviourType.LockVariable => new LockVariable(tree, dataNode.GetParameters()),
             _ => null,
         };
     }

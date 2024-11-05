@@ -212,8 +212,7 @@ public abstract class SensoryModule : MonoBehaviour
     /// </summary>
     protected List<GameObject> FindNearbyInterests(string interestTag)
     {
-        Collider[] nearbyInterests =
-        Physics.OverlapSphere(
+        Collider[] nearbyInterests = Physics.OverlapSphere(
         transform.position,
         INTEREST_RADIUS,
         interestMask,
@@ -231,10 +230,12 @@ public abstract class SensoryModule : MonoBehaviour
                 // Don't add ourselves to our interests
                 // and don't add duplicates
                 if (addObject == owner.gameObject || desiredInterests.Contains(addObject))
-                    shouldAdd = false;
-                else if(addObject.TryGetComponent<SenseInterest>(out var interest))
                 {
-                    if(interest.Owner != null)
+                    shouldAdd = false;
+                }
+                else if (addObject.TryGetComponent<SenseInterest>(out var interest))
+                {
+                    if (interest.Owner != null)
                         addObject = interest.Owner;
 
                     // If we found an actual sense interest, don't add

@@ -55,6 +55,9 @@ public class SimulationHUD : MonoBehaviour
     private GameObject contextMenu;
 
     [SerializeField]
+    private Button monitorGlobalButton;
+
+    [SerializeField]
     private Button monitorBoardButton;
 
     [SerializeField]
@@ -70,6 +73,7 @@ public class SimulationHUD : MonoBehaviour
     {
         // Setup listener callbacks for all the UI
         simulationSpeedSlider.onValueChanged.AddListener(HandleSpeedSliderChange);
+        monitorGlobalButton.onClick.AddListener(HandleMonitorGlobalBlackboard);
         monitorBoardButton.onClick.AddListener(HandleMonitorBlackboard);
         monitorAgentButton.onClick.AddListener(HandleMonitorAgent);
         changeCameraLeftButton.onClick.AddListener(HandleChangeCameraLeft);
@@ -94,10 +98,16 @@ public class SimulationHUD : MonoBehaviour
         speedText.text = $"Simulation speed: {newValue}x";
     }
 
+    private void HandleMonitorGlobalBlackboard()
+    {
+        blackboardView.SetActive(true);
+        blackboardView.GetComponent<BlackboardView>().SetTarget(GameController.Instance.GlobalBlackboard);
+    }
+
     private void HandleMonitorBlackboard()
     {
         blackboardView.SetActive(true);
-        blackboardView.GetComponent<BlackboardView>().SetTarget(contextAgentTarget);
+        blackboardView.GetComponent<BlackboardView>().SetTarget(contextAgentTarget.AgentBlackboard);
     }
 
     private void HandleMonitorAgent()

@@ -8,10 +8,21 @@ using UnityEngine;
 /// </summary>
 public class Blackboard
 {
-    private Dictionary<string, object> variablesDict = new Dictionary<string, object>();
+    private Dictionary<string, object> variablesDict = new();
+
+    private Dictionary<string, float> lockTimerDict = new();
 
     public void SetVariable<T>(string variableName, T newValue)
     {
+        if(lockTimerDict.ContainsKey(variableName))
+        {
+            float endTime = lockTimerDict[variableName];
+            if (Time.time >= endTime)
+                lockTimerDict.Remove(variableName);
+            else
+                return;
+        }
+
         variablesDict[variableName] = newValue;
     }
 
@@ -21,6 +32,11 @@ public class Blackboard
             return (T)val;
         else
             return default;
+    }
+
+    public void LockVariable(string keyName, float lockTimer)
+    {
+        lockTimerDict[keyName] = Time.time + lockTimer;
     }
 
     public Dictionary<string, object> GetData() => variablesDict;

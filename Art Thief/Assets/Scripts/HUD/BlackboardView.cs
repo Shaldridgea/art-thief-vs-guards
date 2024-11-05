@@ -18,7 +18,7 @@ public class BlackboardView : MonoBehaviour
     [SerializeField]
     private GameObject lineBreakTemplate;
 
-    private Agent target;
+    private Blackboard target;
 
     private List<GameObject> entries = new();
 
@@ -29,14 +29,14 @@ public class BlackboardView : MonoBehaviour
         UpdateView();
     }
 
-    public void SetTarget(Agent newTarget) => target = newTarget;
+    public void SetTarget(Blackboard newTarget) => target = newTarget;
 
     private void UpdateView()
     {
         if (target == null)
             return;
 
-        Blackboard board = target.AgentBlackboard;
+        Blackboard board = target;
         var allData = board.GetData();
 
         int i = 0;

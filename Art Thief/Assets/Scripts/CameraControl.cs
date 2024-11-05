@@ -54,7 +54,7 @@ public class CameraControl : MonoBehaviour
 
     void LateUpdate()
     {
-        // Control the camera while holding down right click
+        // Toggle controlling camera while holding down right click
         if (Input.GetMouseButtonDown(1) && !controllingCamera)
         {
             Cursor.visible = false;
@@ -84,7 +84,6 @@ public class CameraControl : MonoBehaviour
 
     private void UpdateFreeCam()
     {
-        // Moving camera around
         Vector3 movementVector = new Vector3(
             Input.GetAxisRaw("FreeCam_X"), Input.GetAxisRaw("FreeCam_Y"), Input.GetAxisRaw("FreeCam_Z")).normalized;
 
@@ -93,15 +92,15 @@ public class CameraControl : MonoBehaviour
         {
             cam.transform.position += camSpeed * Time.unscaledDeltaTime * cam.transform.TransformVector(movementVector);
 
-            // Clamp how far away we can be from the level as to not fly too far away and get lost
             Vector3 vectorFromMiddle = cam.transform.position - Level.Instance.LevelMiddlePoint;
 
+            // We don't want the free cam to fly away from the level and get lost forever,
+            // so clamp how far it can be from the middle of the level
             if (vectorFromMiddle.magnitude > maxCameraDistanceFromMiddle)
                 cam.transform.position = Level.Instance.LevelMiddlePoint +
                     Vector3.ClampMagnitude(vectorFromMiddle, maxCameraDistanceFromMiddle);
         }
 
-        // Turning camera
         if (controllingCamera)
         {
             Vector3 turnVector =
@@ -113,7 +112,6 @@ public class CameraControl : MonoBehaviour
 
     private void UpdateOrbitingCam()
     {
-        // Rotate camera using the mouse
         if (controllingCamera)
         {
             orbitEuler += turnSensitivity * new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0f);
@@ -130,8 +128,9 @@ public class CameraControl : MonoBehaviour
 
         Vector3 thiefOrigin = CameraTarget.AgentView.AgentHeadRoot.position;
         float rayDistance = cameraDistance;
-        // Make a raycast out from the Agent's head to find any collision
-        // with the environment, so the camera will be pushed away from walls
+
+        // Don't want the camera to be clipping through walls,
+        // so make a raycast from the agent's head to push it away
         Vector3 orbitPoint = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
 
         if (Physics.Raycast(thiefOrigin, (orbitPoint - thiefOrigin).normalized,
@@ -140,10 +139,11 @@ public class CameraControl : MonoBehaviour
             rayDistance = Mathf.Max(info.distance - 0.1f, 0.05f);
         }
 
-        // If the gotten ray distance is further than current camera position,
-        // lerp the camera's distance and move it to the ray's distance smoothly
         if (rayDistance > cameraVector.z)
         {
+            // We lerp quickly if the camera is far away, and move it to the
+            // correct distance when it's much smaller/unnoticeable. We want the
+            // movement to be smooth but not be infinitely lerping
             if (Mathf.Abs(cameraVector.z - rayDistance) > 0.05f)
                 cameraVector.z = Mathf.Lerp(cameraVector.z, rayDistance, 4f * Time.unscaledDeltaTime);
             else
@@ -152,10 +152,11 @@ public class CameraControl : MonoBehaviour
         else // If our distance is closer to the agent we instantly change it so as to not clip through walls
             cameraVector.z = rayDistance;
 
-        // Move camera around the spy and make the camera look at the spy
         cam.transform.position = thiefOrigin + Quaternion.Euler(orbitEuler) * cameraVector;
         cam.transform.LookAt(thiefOrigin);
-        // Cache our camera's angle in the free cam's angles so it's the same when the camera mode changes
+
+        // Cache our camera's current angle in the free cam's angles so the
+        // camera angle doesn't snap when we change mode
         freeEuler = cam.transform.eulerAngles;
     }
 }

@@ -30,7 +30,7 @@ public class GuardAgent : Agent
     private float sprintDecayDelay = 5f;
 
     [SerializeField]
-    private VisualInterest stunnedVisualInterest;
+    private VisualInterest suspicionVisualFocus;
 
     [SerializeField]
     private Transform walkieTalkieTransform;
@@ -73,6 +73,10 @@ public class GuardAgent : Agent
         // Create our behaviour tree based on the graph blueprint provided
         agentTree = BehaviourTreeFactory.MakeTree(behaviourTreeGraph, this);
 
+        // Deactivate our torch collision at the start so we don't have
+        // issues if this agent is turned on and off when setting
+        // up the simulation, since OnTriggerExit isn't called
+        // when disabling a collider
         torchLight.SetActive(false);
 
         defaultAgentSpeed = navAgent.speed;
@@ -89,7 +93,7 @@ public class GuardAgent : Agent
 
         walkieTalkiePath = new LTBezierPath(points);
 
-        // Cache other angles for the walkie talkie animation
+        // Cache starting angles for the walkie talkie animation
         walkieStartAngles = walkieTalkieTransform.localEulerAngles;
         walkieStartPosition = walkieTalkieTransform.localPosition;
 
@@ -124,6 +128,9 @@ public class GuardAgent : Agent
     public void StartChaseSprint()
     {
         navAgent.speed += sprintSpeedIncrease;
+        // When starting a tween we can attach it to a specific GameObject for later
+        // cancelling it (generally a good idea). We attach this one to the body root
+        // because it is unused for any other tweens, so we can cancel this one safely
         LeanTween.value(agentView.AgentBodyRoot.gameObject, navAgent.speed, defaultAgentSpeed, sprintDecayTime)
             .setOnUpdate((f) => navAgent.speed = f).setDelay(sprintDecayDelay);
     }
@@ -189,10 +196,8 @@ public class GuardAgent : Agent
 
     public override void AttackAgent(Agent targetAgent)
     {
-        // If thief is going to attack back
         if(targetAgent.CanAttackBack(this))
         {
-            // Decide if we win this struggle or the thief does
             bool winnerIsMe = false;
             if(CanWinStruggle())
             {
@@ -206,12 +211,13 @@ public class GuardAgent : Agent
             SetupAttack(this, targetAgent);
             PlayStruggleSequence(winnerIsMe);
             targetAgent.PlayStruggleSequence(!winnerIsMe);
-            // Mark everyone as interacting and disable agent logic to not interrupt attack
+            // Mark everyone as interacting, which is used elsewhere to avoid
+            // interrupting whatever is going on
             AgentBlackboard.SetVariable("isInteracting", true);
             targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
             targetAgent.DeactivateAgent();
         }
-        else // If thief can't attack back then we tackle them
+        else
         {
             // If a guard was already attacking the thief,
             // end the animations on that guard
@@ -226,7 +232,8 @@ public class GuardAgent : Agent
             targetAgent.transform.Rotate(Vector3.up, 180f);
             PlayTackleSequence(true);
             targetAgent.PlayTackleSequence(false);
-            // Mark everyone as interacting and disable agent logic to not interrupt attack
+            // Mark everyone as interacting, which is used elsewhere to avoid
+            // interrupting whatever is going on
             AgentBlackboard.SetVariable("isInteracting", true);
             targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
             targetAgent.DeactivateAgent();
@@ -245,14 +252,14 @@ public class GuardAgent : Agent
     }
     #endregion
 
-    public void EnableStunnedSuspicionFocus()
+    public void EnableSuspicionFocus()
     {
-        stunnedVisualInterest.gameObject.SetActive(true);
+        suspicionVisualFocus.SetSuspicious(true);
     }
 
-    public void DisableStunnedSuspicionFocus()
+    public void DisableSuspicionFocus()
     {
-        stunnedVisualInterest.gameObject.SetActive(false);
+        suspicionVisualFocus.SetSuspicious(false);
     }
 
     [Button("Test head turn", EButtonEnableMode.Playmode)]

@@ -681,6 +681,7 @@ MonoBehaviour:
     - childNodes 1
     - childNodes 2
     - childNodes 3
+    - childNodes 4
     values:
     - _fieldName: parentNode
       _node: {fileID: -8641600191048322796}
@@ -711,7 +712,7 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=b77a5c561934e089
       connections:
       - fieldName: parentNode
-        node: {fileID: 2390687824899577244}
+        node: {fileID: -1694431870644346178}
         reroutePoints: []
       _direction: 1
       _connectionType: 1
@@ -724,7 +725,7 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=b77a5c561934e089
       connections:
       - fieldName: parentNode
-        node: {fileID: 1984650016347293141}
+        node: {fileID: 2390687824899577244}
         reroutePoints: []
       _direction: 1
       _connectionType: 1
@@ -737,13 +738,26 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=b77a5c561934e089
       connections:
       - fieldName: parentNode
-        node: {fileID: -1694431870644346178}
+        node: {fileID: 1984650016347293141}
         reroutePoints: []
       _direction: 1
       _connectionType: 1
       _typeConstraint: 0
       _dynamic: 1
     - _fieldName: childNodes 3
+      _node: {fileID: -8641600191048322796}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: 4715872256508300625}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+    - _fieldName: childNodes 4
       _node: {fileID: -8641600191048322796}
       _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
         Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
@@ -2378,7 +2392,7 @@ MonoBehaviour:
   m_Name: Set Variable
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 136, y: 88}
+  position: {x: 232, y: 8}
   ports:
     keys:
     - parentNode
@@ -2735,7 +2749,7 @@ MonoBehaviour:
       _typeConstraint: 0
       _dynamic: 0
   type: 21
-  methodName: EnableStunnedSuspicionFocus
+  methodName: EnableSuspicionFocus
 --- !u!114 &-5679778095087155379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2962,7 +2976,7 @@ MonoBehaviour:
       _typeConstraint: 0
       _dynamic: 0
   type: 21
-  methodName: DisableStunnedSuspicionFocus
+  methodName: DisableSuspicionFocus
 --- !u!114 &-5260818694647854776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4353,7 +4367,7 @@ MonoBehaviour:
   m_Name: Set Variable
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 3272, y: 1112}
+  position: {x: 3272, y: 1256}
   ports:
     keys:
     - parentNode
@@ -4363,7 +4377,7 @@ MonoBehaviour:
       _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
       connections:
-      - fieldName: childNodes 4
+      - fieldName: childNodes 5
         node: {fileID: 1324473585299654728}
         reroutePoints: []
       _direction: 0
@@ -5182,7 +5196,7 @@ MonoBehaviour:
   m_Name: Invert
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -376, y: -24}
+  position: {x: -392, y: -200}
   ports:
     keys:
     - parentNode
@@ -5193,7 +5207,7 @@ MonoBehaviour:
       _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
       connections:
-      - fieldName: childNodes 2
+      - fieldName: childNodes 0
         node: {fileID: -8641600191048322796}
         reroutePoints: []
       _direction: 0
@@ -5729,6 +5743,40 @@ MonoBehaviour:
   source: 0
   sourceKey: artList
   destinationKey: artGoal
+--- !u!114 &-939059530035036908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02872d9d26ef2104aa64d4e1d1e120c1, type: 3}
+  m_Name: Lock Variable
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 5832, y: 1160}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: -939059530035036908}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 3
+        node: {fileID: 2519968320590124304}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 28
+  source: 0
+  lockKey: ignoreReport
+  lockLength: 5
 --- !u!114 &-923367304013311042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5833,7 +5881,7 @@ MonoBehaviour:
   m_Name: Copy Variables
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -376, y: 152}
+  position: {x: -152, y: 520}
   ports:
     keys:
     - parentNode
@@ -5843,7 +5891,7 @@ MonoBehaviour:
       _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
       connections:
-      - fieldName: childNodes 3
+      - fieldName: childNodes 4
         node: {fileID: -8641600191048322796}
         reroutePoints: []
       _direction: 0
@@ -6454,6 +6502,9 @@ MonoBehaviour:
   - {fileID: 206359413472226352}
   - {fileID: -8394168876075896567}
   - {fileID: 4475903302687459820}
+  - {fileID: 5230495055298174564}
+  - {fileID: -939059530035036908}
+  - {fileID: 4715872256508300625}
 --- !u!114 &49844048344453605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7379,6 +7430,7 @@ MonoBehaviour:
     - childNodes 2
     - childNodes 3
     - childNodes 4
+    - childNodes 5
     values:
     - _fieldName: parentNode
       _node: {fileID: 1324473585299654728}
@@ -7455,6 +7507,19 @@ MonoBehaviour:
       _typeConstraint: 0
       _dynamic: 1
     - _fieldName: childNodes 4
+      _node: {fileID: 1324473585299654728}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: 5230495055298174564}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+    - _fieldName: childNodes 5
       _node: {fileID: 1324473585299654728}
       _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
         Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
@@ -7689,7 +7754,7 @@ MonoBehaviour:
   m_Name: Sequence
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -152, y: -40}
+  position: {x: -152, y: -232}
   ports:
     keys:
     - parentNode
@@ -7781,7 +7846,7 @@ MonoBehaviour:
   type: 9
   source: 0
   checkConditions:
-  - susDistance > 14.0
+  - susDistance > 3.0
 --- !u!114 &1852425988990131202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7871,7 +7936,7 @@ MonoBehaviour:
   m_Name: Set Variable
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -152, y: -248}
+  position: {x: -152, y: 136}
   ports:
     keys:
     - parentNode
@@ -7884,7 +7949,7 @@ MonoBehaviour:
       - fieldName: childNodes 1
         node: {fileID: -8641600191048322796}
         reroutePoints: []
-      - fieldName: childNodes 1
+      - fieldName: childNodes 2
         node: {fileID: -8641600191048322796}
         reroutePoints: []
       _direction: 0
@@ -8019,7 +8084,7 @@ MonoBehaviour:
   m_Name: Condition
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: -344, y: -408}
+  position: {x: -152, y: -40}
   ports:
     keys:
     - parentNode
@@ -8032,7 +8097,7 @@ MonoBehaviour:
       - fieldName: childNodes 0
         node: {fileID: -8641600191048322796}
         reroutePoints: []
-      - fieldName: childNodes 0
+      - fieldName: childNodes 1
         node: {fileID: -8641600191048322796}
         reroutePoints: []
       _direction: 0
@@ -8100,6 +8165,7 @@ MonoBehaviour:
     - childNodes 0
     - childNodes 1
     - childNodes 2
+    - childNodes 3
     values:
     - _fieldName: parentNode
       _node: {fileID: 2519968320590124304}
@@ -8160,6 +8226,19 @@ MonoBehaviour:
       connections:
       - fieldName: parentNode
         node: {fileID: -6822123483201949636}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 0
+      _dynamic: 1
+    - _fieldName: childNodes 3
+      _node: {fileID: 2519968320590124304}
+      _typeQualifiedName: System.Collections.Generic.List`1[[BTGraphNode+Empty, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+        Culture=neutral, PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: parentNode
+        node: {fileID: -939059530035036908}
         reroutePoints: []
       _direction: 1
       _connectionType: 1
@@ -10527,6 +10606,40 @@ MonoBehaviour:
   type: 0
   childNodes: []
   randomise: 0
+--- !u!114 &4715872256508300625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34a3ad048b6f57843bee12f926e3841c, type: 3}
+  m_Name: Condition
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -152, y: 344}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: 4715872256508300625}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 3
+        node: {fileID: -8641600191048322796}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 9
+  source: 0
+  checkConditions:
+  - guardMode != "chase"
 --- !u!114 &4960294426594362634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10714,6 +10827,40 @@ MonoBehaviour:
   pointKey: chasePoint
   offset: {x: 0, y: 0, z: 0}
   offsetSpace: 0
+--- !u!114 &5230495055298174564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02872d9d26ef2104aa64d4e1d1e120c1, type: 3}
+  m_Name: Lock Variable
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 3272, y: 1112}
+  ports:
+    keys:
+    - parentNode
+    values:
+    - _fieldName: parentNode
+      _node: {fileID: 5230495055298174564}
+      _typeQualifiedName: BTGraphNode+Empty, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      connections:
+      - fieldName: childNodes 4
+        node: {fileID: 1324473585299654728}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 0
+      _typeConstraint: 0
+      _dynamic: 0
+  type: 28
+  source: 1
+  lockKey: applyReport
+  lockLength: 0.5
 --- !u!114 &5291474348649193764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12646,7 +12793,7 @@ MonoBehaviour:
       _dynamic: 0
   type: 12
   pathType: 2
-  pointType: 0
+  pointType: 1
   variableName: myNextPoint
   roomPointKey: lastKnownPoint
 --- !u!114 &8024372029174963847
@@ -13606,7 +13753,7 @@ MonoBehaviour:
   m_Name: Condition
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 136, y: -88}
+  position: {x: 232, y: -168}
   ports:
     keys:
     - parentNode

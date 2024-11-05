@@ -230,15 +230,36 @@ public class SuspicionModule : MonoBehaviour
             }
             else
             {
+                // If we see another guard that's chasing the thief, we want to immediately
+                // respond to that and give chase as well. This isn't an ideal way of doing it
+                // but using the suspicion focus guards have already and swapping out our passed
+                // interest for the thief instead, we'll near instantly give chase
+                bool spottedChasingGuard = false;
+                if(newInterest.OwnerTeam == Consts.Team.GUARD)
+                {
+                    if(newInterest.Owner.TryGetComponent(out Agent agent))
+                    {
+                        if(agent.AgentBlackboard.GetVariable<string>("guardMode") == "chase" &&
+                            !agent.AgentBlackboard.GetVariable<bool>("isStunned"))
+                        {
+                            newInterest = Level.Instance.Thief.GetComponentInChildren<VisualInterest>();
+                            spottedChasingGuard = true;
+                            SetSuspicion(newInterest);
+                        }
+                    }
+                }
+
                 // Add/update a visual interest as being visible
                 if (visualSuspectMap.TryGetValue(newInterest, out var value))
                 {
                     value.Visible = true;
+                    if (spottedChasingGuard)
+                        value.Awareness = 2f;
                     visualSuspectMap[newInterest] = value;
                 }
                 else
                 {
-                    visualSuspectMap[newInterest] = (true, 0f);
+                    visualSuspectMap[newInterest] = (true, spottedChasingGuard ? 2f : 0f);
                     visualSuspectList.Add(newInterest);
                 }
             }
@@ -274,6 +295,11 @@ public class SuspicionModule : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Show the passed marker as being the active marker over the agent's
+    /// head displaying their current awareness state
+    /// </summary>
+    /// <param name="marker">Question mark or exclamation mark object marker</param>
     private void ShowAwarenessMarker(GameObject marker)
     {
         LeanTween.cancel(guardMarkerCanvas);
@@ -284,6 +310,9 @@ public class SuspicionModule : MonoBehaviour
             exclamationIcon.SetActive(false);
     }
 
+    /// <summary>
+    /// Hide the floating awareness marker after a few seconds delay
+    /// </summary>
     private void HideAwarenessMarker()
     {
         LeanTween.cancel(guardMarkerCanvas);
