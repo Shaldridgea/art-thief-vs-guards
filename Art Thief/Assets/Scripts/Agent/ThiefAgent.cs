@@ -63,13 +63,13 @@ public class ThiefAgent : Agent
         foreach(var g in guards)
         {
             // Ignore guards who aren't a threat to us
-            if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
+            if (g.AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
                 continue;
 
             ++guardThreats;
             bool seenByGuard = g.GuardSenses.IsSeen(transform.position);
             float distanceToGuard = Vector3.Distance(transform.position, g.transform.position);
-            bool isGuardChasing = g.AgentBlackboard.GetVariable<string>("guardMode") == "chase";
+            bool isGuardChasing = g.IsInChase();
             // Add more danger the closer a guard is to us
             danger += Mathf.InverseLerp(dangerDistanceMax, dangerDistanceMin, distanceToGuard);
 
@@ -111,7 +111,7 @@ public class ThiefAgent : Agent
         danger += guardThreats * 0.1f;
 
         // Reflect being chased in our blackboard and increase our danger significantly if so
-        AgentBlackboard.SetVariable("inChase", beingChased);
+        AgentBlackboard.SetVariable(Consts.THIEF_CHASE_STATUS, beingChased);
         if (beingChased)
             danger += 1f;
 
@@ -133,7 +133,7 @@ public class ThiefAgent : Agent
     private void LateUpdate()
     {
         // Guards win the simulation if thief is stunned
-        if (AgentBlackboard.GetVariable<bool>("isStunned"))
+        if (AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
         {
             GameController.Instance.EndGame(Consts.Team.GUARD);
             enabled = false;
@@ -235,8 +235,8 @@ public class ThiefAgent : Agent
             PlayStruggleSequence(winnerIsMe);
             targetAgent.PlayStruggleSequence(!winnerIsMe);
             // Mark everyone as interacting and disable agent logic to not interrupt attack
-            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
-            AgentBlackboard.SetVariable("isInteracting", true);
+            targetAgent.AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
+            AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
             DeactivateAgent();
         }
     }

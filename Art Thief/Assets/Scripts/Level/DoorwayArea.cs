@@ -55,7 +55,7 @@ public class DoorwayArea : MonoBehaviour
             GuardAgent guard = threats[i];
 
             // Stunned guards aren't a threat to us
-            if (guard.AgentBlackboard.GetVariable<bool>("isStunned"))
+            if (guard.AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
                 continue;
 
             ++threatCount;

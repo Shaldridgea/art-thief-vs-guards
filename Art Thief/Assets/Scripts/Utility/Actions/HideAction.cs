@@ -72,7 +72,7 @@ public class HideAction : UtilityAction
 
         ThiefSensoryModule senses = thief.ThiefSenses;
 
-        bool beingChased = thief.AgentBlackboard.GetVariable<bool>("inChase");
+        bool beingChased = thief.IsInChase();
         // Check if any of these areas are safe to go to, preferring closest first
         foreach (var (area, distance) in areaList)
         {
@@ -147,7 +147,7 @@ public class HideAction : UtilityAction
             GuardAgent guard = guardThreats[i];
 
             // Ignore stunned guards who aren't a threat to us
-            if (guard.AgentBlackboard.GetVariable<bool>("isStunned"))
+            if (guard.AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
                 continue;
 
             // Store our initial guard position before simulation

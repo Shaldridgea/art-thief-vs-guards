@@ -157,7 +157,7 @@ public abstract class Agent : MonoBehaviour
     private IEnumerator MakeWalkingSound()
     {
         while(Vector3.Distance(transform.position, navAgent.destination) > 1f &&
-            !AgentBlackboard.GetVariable<bool>("isInteracting"))
+            !AgentBlackboard.GetVariable<bool>(Consts.AGENT_INTERACT_STATUS))
         {
             walkingSound.PlaySound();
             yield return new WaitForSeconds(walkSoundInterval);
@@ -215,6 +215,12 @@ public abstract class Agent : MonoBehaviour
 
     public bool IsTweeningHead() => LeanTween.isTweening(AgentView.AgentHeadRoot.gameObject);
 
+    public bool IsInChase()
+    {
+        return AgentBlackboard.GetVariable<string>(Consts.GUARD_MODE_STATUS) == Consts.GUARD_CHASE_MODE
+           || AgentBlackboard.GetVariable<bool>(Consts.THIEF_CHASE_STATUS);
+    }
+
     #region ATTACKING
     /// <summary>
     /// Whether this agent is allowed to attack another agent
@@ -222,7 +228,7 @@ public abstract class Agent : MonoBehaviour
     /// <returns></returns>
     public virtual bool CanAttackEnemy()
     {
-        return !AgentBlackboard.GetVariable<bool>("isInteracting");
+        return !AgentBlackboard.GetVariable<bool>(Consts.AGENT_INTERACT_STATUS);
     }
 
     /// <summary>
@@ -310,10 +316,10 @@ public abstract class Agent : MonoBehaviour
         yield return new WaitForSeconds(3f);
         PlayStruggleOutcomeAnimation(isWinner);
         yield return new WaitForSeconds(1f);
-        AgentBlackboard.SetVariable("isInteracting", false);
+        AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, false);
         if (!isWinner)
         {
-            AgentBlackboard.SetVariable("isStunned", true);
+            AgentBlackboard.SetVariable(Consts.AGENT_STUN_STATUS, true);
             GameEventLog.Log($"{name} lost the struggle!");
         }
         else
@@ -348,10 +354,10 @@ public abstract class Agent : MonoBehaviour
     {
         PlayTackleAnimation(isWinner);
         yield return new WaitForSeconds(1.6f);
-        AgentBlackboard.SetVariable("isInteracting", false);
+        AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, false);
         if (!isWinner)
         {
-            AgentBlackboard.SetVariable("isStunned", true);
+            AgentBlackboard.SetVariable(Consts.AGENT_STUN_STATUS, true);
             GameEventLog.Log($"{name} was tackled to the floor!");
         }
         else

@@ -127,10 +127,12 @@ public class SimulationHUD : MonoBehaviour
 
     private void HandleChangeCameraLeft()
     {
-        cameraTargetIndex = (cameraTargetIndex - 1) % cameraTargetList.Count - 1;
+        int count = cameraTargetList.Count;
+        // Modulo math to handle negative numbers
+        cameraTargetIndex = ((cameraTargetIndex - 1) % count + count) % count;
 
         while (!cameraTargetList[cameraTargetIndex].gameObject.activeSelf)
-            cameraTargetIndex = (cameraTargetIndex - 1) % cameraTargetList.Count - 1;
+            cameraTargetIndex = ((cameraTargetIndex - 1) % count + count) % count;
 
         GameController.Instance.CameraController.CameraTarget = cameraTargetList[cameraTargetIndex];
         cameraTargetNameText.text = GameController.Instance.CameraController.CameraTarget.name;

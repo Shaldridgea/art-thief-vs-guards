@@ -213,8 +213,8 @@ public class GuardAgent : Agent
             targetAgent.PlayStruggleSequence(!winnerIsMe);
             // Mark everyone as interacting, which is used elsewhere to avoid
             // interrupting whatever is going on
-            AgentBlackboard.SetVariable("isInteracting", true);
-            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
+            AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
+            targetAgent.AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
             targetAgent.DeactivateAgent();
         }
         else
@@ -234,8 +234,8 @@ public class GuardAgent : Agent
             targetAgent.PlayTackleSequence(false);
             // Mark everyone as interacting, which is used elsewhere to avoid
             // interrupting whatever is going on
-            AgentBlackboard.SetVariable("isInteracting", true);
-            targetAgent.AgentBlackboard.SetVariable("isInteracting", true);
+            AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
+            targetAgent.AgentBlackboard.SetVariable(Consts.AGENT_INTERACT_STATUS, true);
             targetAgent.DeactivateAgent();
         }
         GameEventLog.Log($"{name} started attacking the thief!");

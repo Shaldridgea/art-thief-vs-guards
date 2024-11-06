@@ -49,7 +49,7 @@ public class Room : MonoBehaviour
             var overlaps = Physics.OverlapBox(
                 transform.position + box.center,
                 box.size / 2f, Quaternion.identity,
-                LayerMask.GetMask("Default"),
+                LayerMask.GetMask("Doorway"),
                 QueryTriggerInteraction.Collide);
 
             if (overlaps.Length > 0)

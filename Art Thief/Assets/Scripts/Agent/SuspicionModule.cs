@@ -39,8 +39,6 @@ public class SuspicionModule : MonoBehaviour
 
     private GuardAgent owner;
 
-    private bool IsChasing => owner.AgentBlackboard.GetVariable<string>("guardMode") == "chase";
-
     void Start()
     {
         reactionTimer = -1f;
@@ -63,7 +61,7 @@ public class SuspicionModule : MonoBehaviour
         else if (reactionTimer > 0f)
             reactionTimer = Mathf.Max(reactionTimer - Time.deltaTime, 0f);
 
-        if (IsChasing)
+        if (owner.IsInChase())
             return;
 
         bool shouldResetInterest = false;
@@ -210,7 +208,7 @@ public class SuspicionModule : MonoBehaviour
 
     public bool OnSuspicionSensed(SenseInterest newInterest, Consts.SuspicionType suspicionType)
     {
-        if (IsChasing)
+        if (owner.IsInChase())
             return false;
 
         if (ignoreList.Contains(newInterest))
@@ -230,21 +228,23 @@ public class SuspicionModule : MonoBehaviour
             }
             else
             {
-                // If we see another guard that's chasing the thief, we want to immediately
+                // If we see a guard chasing or the thief being chased, we want to immediately
                 // respond to that and give chase as well. This isn't an ideal way of doing it
-                // but using the suspicion focus guards have already and swapping out our passed
-                // interest for the thief instead, we'll near instantly give chase
+                // but using the suspicion focus agents have already and forcing our suspicion
+                // to the thief means we'll near instantly give chase
                 bool spottedChasingGuard = false;
                 if(newInterest.OwnerTeam == Consts.Team.GUARD)
                 {
                     if(newInterest.Owner.TryGetComponent(out Agent agent))
                     {
-                        if(agent.AgentBlackboard.GetVariable<string>("guardMode") == "chase" &&
-                            !agent.AgentBlackboard.GetVariable<bool>("isStunned"))
+                        if(!agent.AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
                         {
-                            newInterest = Level.Instance.Thief.GetComponentInChildren<VisualInterest>();
-                            spottedChasingGuard = true;
-                            SetSuspicion(newInterest);
+                            if (agent.IsInChase())
+                            {
+                                newInterest = Level.Instance.Thief.GetComponentInChildren<VisualInterest>();
+                                spottedChasingGuard = true;
+                                SetSuspicion(newInterest);
+                            }
                         }
                     }
                 }

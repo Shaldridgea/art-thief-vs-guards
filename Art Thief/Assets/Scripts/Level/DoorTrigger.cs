@@ -40,7 +40,7 @@ public class DoorTrigger : MonoBehaviour
             return;
 
         // Check if our agent is in chase (thief only) and play the corresponding door opening sound
-        bool inChase = agent.AgentBlackboard.GetVariable<bool>("inChase");
+        bool inChase = agent.IsInChase();
         SoundInterest playSound;
         if (inChase)
             playSound = agent.DoorSlamSound;

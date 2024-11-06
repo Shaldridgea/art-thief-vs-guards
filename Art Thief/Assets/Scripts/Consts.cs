@@ -177,4 +177,18 @@ public static class Consts
         parsedVector = new Vector3(vectorComponents[0], vectorComponents[1], vectorComponents[2]);
         return true;
     }
+
+    public const string THIEF_CHASE_STATUS = "inChase";
+
+    public const string GUARD_PASSIVE_MODE = "passive";
+
+    public const string GUARD_ALERT_MODE = "alert";
+
+    public const string GUARD_CHASE_MODE = "chase";
+
+    public const string GUARD_MODE_STATUS = "guardMode";
+
+    public const string AGENT_STUN_STATUS = "isStunned";
+
+    public const string AGENT_INTERACT_STATUS = "isInteracting";
 }

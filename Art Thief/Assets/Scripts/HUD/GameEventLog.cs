@@ -23,7 +23,7 @@ public class GameEventLog : MonoBehaviour
 
     private int logCount;
 
-    private Queue<string> messageQueue = new();
+    private string lastMessage;
 
     private void Awake()
     {
@@ -68,10 +68,10 @@ public class GameEventLog : MonoBehaviour
     private void LogMessage(string newLogMessage)
     {
         // We're not interested in potential duplicate messages clogging up the feed
-        if (messageQueue.Count > 0 && messageQueue.Peek() == newLogMessage)
+        if (lastMessage == newLogMessage)
             return;
 
-        messageQueue.Enqueue(newLogMessage);
+        lastMessage = newLogMessage;
 
         Transform logParent = logTemplate.transform.parent;
         TextMeshProUGUI newLog = logPool.GetFromPool();
@@ -90,7 +90,6 @@ public class GameEventLog : MonoBehaviour
             // Return the oldest message entry boxes to our pool
             // so they can be gotten again for new entries
             logPool.ReturnToPool(logParent.GetChild(i + 1).gameObject);
-            messageQueue.Dequeue();
             --logCount;
             ++i;
         }

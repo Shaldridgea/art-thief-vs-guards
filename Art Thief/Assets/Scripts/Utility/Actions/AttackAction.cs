@@ -22,7 +22,7 @@ public class AttackAction : UtilityAction
         float beatDistance = float.MaxValue;
         foreach(var g in guards)
         {
-            if (g.AgentBlackboard.GetVariable<bool>("isStunned"))
+            if (g.AgentBlackboard.GetVariable<bool>(Consts.AGENT_STUN_STATUS))
                 continue;
 
             float angleToGuard = Vector3.Angle(thief.transform.forward,
