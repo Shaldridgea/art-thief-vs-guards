@@ -1,0 +1,25 @@
+ASSET CREDITS
+
+Models:
+Bronze sculpture	https://blendswap.com/blend/31203
+Dolphin statue	https://blendswap.com/blend/20710
+Cat figurine	https://blendswap.com/blend/18877
+Abstract birds statue	https://blendswap.com/blend/30796
+Modern art sculpture	https://blendswap.com/blend/15788
+Abstract art paintings	https://opengameart.org/content/abstract-art
+30 medieval paintings	https://opengameart.org/content/30-authentic-medieval-or-least-old-paintings
+Frame with painting	https://opengameart.org/content/frame-with-paintingvan-gogh
+Victorian painting frame	https://opengameart.org/content/victorian-frame-painting
+Landscape oil paintings	https://opengameart.org/content/oil-painting-landscapes
+Beige wall texture	https://polyhaven.com/a/beige_wall_001
+Wooden floor texture	https://polyhaven.com/a/wood_floor_worn
+City at night HDR skybox	https://polyhaven.com/a/hansaplatz
+Toilet model	https://opengameart.org/content/bathroom
+Walkie talkie model	https://www.freepik.com/3d-model/walkie-talkie-001_4331.htm
+Information icon	https://www.flaticon.com/free-icon/info_665049?term=information&page=1&position=4&origin=tag&related_id=665049
+
+Sounds:
+Guard footsteps	https://freesound.org/people/florianreichelt/sounds/459965/
+Thief footsteps	https://freesound.org/people/Fission9/sounds/521589/
+Door open and close	https://freesound.org/people/Profispiesser/sounds/583214/
+Door slam	https://freesound.org/people/NachtmahrTV/sounds/571797/
