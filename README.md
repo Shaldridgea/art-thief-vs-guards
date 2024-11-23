@@ -8,6 +8,15 @@ Assets taken from online are credited in the [credits file](Asset%20Credits.txt)
 
 A playable web build is available to view here: [Link](https://shaldridgea.github.io/art-thief-vs-guards)
 
+Notable features and systems:
+- A simulation customisation menu for tweaking starting parameters
+- Utility system AI that autonomously navigates and avoids enemies while attempting to fulfill its goal
+- Behaviour tree system with a graphical node editor UI in Unity
+- In-depth behaviour trees for the guards with unique behaviour and patrols per-guard
+- Sensory systems for agents that detect sound as well as taking into account lighting
+- Suspicion system for guards to notice, raise awareness, and detect the thief and their actions
+- Runtime visualisation and views for agent data and the AI systems running them
+
 Controls:
 - Left click agents in view to see options for them
 - Hold right click to control the camera. While controlling it;
